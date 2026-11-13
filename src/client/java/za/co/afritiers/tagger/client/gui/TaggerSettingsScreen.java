@@ -64,12 +64,12 @@ public final class TaggerSettingsScreen extends Screen {
         field.setHint(Component.literal(compact ? "Tier colours" : "Default tier colours").withColor(TaggerWidgets.MUTED));
         field.setTextColor(0xFFE8ECE9);
         field.setResponder(value -> { draft.customColour = value; updatePreview(); if (validationError.isEmpty()) persist(); });
-        field.setTooltip(Tooltip.create(Component.literal("Optional six-digit hex colour, for example FFD700. Leave blank for gold, silver, bronze and purple. Icons keep their own colours.")));
+        field.setTooltip(TaggerFonts.tooltip(Component.literal("Optional six-digit hex colour, for example FFD700. Leave blank for gold, silver, bronze and purple. Icons keep their own colours.")));
         colour.addChild(field);
         appearance.addChild(colour);
         var source = new TaggerWidgets.Action("Tierlist: " + AfriTiersClient.instance().selectedProvider().label() + " >",
                 columnWidth, 26, false, pressed -> minecraft.gui.setScreen(new TierlistsScreen(this)));
-        source.setTooltip(Tooltip.create(Component.literal("Choose the source for Tab and nametag tiers.")));
+        source.setTooltip(TaggerFonts.tooltip(Component.literal("Choose the source for Tab and nametag tiers.")));
         appearance.addChild(source);
         LinearLayout controls = columns ? LinearLayout.horizontal().spacing(12) : LinearLayout.vertical().spacing(12);
         controls.addChild(display);
@@ -82,19 +82,19 @@ public final class TaggerSettingsScreen extends Screen {
         scroll.visitWidgets(this::addRenderableWidget);
 
         Button previous = new TaggerWidgets.Action("<", 16, 16, false, pressed -> cyclePreview(-1));
-        previous.setTooltip(Tooltip.create(Component.literal("Previous preview tier")));
+        previous.setTooltip(TaggerFonts.tooltip(Component.literal("Previous preview tier")));
         previous.setPosition(panelX + panelWidth - 50, panelY + (compact ? 38 : 48) + navigationOffset);
         addRenderableWidget(previous);
         Button next = new TaggerWidgets.Action(">", 16, 16, false, pressed -> cyclePreview(1));
-        next.setTooltip(Tooltip.create(Component.literal("Next preview tier")));
+        next.setTooltip(TaggerFonts.tooltip(Component.literal("Next preview tier")));
         next.setPosition(panelX + panelWidth - 30, panelY + (compact ? 38 : 48) + navigationOffset);
         addRenderableWidget(next);
         Button refresh = TaggerWidgets.action("Refresh", 52, false, pressed -> feedback = AfriTiersClient.instance().repository().refresh());
-        refresh.setTooltip(Tooltip.create(Component.literal("Refresh rankings using your saved settings.")));
+        refresh.setTooltip(TaggerFonts.tooltip(Component.literal("Refresh rankings using your saved settings.")));
         refresh.setPosition(panelX + panelWidth - 122, panelY + panelHeight - (compact ? 49 : 69));
         addRenderableWidget(refresh);
         Button details = TaggerWidgets.action("Details", 52, false, pressed -> minecraft.gui.setScreen(new ConnectionDetailsScreen(this)));
-        details.setTooltip(Tooltip.create(Component.literal("Connection, freshness and username matching details")));
+        details.setTooltip(TaggerFonts.tooltip(Component.literal("Connection, freshness and username matching details")));
         details.setPosition(panelX + panelWidth - 64, panelY + panelHeight - (compact ? 49 : 69));
         addRenderableWidget(details);
         Button reset = TaggerWidgets.action("Reset", 52, false, pressed -> {
@@ -103,7 +103,7 @@ public final class TaggerSettingsScreen extends Screen {
             persist();
             rebuildWidgets();
         });
-        reset.setTooltip(Tooltip.create(Component.literal("Restore and save default settings")));
+        reset.setTooltip(TaggerFonts.tooltip(Component.literal("Restore and save default settings")));
         reset.setPosition(panelX + 12, panelY + panelHeight - (compact ? 27 : 30));
         addRenderableWidget(reset);
         Button done = TaggerWidgets.action("Done", 80, true, pressed -> onClose());
@@ -149,7 +149,7 @@ public final class TaggerSettingsScreen extends Screen {
                 Tier.ORDER.get(previewTier), false), sample)).append(minecraft.getUser().getName());
         if (colourField != null) {
             colourField.setTextColor(validationError.isEmpty() ? TaggerWidgets.TEXT : 0xFFE0BE83);
-            if (!previousError.equals(validationError)) colourField.setTooltip(Tooltip.create(Component.literal(validationError.isEmpty()
+            if (!previousError.equals(validationError)) colourField.setTooltip(TaggerFonts.tooltip(Component.literal(validationError.isEmpty()
                     ? "Leave blank for tier colours, or enter a six-digit hex colour." : validationError)));
         }
     }
@@ -175,7 +175,7 @@ public final class TaggerSettingsScreen extends Screen {
     @Override public void tick() { updatePreview(); }
 
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        frame.draw(g, "Display settings");
+        frame.draw(g, "Settings");
         int x = panelX + 12, y = panelY + (compact ? 34 : 42) + navigationOffset, w = panelWidth - 24;
         int previewHeight = compact ? 36 : 50;
         TaggerWidgets.surface(g, x, y, w, previewHeight, 3, 0xFF111111, TaggerWidgets.LINE);

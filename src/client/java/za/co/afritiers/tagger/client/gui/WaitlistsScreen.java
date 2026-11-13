@@ -110,13 +110,13 @@ public final class WaitlistsScreen extends Screen {
         if (!knownModes.containsAll(state.snapshot().entries().keySet())) { rebuildWidgets(); return; }
         if (lastState != state) {
             lastState = state;
-            modeToggles.forEach((mode, toggle) -> toggle.setTooltip(Tooltip.create(Component.empty()
+            modeToggles.forEach((mode, toggle) -> toggle.setTooltip(TaggerFonts.tooltip(Component.empty()
                     .append(ModeIcons.component(mode)).append(" " + Tier.modeLabel(mode) + ": " + queueStatus(mode) + ". Notify once per opening."))));
         }
     }
 
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        frame.draw(g, "Waitlist notifications");
+        frame.draw(g, "Waitlists");
         g.text(font, font.plainSubstrByWidth("AfriTiers alerts · independent of your selected tierlist.", w - 24), x + 12, y + 43 + navigationOffset, TaggerWidgets.MUTED);
         String summary = config.waitlistModes.size() + " watched · " + (config.waitlistNotifications ? "one alert per opening" : "notifications paused");
         g.text(font, font.plainSubstrByWidth(summary, w - 24), x + 12, y + 94 + navigationOffset, TaggerWidgets.GREEN);

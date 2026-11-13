@@ -70,7 +70,7 @@ final class ConnectionDetailsScreen extends Screen {
         for (int i = 0; i < values.size(); i++) {
             String line = lines.get(i);
             values.get(i).setMessage(Component.literal(font.plainSubstrByWidth(line, w - 44)).withColor(TaggerWidgets.MUTED));
-            values.get(i).setTooltip(Tooltip.create(Component.literal(line)));
+            values.get(i).setTooltip(TaggerFonts.tooltip(Component.literal(line)));
         }
     }
 
