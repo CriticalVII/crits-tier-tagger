@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.1.0 — 2026-11-13
+
+### GUI redesign
+
+- Rebuilt the GUI around a charcoal workbench theme with thin neutral borders, muted blue accents, high-contrast light primary buttons and a subtle dotted backdrop.
+- Added a fixed navigation sidebar on wide layouts and compact top navigation at smaller GUI scales.
+- Added bundled Outfit Medium headings while retaining Minecraft text for controls, player names and tier labels. Font styling is scoped to this mod's headings.
+- Redesigned Settings, Profiles, Tierlists, Waitlists, mode selection, profile-source selection and connection details with shared controls and surfaces.
+- Added a framed live preview, grouped settings, a direct tierlist shortcut, framed player portraits, clearer profile rows and a selected-source status panel.
+- Added consistent footer actions and responsive grids with full-width final rows when a mode list has an odd count.
+- Added subtle hover transitions and heading reveals that respect Minecraft's Screen Effects setting.
+
+Original tierlist mode icons, provider logos, tag sizes/colours, automatic saving, main-menu access, username matching, provider isolation, waitlist notifications and network safeguards are preserved.
+
 ## 2.0.2 — 2026-11-13
 
 - Replaced all redrawn mode icons with the original MCTiers and SubTiers assets shown in the supplied references. Original SVG/PNG files and source links are retained; sprites only receive proportional resizing and transparent padding for Minecraft.

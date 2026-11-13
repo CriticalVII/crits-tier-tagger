@@ -7,7 +7,7 @@
 A client-side Fabric mod for **Minecraft Java 26.2**. Display PvP tiers from **AfriTiers, MCTiers, PvPTiers or SubTiers**, search player profiles, and watch AfriTiers waitlists.
 
 - One selected tierlist for player nametags and Tab, with smooth mode icons and tier colours.
-- Transparent settings with automatic saving and a provider-specific mode picker.
+- A charcoal workspace with responsive navigation, automatic saving and a provider-specific mode picker.
 - Profiles with a separate tierlist selector, region, points, overall rank and per-mode tiers.
 - Optional gold `#1`–`#10` overall labels; Tab alignment applies only to top-ten players.
 - AfriTiers waitlist alerts in chat, optional sound and available Discord join links.
@@ -15,7 +15,7 @@ A client-side Fabric mod for **Minecraft Java 26.2**. Display PvP tiers from **A
 
 ## Install
 
-Download [crits-tier-tagger-2.0.2.jar](releases/crits-tier-tagger-2.0.2.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
+Download [crits-tier-tagger-2.1.0.jar](releases/crits-tier-tagger-2.1.0.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
 
 | Requirement | Version |
 | --- | --- |
@@ -32,6 +32,8 @@ The mod keeps its original internal ID and `config/afritiers_tagger.json` file s
 ## Settings and tierlists
 
 Press **K**, run `/crittiers config`, or open **Mods → Crit's Tier Tagger → Configure**. Changes save immediately. Close with Done or Escape; invalid colour values are not saved.
+
+The GUI uses a charcoal theme with thin borders, Outfit headings and Minecraft text for controls and tiers. Wide screens have a fixed navigation sidebar; smaller GUI sizes switch to a top navigation row. Settings, profiles, tierlist selection, waitlists and the mode/source/connection dialogs share the same visual system. Hover transitions and heading reveals respect Minecraft's Screen Effects setting; set it to 0 to remove animation.
 
 Choose your in-game source in **Tierlists**. This supplies both Tab and nametags. Each provider remembers its selected mode; choose a specific mode or Strongest tier from Settings. Providers remain separate: an outage or missing player does not substitute another tierlist's result.
 
@@ -79,10 +81,12 @@ Queues are checked about every 30 seconds while watching in game or browsing thi
 
 ## Build
 
-Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.0.2.jar`.
+Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.1.0.jar`.
 
 The repository includes production source, assets, build files, editable mode artwork in `artwork/modes/`, and the latest packaged JAR. Local verification tools, fixtures and debug files are excluded.
 
 ## License
 
 All rights reserved. See [LICENSE](LICENSE). Third-party names, logos and mode icons belong to their respective owners; original asset links are in [artwork/PROVIDERS.md](artwork/PROVIDERS.md) and [artwork/MODES.md](artwork/MODES.md). This project is independent of the listed tierlist services.
+
+Outfit is by The Outfit Project Authors, licensed under the SIL Open Font License 1.1. The bundled font license is included in the mod assets.
