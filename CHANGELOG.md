@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.4 — 2026-11-13
+
+- Shortened source paths to `src/client/crits/` and `src/common/crits/`, with a single top-level `resources/` directory. Removed redundant source-root nesting and empty directories.
+- Updated Java namespaces, Fabric entrypoints, mixin registration, build configuration and documentation to match. Existing mod/config IDs, assets and behaviour remain unchanged.
+
 ## 2.2.3 — 2026-11-13
 
 - Reorganized Java under `dev.crits.tiertagger`, with dedicated rendering, identity, HTTP/source and repository packages. Renamed client/command entrypoints for the current brand.
