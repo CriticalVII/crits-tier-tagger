@@ -51,7 +51,8 @@ final class TaggerWidgets {
         }
         @Override public void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             var font = TaggerFonts.body();
-            var text = net.minecraft.client.gui.components.ComponentRenderUtils.clipText(getMessage(), font, getWidth());
+            var text = font.width(getMessage()) > getWidth()
+                    ? net.minecraft.client.gui.components.ComponentRenderUtils.clipText(getMessage(), font, getWidth()) : getMessage();
             g.text(font, text, getX(), getY() + (getHeight() - 9) / 2, TEXT, false);
         }
     }

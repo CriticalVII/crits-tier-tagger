@@ -19,6 +19,7 @@ import java.util.Comparator;
 
 /** A centred searchable profile, overall position and compact mode badges. */
 public final class ProfilesScreen extends Screen {
+    private static final za.co.afritiers.tagger.config.TaggerConfig TIER_COLOURS = new za.co.afritiers.tagger.config.TaggerConfig();
     private final TaggerSettingsScreen owner;
     private String input = "", requested = "", apiName = "", feedback = "";
     private Rankings snapshot = Rankings.EMPTY;
@@ -208,7 +209,8 @@ public final class ProfilesScreen extends Screen {
         private final java.util.function.Supplier<net.minecraft.world.entity.player.PlayerSkin> skin = skinSource();
         IdentityHeader(int width, PlayerStats profile) {
             super(0, 0, width, 102, Component.literal((requested.equalsIgnoreCase(minecraft.getUser().getName()) ? "YOUR PROFILE · " : "")
-                    + requested + (profile == null ? "" : " · Region: " + profile.region()
+                    + requested + (profile != null && !requested.equalsIgnoreCase(profile.name()) ? " · API name: " + profile.name() : "")
+                    + (profile == null ? "" : " · Region: " + profile.region()
                     + (profile.combatTitle().isBlank() ? "" : " · " + profile.combatTitle()))));
             this.profile = profile;
             setTooltip(TaggerFonts.tooltip(Component.literal("Player: " + requested + (profile != null && !requested.equalsIgnoreCase(profile.name())
@@ -273,7 +275,7 @@ public final class ProfilesScreen extends Screen {
             }
             for (int index = 0; index < tiers.size(); index++) {
                 Tier tier = tiers.get(index); int left = getX() + 6 + index * 36;
-                int colour = 0xFF000000 | new za.co.afritiers.tagger.config.TaggerConfig().colour(tier.level());
+                int colour = 0xFF000000 | TIER_COLOURS.colour(tier.level());
                 TaggerWidgets.surface(g, left + 4, getY() + 5, 26, 26, 13, 0xFF090C0E, hovered == index ? colour : TaggerWidgets.LINE);
                 g.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
                         ModeIcons.sprite(ModeIcon.forMode(tier.mode())).spriteId(), left + 9, getY() + 10, 16, 16);
