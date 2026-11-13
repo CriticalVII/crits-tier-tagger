@@ -1,1 +1,1 @@
-dc8401ee97945e55453b432a3dc348fd0bb12eda202cc4d29539addd8b025dd1  afritiers-tagger-1.7.1.jar
+8ce506db69b4d2bb69b21ea17519bf35071f86d78ba0b01fa44f112dd14d5462  crits-tier-tagger-2.0.0.jar
