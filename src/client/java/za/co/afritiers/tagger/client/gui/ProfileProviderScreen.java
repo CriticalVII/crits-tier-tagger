@@ -18,7 +18,7 @@ final class ProfileProviderScreen extends Screen {
         x = (width - w) / 2; y = (height - h) / 2;
         int index = 0, cell = (w - 36) / 2;
         for (var provider : TierlistProvider.values()) {
-            var button = new TaggerWidgets.Action(provider.label(), cell, 34, provider == selected, pressed -> {
+            var button = TierlistLogo.button(provider, provider.label(), cell, 34, provider == selected, pressed -> {
                 owner.selectProvider(provider); onClose();
             });
             button.setPosition(x + 12 + index % 2 * (cell + 12), y + 66 + index / 2 * 44);
