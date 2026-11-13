@@ -21,6 +21,7 @@ public final class WaitlistsScreen extends Screen {
     private final Map<String, TaggerWidgets.Toggle> modeToggles = new HashMap<>();
     private QueueRepository.State lastState;
     private int x, y, w, h;
+    private int navigationOffset;
     private String feedback = "";
     private long feedbackUntil;
 
@@ -36,17 +37,18 @@ public final class WaitlistsScreen extends Screen {
         lastState = null;
         w = Math.min(520, width - 20); h = Math.min(348, height - 16);
         x = (width - w) / 2; y = (height - h) / 2;
+        navigationOffset = TaggerTabs.offset(w);
         TaggerTabs.add(this::addRenderableWidget, owner, "Waitlists", x, y, w);
         int column = (w - 36) / 2;
         var enabled = new TaggerWidgets.Toggle("Notifications", "Alert when watched waitlists open", column, true,
                 () -> config.waitlistNotifications, value -> save(edited -> edited.waitlistNotifications = value));
-        enabled.setPosition(x + 12, y + 61); addRenderableWidget(enabled);
+        enabled.setPosition(x + 12, y + 61 + navigationOffset); addRenderableWidget(enabled);
         var sound = new TaggerWidgets.Toggle("Sound", "Play a chime with chat alerts", column, true,
                 () -> config.waitlistSound, value -> save(edited -> edited.waitlistSound = value));
-        sound.setPosition(x + 24 + column, y + 61); addRenderableWidget(sound);
+        sound.setPosition(x + 24 + column, y + 61 + navigationOffset); addRenderableWidget(sound);
 
         Set<String> modes = new TreeSet<>(Comparator.comparing(Tier::modeLabel).thenComparing(Comparator.naturalOrder()));
-        for (var icon : ModeIcon.values()) if (icon != ModeIcon.OVERALL) modes.add(icon.primaryMode());
+        modes.addAll(za.co.afritiers.tagger.provider.TierlistProvider.AFRITIERS.modes());
         modes.addAll(mod.waitlists().state().snapshot().entries().keySet());
         modes.addAll(config.waitlistModes);
         knownModes = Set.copyOf(modes);
@@ -64,8 +66,8 @@ public final class WaitlistsScreen extends Screen {
             modeToggles.put(mode, toggle);
             row.addChild(toggle);
         }
-        var scroll = new ScrollableLayout(minecraft, rows, Math.max(32, h - 151), ScrollableLayout.ReserveStrategy.RIGHT);
-        scroll.setMinWidth(w - 24); scroll.arrangeElements(); scroll.setX(x + 12); scroll.setY(y + 105);
+        var scroll = new ScrollableLayout(minecraft, rows, Math.max(32, h - 151 - navigationOffset), ScrollableLayout.ReserveStrategy.RIGHT);
+        scroll.setMinWidth(w - 24); scroll.arrangeElements(); scroll.setX(x + 12); scroll.setY(y + 105 + navigationOffset);
         scroll.visitWidgets(this::addRenderableWidget);
         button("Refresh", 64, x + 12, pressed -> feedback(mod.waitlists().refresh()));
         button("All", 42, x + 82, pressed -> { save(edited -> edited.waitlistModes.addAll(knownModes)); rebuildWidgets(); });
@@ -115,11 +117,11 @@ public final class WaitlistsScreen extends Screen {
         g.fill(0, 0, width, height, 0x28090A13);
         TaggerWidgets.panel(g, x, y, w, h);
         g.text(font, Component.literal("AfriTiers").withStyle(style -> style.withBold(true)), x + 12, y + 10, TaggerWidgets.TEXT);
-        if (w >= 380) g.text(font, "WAITLIST NOTIFICATIONS", x + 12, y + 22, TaggerWidgets.MUTED);
-        g.fill(x + 12, y + 32, x + w - 12, y + 33, TaggerWidgets.LINE);
-        g.text(font, font.plainSubstrByWidth("Choose which waitlists should notify you in game.", w - 24), x + 12, y + 43, TaggerWidgets.MUTED);
+        if (w >= 400) g.text(font, "AFRITIERS WAITLISTS", x + 12, y + 22, TaggerWidgets.MUTED);
+        g.fill(x + 12, y + 32 + navigationOffset, x + w - 12, y + 33 + navigationOffset, TaggerWidgets.LINE);
+        g.text(font, font.plainSubstrByWidth("AfriTiers alerts · independent of your selected tierlist.", w - 24), x + 12, y + 43 + navigationOffset, TaggerWidgets.MUTED);
         String summary = config.waitlistModes.size() + " watched · " + (config.waitlistNotifications ? "one alert per opening" : "notifications paused");
-        g.text(font, font.plainSubstrByWidth(summary, w - 24), x + 12, y + 94, TaggerWidgets.GREEN);
+        g.text(font, font.plainSubstrByWidth(summary, w - 24), x + 12, y + 94 + navigationOffset, TaggerWidgets.GREEN);
         var state = AfriTiersClient.instance().waitlists().state();
         String note = System.nanoTime() < feedbackUntil ? feedback : state.message();
         g.text(font, font.plainSubstrByWidth(note, w - 24), x + 12, y + h - 43, TaggerWidgets.MUTED);

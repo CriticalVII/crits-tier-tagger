@@ -40,7 +40,9 @@ public final class ProfileRepository implements TierRepository {
         if (closed) return;
         if (connected) { worldChanged(); return; }
         connected = true;
-        publish(enabled ? Phase.READY : Phase.DISABLED, "Ready for " + provider().label() + " player lookups");
+        publish(!enabled ? Phase.DISABLED : clock.instant().isBefore(retryAt) ? Phase.ERROR : Phase.READY,
+                clock.instant().isBefore(retryAt) ? provider().label() + " is cooling down; retrying automatically"
+                        : "Ready for " + provider().label() + " player lookups");
         tick();
     }
     @Override public synchronized void disconnect() {
