@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.2.3 — 2026-11-13
+
+- Reorganized Java under `dev.crits.tiertagger`, with dedicated rendering, identity, HTTP/source and repository packages. Renamed client/command entrypoints for the current brand.
+- Consolidated artwork into canonical runtime assets, removed 23 unused source/duplicate images and moved source attribution into `docs/`. Simplified mode sprite paths and moved client mixin metadata into client resources.
+- Removed obsolete navigation branches/status helpers and redundant imports. Development runtime files now stay under the ignored local directory.
+- Preserved the mod ID, config/resource namespace, keybind IDs, artwork, licenses, network safeguards and existing matching behaviour. Added codebase documentation and expanded credential/dump ignores.
+
 ## 2.2.2 — 2026-11-13
 
 - Replaced the previous brand icon with the approved charcoal HT1 tag, gold trim and mint-green loop. Mod Menu, Fabric metadata, the packaged mod and README share the same updated icon.
