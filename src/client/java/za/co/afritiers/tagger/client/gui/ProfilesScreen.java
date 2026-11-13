@@ -82,7 +82,7 @@ public final class ProfilesScreen extends Screen {
         searchField.setResponder(value -> { input = value; searchButton.active = validInput(); });
         searchField.setTooltip(Tooltip.create(Component.literal(provider == TierlistProvider.AFRITIERS
                 ? "Search a username or saved alias. Verified paid-account name changes are resolved automatically."
-                : "Search " + provider.label() + " by Minecraft username or a saved alias.")));
+                : "Resolve a username to its verified Minecraft UUID, then search " + provider.label() + ".")));
         addRenderableWidget(searchField); addRenderableWidget(searchButton);
         Button self = TaggerWidgets.action("My profile", 70, false, pressed -> {
             input = "";
@@ -195,8 +195,8 @@ public final class ProfilesScreen extends Screen {
         }
         if (profile.isEmpty()) {
             String message = requested.isEmpty() ? "Search a player to see their stats" : "No ranked player found";
-            String query = AfriTiersClient.instance().config().aliases(provider).getOrDefault(Tier.normalizeUsername(requested), requested);
-            var lookup = AfriTiersClient.instance().playerSearchRepository().lookupStatus(query);
+            var mod = AfriTiersClient.instance();
+            var lookup = mod.playerLookupStatus(requested, provider, mod.playerSearchRepository());
             if (lookup == TierRepository.LookupStatus.LOADING) message = "Loading player stats...";
             if (lookup == TierRepository.LookupStatus.ERROR) message = "Stats unavailable — retrying automatically";
             g.text(font, font.plainSubstrByWidth(message, contentWidth), contentX, y + 110 + contentOffset, TaggerWidgets.MUTED);
@@ -205,7 +205,7 @@ public final class ProfilesScreen extends Screen {
                 : snapshot.stale() ? "Source out of date · placements may change"
                 : profile.isPresent() ? provider == TierlistProvider.AFRITIERS ? "Points count active tiers; retired tiers earn 0."
                         : provider.label() + " supplies the displayed points and overall rank."
-                : "Searching " + provider.label() + " by username.";
+                : "Searching " + provider.label() + (provider == TierlistProvider.AFRITIERS ? " by username." : " by verified account UUID.");
         g.text(font, font.plainSubstrByWidth(note, w - 24), x + 12, y + h - 45, TaggerWidgets.MUTED);
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
