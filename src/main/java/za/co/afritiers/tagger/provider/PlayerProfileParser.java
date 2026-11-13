@@ -15,7 +15,7 @@ public final class PlayerProfileParser {
         if (key == null || json == null || !json.isJsonObject()) throw new IllegalArgumentException("Invalid UUID player profile");
         JsonObject root = json.getAsJsonObject();
         String name = text(root, "name");
-        if (!name.matches("[A-Za-z0-9_]{1,16}")) throw new IllegalArgumentException("Invalid profile display name");
+        if (!name.matches("[A-Za-z0-9_]{1,16}")) name = "Unknown";
         if (!key.equals(PlayerIdentity.uuid(text(root, "uuid")))) throw new IllegalArgumentException("The API returned a different UUID");
         if (!root.has("rankings") || !root.get("rankings").isJsonObject()) throw new IllegalArgumentException("Profile rankings are missing");
         JsonObject rankings = root.getAsJsonObject("rankings");
