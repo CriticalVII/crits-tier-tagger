@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.2 — 2026-11-13
+
+- Replaced the previous brand icon with the approved charcoal HT1 tag, gold trim and mint-green loop. Mod Menu, Fabric metadata, the packaged mod and README share the same updated icon.
+- Mode icons, tierlist logos and GUI behaviour are unchanged.
+
 ## 2.2.1 — 2026-11-13
 
 - Smoothed Outfit menu text with 4× glyph oversampling and linear filtering scoped to this mod's UI. Labels, fields and tooltips use the same font; Minecraft's HUD and in-game tags remain unchanged.
