@@ -46,6 +46,16 @@ public final class TierlistsScreen extends Screen {
         frame.draw(g, "Tierlist sources");
         g.text(font, "In-game tierlist", x + 12, y + 44 + offset, TaggerWidgets.GREEN);
         g.text(font, font.plainSubstrByWidth("One source for Tab and nametags. Profiles has its own selector.", w - 24), x + 12, y + 58 + offset, TaggerWidgets.MUTED);
+        if (h >= 300) {
+            int cardY = y + 166 + offset;
+            var mod = AfriTiersClient.instance(); var provider = mod.selectedProvider();
+            g.fill(x + 12, cardY, x + w - 12, cardY + 76, TaggerWidgets.SURFACE);
+            g.outline(x + 12, cardY, w - 24, 76, TaggerWidgets.LINE);
+            TierlistLogo.draw(g, provider, x + 24, cardY + 14, 18);
+            g.text(font, TaggerFrame.heading(provider.label()), x + 50, cardY + 14, TaggerWidgets.TEXT, false);
+            g.text(font, font.plainSubstrByWidth(mod.repository().state().message(), w - 48), x + 24, cardY + 40, TaggerWidgets.MUTED, false);
+            g.text(font, font.plainSubstrByWidth("Mode: " + provider.modeLabel(mod.config().mode), w - 48), x + 24, cardY + 56, TaggerWidgets.GREEN, false);
+        }
         g.text(font, font.plainSubstrByWidth(feedback.isEmpty() ? "AfriTiers waitlist notifications stay independent." : feedback, w - 24),
                 x + 12, y + h - 45, TaggerWidgets.MUTED);
         super.extractRenderState(g, mouseX, mouseY, delta);

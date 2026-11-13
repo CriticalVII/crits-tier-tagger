@@ -6,3 +6,7 @@ Mod Menu, and other dependencies retain their respective licenses.
 
 Third-party tierlist names, logos and mode icons remain the property of their
 respective owners; see artwork/PROVIDERS.md and artwork/MODES.md for sources.
+
+The bundled Outfit font is Copyright 2021 The Outfit Project Authors and is
+licensed under the SIL Open Font License 1.1. Its license is included at
+assets/afritiers_tagger/font/ofl-outfit.txt in the mod JAR.

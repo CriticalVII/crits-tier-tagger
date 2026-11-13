@@ -152,7 +152,7 @@ public final class ProfilesScreen extends Screen {
             int skinHeight = Math.max(50, Math.min(220, h - 174 - contentOffset));
             var skin = new PlayerSkinWidget(132, skinHeight, minecraft.getEntityModels(), skinSource);
             skin.setPosition(x + 12, y + 102 + contentOffset); addRenderableWidget(skin);
-            var caption = new ProfileLine(132, Component.literal(self ? "YOUR PROFILE" : online == null ? "Default skin" : "Online skin").withColor(TaggerWidgets.MUTED));
+            var caption = new ProfileLine(128, Component.literal(self ? "YOUR PROFILE" : online == null ? "Default skin" : "Online skin").withColor(TaggerWidgets.MUTED));
             caption.setPosition(x + 16, y + 105 + skinHeight + contentOffset); addRenderableWidget(caption);
     }
 
@@ -220,8 +220,9 @@ public final class ProfilesScreen extends Screen {
             setTooltip(Tooltip.create(text));
         }
         @Override protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
+            g.fill(getX(), getY(), getRight(), getBottom(), isHovered() ? 0xFF222B30 : 0xFF191E21);
             g.enableScissor(getX(), getY() - 2, getRight(), getBottom());
-            g.text(font, getMessage(), getX(), getY() + 4, TaggerWidgets.TEXT);
+            g.text(font, getMessage(), getX() + 4, getY() + 4, TaggerWidgets.TEXT, false);
             g.disableScissor();
         }
         @Override protected void updateWidgetNarration(net.minecraft.client.gui.narration.NarrationElementOutput output) {
