@@ -47,7 +47,8 @@ public final class TierlistsScreen extends Screen {
             g.fill(getX(), getY(), getRight(), getBottom(), selected ? 0x90694C8C : isHoveredOrFocused() ? 0x70584C6C : 0x40352E45);
             g.fill(getX(), getY(), getX() + 2, getBottom(), selected ? TaggerWidgets.GREEN : TaggerWidgets.LINE);
             if (isFocused()) g.outline(getX(), getY(), getWidth(), getHeight(), TaggerWidgets.GREEN);
-            g.text(font, Component.literal(provider.label()).withStyle(style -> style.withBold(true)), getX() + 10, getY() + 10, TaggerWidgets.TEXT);
+            TierlistLogo.draw(g, provider, getX() + 10, getY() + 7, 14);
+            g.text(font, Component.literal(provider.label()).withStyle(style -> style.withBold(true)), getX() + 29, getY() + 10, TaggerWidgets.TEXT);
             g.text(font, font.plainSubstrByWidth(selected ? "SELECTED" : "Select tierlist", getWidth() - 20), getX() + 10, getY() + 26,
                     selected ? 0xFFFFD700 : TaggerWidgets.MUTED);
             if (getHeight() >= 68) g.text(font, font.plainSubstrByWidth(provider.description(), getWidth() - 20), getX() + 10, getY() + 43, TaggerWidgets.MUTED);

@@ -66,6 +66,7 @@ public final class AfriTiersClient implements ClientModInitializer {
         return config.profileTierlist.isEmpty() ? selectedProvider : TierlistProvider.from(config.profileTierlist);
     }
     public String providerStatus(TierlistProvider provider) {
+        if (provider != selectedProvider) return "Select to load";
         var service = provider == selectedProvider ? repository : gameRepositories.get(provider);
         return service == null ? "Not selected" : service.state().message();
     }
