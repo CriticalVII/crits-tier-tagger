@@ -32,6 +32,8 @@ public enum TierlistProvider {
             case "strongest" -> "Strongest tier";
             case "pot" -> "Pot";
             case "crystal" -> "Crystal";
+            case "minecart" -> "Minecart";
+            case "dia_crystal" -> "Diamond Crystal";
             case "neth_pot" -> "Netherite Pot";
             case "nethop" -> this == MCTIERS ? "NethPot" : "NethOP";
             default -> za.co.afritiers.tagger.ranking.Tier.modeLabel(mode);

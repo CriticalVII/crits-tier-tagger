@@ -12,7 +12,7 @@ import za.co.afritiers.tagger.ranking.ModeIcon;
 import za.co.afritiers.tagger.ranking.Tier;
 import java.util.*;
 
-/** All bundled modes remain selectable even before rankings have downloaded. */
+/** Provider-supported modes remain selectable before rankings have downloaded. */
 public final class ModePickerScreen extends Screen {
     private final TaggerSettingsScreen owner;
     private final String selected;

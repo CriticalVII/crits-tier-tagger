@@ -116,7 +116,7 @@ public final class WaitlistsScreen extends Screen {
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         g.fill(0, 0, width, height, 0x28090A13);
         TaggerWidgets.panel(g, x, y, w, h);
-        g.text(font, Component.literal("AfriTiers").withStyle(style -> style.withBold(true)), x + 12, y + 10, TaggerWidgets.TEXT);
+        g.text(font, Component.literal("Crit's").withStyle(style -> style.withBold(true)), x + 12, y + 10, TaggerWidgets.TEXT);
         if (w >= 400) g.text(font, "AFRITIERS WAITLISTS", x + 12, y + 22, TaggerWidgets.MUTED);
         g.fill(x + 12, y + 32 + navigationOffset, x + w - 12, y + 33 + navigationOffset, TaggerWidgets.LINE);
         g.text(font, font.plainSubstrByWidth("AfriTiers alerts · independent of your selected tierlist.", w - 24), x + 12, y + 43 + navigationOffset, TaggerWidgets.MUTED);

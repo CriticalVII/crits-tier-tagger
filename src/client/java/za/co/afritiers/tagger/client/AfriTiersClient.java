@@ -109,7 +109,7 @@ public final class AfriTiersClient implements ClientModInitializer {
             var watched = config.waitlistNotifications ? config.waitlistModes : java.util.Set.<String>of();
             var notifications = waitlists.tick(client.player != null && client.getConnection() != null, browsingWaitlists, watched);
             for (var queue : notifications) {
-                Component message = Component.literal("[AfriTiers] ").withColor(0xC8ACF2)
+                Component message = Component.literal("[Crit's · AfriTiers] ").withColor(0xC8ACF2)
                         .append(ModeIcons.component(queue.mode()))
                         .append(Component.literal(" " + Tier.modeLabel(queue.mode()) + " waitlist is open!").withColor(0xFFD700));
                 if (queue.joinUrl() != null) message = message.copy().append(Component.literal(" [Join]").withStyle(style -> style
@@ -121,7 +121,7 @@ public final class AfriTiersClient implements ClientModInitializer {
             while (openSettings.consumeClick()) client.gui.setScreen(new TaggerSettingsScreen(client.gui.screen()));
         });
         AfriTiersCommands.register(this);
-        LOGGER.info("AfriTiers ready: username matching, verified paid-account rename recovery");
+        LOGGER.info("Crit's Tier Tagger ready: {} selected, username-based provider lookups", selectedProvider.label());
         if (!store.warning().isEmpty()) LOGGER.warn("{}", store.warning());
     }
 
@@ -220,9 +220,9 @@ public final class AfriTiersClient implements ClientModInitializer {
         if (!config.enabled || selectedProvider == TierlistProvider.AFRITIERS || client.player == null || client.level == null || client.getConnection() == null) return;
         LinkedHashSet<String> names = new LinkedHashSet<>();
         names.add(client.player.getGameProfile().name());
-        client.level.players().stream().limit(80).forEach(player -> names.add(player.getGameProfile().name()));
-        client.getConnection().getListedOnlinePlayers().stream().limit(80).forEach(info -> names.add(info.getProfile().name()));
-        names.stream().limit(80).forEach(name -> repository.requestPlayer(config.aliases(selectedProvider)
+        client.level.players().stream().limit(512).forEach(player -> names.add(player.getGameProfile().name()));
+        client.getConnection().getListedOnlinePlayers().stream().limit(512).forEach(info -> names.add(info.getProfile().name()));
+        names.stream().limit(512).forEach(name -> repository.requestPlayer(config.aliases(selectedProvider)
                 .getOrDefault(Tier.normalizeUsername(name), name), false));
     }
 

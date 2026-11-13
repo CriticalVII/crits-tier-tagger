@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "id": "afritiers_tagger",
   "version": "${version}",
-  "name": "AfriTiers Tier Tagger",
+  "name": "Crit's Tier Tagger",
   "icon": "assets/afritiers_tagger/icon.png",
-  "description": "AfriTiers PvP tiers on player nameplates and the Tab list. Matches usernames, including offline accounts.",
+  "description": "PvP tiers from AfriTiers, MCTiers, PvPTiers and SubTiers on player nameplates and Tab. Search profiles and watch AfriTiers waitlists.",
   "environment": "client",
   "license": "LicenseRef-All-Rights-Reserved",
-  "contact": { "homepage": "https://afritiers.co.za" },
+  "contact": { "homepage": "https://github.com/CriticalVII/afritiers-tagger", "sources": "https://github.com/CriticalVII/afritiers-tagger", "issues": "https://github.com/CriticalVII/afritiers-tagger/issues" },
   "entrypoints": {
     "client": ["za.co.afritiers.tagger.client.AfriTiersClient"],
     "modmenu": ["za.co.afritiers.tagger.client.ModMenuIntegration"]
