@@ -8,7 +8,6 @@ public final class TaggerConfig {
     public boolean nameplates = true;
     public boolean tabList = true;
     public boolean includeRetired = true;
-    public boolean showTopTen = false;
     public boolean waitlistNotifications = true;
     public boolean waitlistSound = true;
     /** Empty is opt-in: no background polling or alerts until a mode is selected. */
@@ -30,7 +29,6 @@ public final class TaggerConfig {
         copy.nameplates = nameplates;
         copy.tabList = tabList;
         copy.includeRetired = includeRetired;
-        copy.showTopTen = showTopTen;
         copy.waitlistNotifications = waitlistNotifications;
         copy.waitlistSound = waitlistSound;
         copy.waitlistModes = waitlistModes == null ? new java.util.LinkedHashSet<>() : new java.util.LinkedHashSet<>(waitlistModes);

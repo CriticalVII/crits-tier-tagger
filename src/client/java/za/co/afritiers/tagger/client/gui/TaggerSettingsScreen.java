@@ -10,6 +10,7 @@ import za.co.afritiers.tagger.client.ModeIcons;
 import za.co.afritiers.tagger.client.TagFormatter;
 import za.co.afritiers.tagger.config.TaggerConfig;
 import za.co.afritiers.tagger.ranking.Tier;
+import za.co.afritiers.tagger.provider.TierlistProvider;
 
 /** Translucent native settings with immediate persistence and a pinned reference preview. */
 public final class TaggerSettingsScreen extends Screen {
@@ -48,13 +49,12 @@ public final class TaggerSettingsScreen extends Screen {
         display.addChild(new TaggerWidgets.Toggle("Enabled", "Show tier tags", columnWidth, compact, () -> draft.enabled, value -> { draft.enabled = value; persist(); }));
         display.addChild(new TaggerWidgets.Toggle("Nameplates", "Above players", columnWidth, compact, () -> draft.nameplates, value -> { draft.nameplates = value; persist(); }));
         display.addChild(new TaggerWidgets.Toggle("Tab list", "In the player list", columnWidth, compact, () -> draft.tabList, value -> { draft.tabList = value; persist(); }));
-        display.addChild(new TaggerWidgets.Toggle("Top 10 rank", "Gold labels #1–#10", columnWidth, compact, () -> draft.showTopTen, value -> { draft.showTopTen = value; persist(); }));
         LinearLayout appearance = section("Rankings & colour", columnWidth);
         appearance.addChild(new TaggerWidgets.Mode(columnWidth, compact, this::modeText,
                 pressed -> minecraft.gui.setScreen(new ModePickerScreen(this, draft.mode))));
         appearance.addChild(new TaggerWidgets.Toggle("Retired tiers", "Include past tiers", columnWidth, compact, () -> draft.includeRetired, value -> { draft.includeRetired = value; persist(); }));
         LinearLayout colour = compact ? LinearLayout.horizontal().spacing(4) : LinearLayout.vertical().spacing(3);
-        colour.addChild(new StringWidget(compact ? 43 : columnWidth, compact ? 20 : 12,
+        colour.addChild(new TaggerWidgets.Label(compact ? 43 : columnWidth, compact ? 20 : 12,
                 Component.literal(compact ? "Colour" : "Colour override").withColor(TaggerWidgets.MUTED), font));
         EditBox field = new TaggerWidgets.Input(compact ? columnWidth - 47 : columnWidth, 20, Component.literal("Colour override; blank uses tier colours"));
         colourField = field;
@@ -67,14 +67,13 @@ public final class TaggerSettingsScreen extends Screen {
         field.setTooltip(TaggerFonts.tooltip(Component.literal("Optional six-digit hex colour, for example FFD700. Leave blank for gold, silver, bronze and purple. Icons keep their own colours.")));
         colour.addChild(field);
         appearance.addChild(colour);
-        var source = new TaggerWidgets.Action("Tierlist: " + AfriTiersClient.instance().selectedProvider().label() + " >",
-                columnWidth, 26, false, pressed -> minecraft.gui.setScreen(new TierlistsScreen(this)));
-        source.setTooltip(TaggerFonts.tooltip(Component.literal("Choose the source for Tab and nametag tiers.")));
-        appearance.addChild(source);
         LinearLayout controls = columns ? LinearLayout.horizontal().spacing(12) : LinearLayout.vertical().spacing(12);
         controls.addChild(display);
         controls.addChild(appearance);
-        ScrollableLayout scroll = new ScrollableLayout(minecraft, controls, Math.max(32, panelHeight - (compact ? 128 : 174) - navigationOffset), ScrollableLayout.ReserveStrategy.RIGHT);
+        var settings = LinearLayout.vertical().spacing(10);
+        settings.addChild(tierlistChoices(contentWidth));
+        settings.addChild(controls);
+        ScrollableLayout scroll = new ScrollableLayout(minecraft, settings, Math.max(32, panelHeight - (compact ? 128 : 174) - navigationOffset), ScrollableLayout.ReserveStrategy.RIGHT);
         scroll.setMinWidth(contentWidth);
         scroll.arrangeElements();
         scroll.setX(panelX + 12);
@@ -117,9 +116,32 @@ public final class TaggerSettingsScreen extends Screen {
         TaggerTabs.add(this::addRenderableWidget, this, "Settings", frame);
     }
 
+    private LinearLayout tierlistChoices(int width) {
+        var choices = LinearLayout.vertical().spacing(4);
+        choices.addChild(new TaggerWidgets.Label(width, 14, Component.literal("In-game tierlist").withColor(TaggerWidgets.TEXT), font));
+        int columns = width >= 320 ? 4 : 2;
+        int cellWidth = (width - (columns - 1) * 6) / columns;
+        LinearLayout row = null;
+        int index = 0;
+        for (var provider : TierlistProvider.values()) {
+            if (index++ % columns == 0) { row = LinearLayout.horizontal().spacing(6); choices.addChild(row); }
+            var button = TierlistLogo.button(provider, provider.label(), cellWidth, compact ? 22 : 28,
+                    provider == AfriTiersClient.instance().selectedProvider(), pressed -> {
+                        try {
+                            AfriTiersClient.instance().selectTierlist(provider);
+                            feedback = "Saved · now showing " + provider.label();
+                            rebuildWidgets();
+                        } catch (java.io.IOException exception) { feedback = "Could not save. Check config permissions."; }
+                    });
+            button.setTooltip(TaggerFonts.tooltip(Component.literal(provider.description() + "\nUsed for Tab and nametags. Profiles has its own selector.")));
+            row.addChild(button);
+        }
+        return choices;
+    }
+
     private LinearLayout section(String heading, int sectionWidth) {
         LinearLayout layout = LinearLayout.vertical().spacing(3);
-        layout.addChild(new StringWidget(sectionWidth, 18, Component.literal(heading).withColor(TaggerWidgets.TEXT), font));
+        layout.addChild(new TaggerWidgets.Label(sectionWidth, 18, Component.literal(heading).withColor(TaggerWidgets.TEXT), font));
         return layout;
     }
 
@@ -145,7 +167,7 @@ public final class TaggerSettingsScreen extends Screen {
         validationError = "";
         try { sample.validate(); }
         catch (IllegalArgumentException exception) { validationError = exception.getMessage(); sample.customColour = ""; }
-        preview = Component.empty().append(TagFormatter.placement(1)).append(TagFormatter.tag(new Tier("sword",
+        preview = Component.empty().append(TagFormatter.tag(new Tier("sword",
                 Tier.ORDER.get(previewTier), false), sample)).append(minecraft.getUser().getName());
         if (colourField != null) {
             colourField.setTextColor(validationError.isEmpty() ? TaggerWidgets.TEXT : 0xFFE0BE83);
@@ -159,7 +181,6 @@ public final class TaggerSettingsScreen extends Screen {
         edited.enabled = draft.enabled;
         edited.nameplates = draft.nameplates;
         edited.tabList = draft.tabList;
-        edited.showTopTen = draft.showTopTen;
         edited.includeRetired = draft.includeRetired;
         edited.mode = draft.mode;
         edited.tierlistModes.put(edited.tierlist, draft.mode);
@@ -200,10 +221,10 @@ public final class TaggerSettingsScreen extends Screen {
         if (compact && !validationError.isEmpty()) summary = validationError;
         else if (compact && !feedback.isEmpty()) summary = feedback;
         g.fill(x, statusY + 2, x + 3, statusY + 5, statusColor);
-        g.text(font, font.plainSubstrByWidth(summary, panelWidth - 152), x + 9, statusY, TaggerWidgets.MUTED);
+        g.text(font, font.plainSubstrByWidth(summary, panelWidth - 152), x + 9, statusY, TaggerWidgets.MUTED, false);
         String note = !validationError.isEmpty() ? validationError : !feedback.isEmpty() ? feedback : "Settings save automatically";
         if (!compact) g.text(font, font.plainSubstrByWidth(note, panelWidth - 24), x, panelY + panelHeight - 43,
-                validationError.isEmpty() ? TaggerWidgets.MUTED : 0xFFE0BE83);
+                validationError.isEmpty() ? TaggerWidgets.MUTED : 0xFFE0BE83, false);
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
 

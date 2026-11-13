@@ -7,15 +7,14 @@
 A client-side Fabric mod for **Minecraft Java 26.2**. Display PvP tiers from **AfriTiers, MCTiers, PvPTiers or SubTiers**, search player profiles, and watch AfriTiers waitlists.
 
 - One selected tierlist for player nametags and Tab, with smooth mode icons and tier colours.
-- A Pandora-inspired black workspace with responsive navigation, image galleries, automatic saving and a provider-specific mode picker.
+- A Pandora-inspired black workspace with simple side tabs, image galleries, automatic saving and a provider-specific mode picker.
 - Profiles with a separate tierlist selector, region, points, overall rank and per-mode tiers.
-- Optional gold `#1`–`#10` overall labels; Tab alignment applies only to top-ten players.
 - AfriTiers waitlist alerts in chat, optional sound and available Discord join links.
 - AfriTiers username matching and paid-name recovery; verified UUID matching for the other tierlists.
 
 ## Install
 
-Download [crits-tier-tagger-2.2.0.jar](releases/crits-tier-tagger-2.2.0.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
+Download [crits-tier-tagger-2.2.1.jar](releases/crits-tier-tagger-2.2.1.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
 
 | Requirement | Version |
 | --- | --- |
@@ -33,13 +32,13 @@ The mod keeps its original internal ID and `config/afritiers_tagger.json` file s
 
 Press **K**, run `/crittiers config`, or open **Mods → Crit's Tier Tagger → Configure**. Changes save immediately. Close with Done or Escape; invalid colour values are not saved.
 
-The GUI takes inspiration from Pandora's launcher: an edge-to-edge black workspace, slim grouped sidebar, clean Outfit text, compact green/cyan actions, switches, and blue-outlined selections. Smaller GUI sizes switch to top navigation. Modes and providers use image tiles, and Profiles pairs a large player portrait with a ranking gallery. Settings, waitlists and dialogs share the same controls. The UI font is isolated from Minecraft's HUD; the live nameplate preview and in-game tags keep Minecraft text and the approved icon dimensions. Tile motion, portrait fades and heading reveals respect Minecraft's Screen Effects setting; set it to 0 to remove animation.
+The GUI takes inspiration from Pandora's launcher: an edge-to-edge black workspace, three simple side tabs, compact green/cyan actions, switches and blue-outlined selections. Outfit text is oversampled and linearly filtered in this mod's menus, including labels, text fields and tooltips; Minecraft's HUD and in-game tag fonts retain their original rendering. Smaller GUI sizes keep the sidebar and scroll their content. Profiles uses a centred player identity, a position-and-points panel and compact circular mode icons with coloured tier pills. Hover a badge for its full mode and tier; extra modes wrap onto further rows within one continuous panel. Tile motion and heading reveals respect Minecraft's Screen Effects setting; set it to 0 to remove animation.
 
-Choose your in-game source in **Tierlists**. This supplies both Tab and nametags. Each provider remembers its selected mode; choose a specific mode or Strongest tier from Settings. Providers remain separate: an outage or missing player does not substitute another tierlist's result.
+Choose the in-game tierlist directly in **Settings**, using the four provider buttons. This source supplies both Tab and nametags. Each provider remembers its selected mode; choose a specific mode or Strongest tier below the selector. Providers remain separate: an outage or missing player does not substitute another tierlist's result. Profiles has its own independent source selector.
 
-Settings and Profiles work from the main menu through Mod Menu or the **K** shortcut; joining a world is not required. The title-screen shortcut follows your configured keybind and also works without Mod Menu. Opening Settings loads the selected tierlist, and selecting another source starts its update immediately. Profiles can display your account or search any username from the main menu. Background refreshes and API cooldowns still apply. Tierlists presents four provider tiles in a row on wide screens; the profile source picker uses a two-by-two gallery. Both show each service's original logo. Mode icons use the original MCTiers and SubTiers artwork, with no redrawing or recolouring.
+Settings and Profiles work from the main menu through Mod Menu or the **K** shortcut; joining a world is not required. The title-screen shortcut follows your configured keybind and works without Mod Menu. Opening Settings loads the selected tierlist, and selecting another source starts its update immediately. Background refreshes and API cooldowns still apply. Mode and provider artwork uses the original assets, with no redrawing or recolouring.
 
-Retired tiers are included by default. Top 10 rank is off by default and uses the selected provider's **overall** leaderboard position. Tier colours are gold for tier 1, silver for tier 2, bronze for tier 3 and purple for tiers 4–5. A custom colour affects tags; profile stats keep tier colours. The preview starts with Sword HT1 and gold #1. Tags use spaces with no added pipe separator.
+Retired tiers are included by default. Tier colours are gold for tier 1, silver for tier 2, bronze for tier 3 and purple for tiers 4–5. A custom colour affects tags; profile stats keep tier colours. The preview starts with Sword HT1. Tab and nametags show the mode icon and tier without ranking labels or rank indentation. Tags use spaces with no added pipe separator.
 
 | Tierlist | Data source | Points and ranking |
 | --- | --- | --- |
@@ -83,7 +82,7 @@ Queues are checked about every 30 seconds while watching in game or browsing thi
 
 ## Build
 
-Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.2.0.jar`.
+Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.2.1.jar`.
 
 The repository includes production source, assets, build files, editable mode artwork in `artwork/modes/`, and the latest packaged JAR. Local verification tools, fixtures and debug files are excluded.
 
