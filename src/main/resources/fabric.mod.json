@@ -9,8 +9,8 @@
   "license": "LicenseRef-All-Rights-Reserved",
   "contact": { "homepage": "https://github.com/CriticalVII/afritiers-tagger", "sources": "https://github.com/CriticalVII/afritiers-tagger", "issues": "https://github.com/CriticalVII/afritiers-tagger/issues" },
   "entrypoints": {
-    "client": ["za.co.afritiers.tagger.client.AfriTiersClient"],
-    "modmenu": ["za.co.afritiers.tagger.client.ModMenuIntegration"]
+    "client": ["dev.crits.tiertagger.client.CritsTierTaggerClient"],
+    "modmenu": ["dev.crits.tiertagger.client.ModMenuIntegration"]
   },
   "mixins": ["afritiers_tagger.client.mixins.json"],
   "depends": {
