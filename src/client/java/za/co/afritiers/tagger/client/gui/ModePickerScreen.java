@@ -44,7 +44,8 @@ public final class ModePickerScreen extends Screen {
         for (String mode : modes) {
             if (index++ % columns == 0) { row = LinearLayout.horizontal().spacing(8); list.addChild(row); }
             String name = provider.modeLabel(mode);
-            var button = new TaggerWidgets.Action(name, cellWidth, 24, isSelected(mode), pressed -> {
+            int buttonWidth = columns == 2 && modes.size() % 2 == 1 && index == modes.size() ? 2 * cellWidth + 8 : cellWidth;
+            var button = new TaggerWidgets.Action(name, buttonWidth, 24, isSelected(mode), pressed -> {
                 owner.selectMode(mode); onClose();
             });
             button.setMessage(Component.empty().append(ModeIcons.component(mode)).append(" " + name));
@@ -65,9 +66,10 @@ public final class ModePickerScreen extends Screen {
     }
 
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        g.fill(0, 0, width, height, 0x35090A13);
+        TaggerWidgets.backdrop(g, width, height);
         TaggerWidgets.panel(g, x, y, w, h);
-        g.text(font, "Choose a mode", x + 12, y + 14, TaggerWidgets.TEXT);
+        g.text(font, TaggerFrame.heading("Choose a mode"), x + 12, y + 12, TaggerWidgets.TEXT, false);
+        g.fill(x + 12, y + 29, x + w - 12, y + 30, TaggerWidgets.LINE);
         g.text(font, "One mode, or everyone's strongest tier.", x + 12, y + 34, TaggerWidgets.MUTED);
         super.extractRenderState(g, mouseX, mouseY, delta);
     }

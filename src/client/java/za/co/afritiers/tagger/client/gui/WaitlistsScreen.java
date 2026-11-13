@@ -24,6 +24,7 @@ public final class WaitlistsScreen extends Screen {
     private int navigationOffset;
     private String feedback = "";
     private long feedbackUntil;
+    private TaggerFrame frame;
 
     WaitlistsScreen(TaggerSettingsScreen owner) {
         super(Component.literal("Waitlist Notifications")); this.owner = owner;
@@ -35,10 +36,10 @@ public final class WaitlistsScreen extends Screen {
         config = mod.config();
         modeToggles.clear();
         lastState = null;
-        w = Math.min(520, width - 20); h = Math.min(348, height - 16);
-        x = (width - w) / 2; y = (height - h) / 2;
-        navigationOffset = TaggerTabs.offset(w);
-        TaggerTabs.add(this::addRenderableWidget, owner, "Waitlists", x, y, w);
+        frame = TaggerFrame.fit(width, height);
+        w = frame.w(); h = frame.h(); x = frame.x(); y = frame.y();
+        navigationOffset = frame.offset();
+        TaggerTabs.add(this::addRenderableWidget, owner, "Waitlists", frame);
         int column = (w - 36) / 2;
         var enabled = new TaggerWidgets.Toggle("Notifications", "Alert when watched waitlists open", column, true,
                 () -> config.waitlistNotifications, value -> save(edited -> edited.waitlistNotifications = value));
@@ -57,7 +58,8 @@ public final class WaitlistsScreen extends Screen {
         int index = 0;
         for (String mode : modes) {
             if (index++ % 2 == 0) { row = LinearLayout.horizontal().spacing(12); rows.addChild(row); }
-            var toggle = new TaggerWidgets.Toggle(Tier.modeLabel(mode), "Notify when this waitlist opens", column, true,
+            int rowWidth = modes.size() % 2 == 1 && index == modes.size() ? 2 * column + 12 : column;
+            var toggle = new TaggerWidgets.Toggle(Tier.modeLabel(mode), "Notify when this waitlist opens", rowWidth, true,
                     () -> config.waitlistModes.contains(mode), value -> save(edited -> {
                         if (value) edited.waitlistModes.add(mode); else edited.waitlistModes.remove(mode);
                     }));
@@ -114,11 +116,7 @@ public final class WaitlistsScreen extends Screen {
     }
 
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        g.fill(0, 0, width, height, 0x28090A13);
-        TaggerWidgets.panel(g, x, y, w, h);
-        g.text(font, Component.literal("Crit's").withStyle(style -> style.withBold(true)), x + 12, y + 10, TaggerWidgets.TEXT);
-        if (w >= 400) g.text(font, "AFRITIERS WAITLISTS", x + 12, y + 22, TaggerWidgets.MUTED);
-        g.fill(x + 12, y + 32 + navigationOffset, x + w - 12, y + 33 + navigationOffset, TaggerWidgets.LINE);
+        frame.draw(g, "Waitlist notifications");
         g.text(font, font.plainSubstrByWidth("AfriTiers alerts · independent of your selected tierlist.", w - 24), x + 12, y + 43 + navigationOffset, TaggerWidgets.MUTED);
         String summary = config.waitlistModes.size() + " watched · " + (config.waitlistNotifications ? "one alert per opening" : "notifications paused");
         g.text(font, font.plainSubstrByWidth(summary, w - 24), x + 12, y + 94 + navigationOffset, TaggerWidgets.GREEN);

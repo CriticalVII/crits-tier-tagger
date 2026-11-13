@@ -28,8 +28,9 @@ final class ProfileProviderScreen extends Screen {
         back.setPosition(x + w - 92, y + h - 30); addRenderableWidget(back);
     }
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        g.fill(0, 0, width, height, 0x35090A13); TaggerWidgets.panel(g, x, y, w, h);
-        g.text(font, "Profile tierlist", x + 12, y + 15, TaggerWidgets.TEXT);
+        TaggerWidgets.backdrop(g, width, height); TaggerWidgets.panel(g, x, y, w, h);
+        g.text(font, TaggerFrame.heading("Profile tierlist"), x + 12, y + 12, TaggerWidgets.TEXT, false);
+        g.fill(x + 12, y + 29, x + w - 12, y + 30, TaggerWidgets.LINE);
         g.text(font, font.plainSubstrByWidth("Choose where to search this player's rankings.", w - 24), x + 12, y + 36, TaggerWidgets.MUTED);
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
