@@ -6,6 +6,8 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -89,6 +91,14 @@ public final class AfriTiersClient implements ClientModInitializer {
         KeyMapping openSettings = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.afritiers_tagger.settings", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K,
                 KeyMapping.Category.register(Identifier.fromNamespaceAndPath("afritiers_tagger", "controls"))));
+        ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
+            if (screen instanceof net.minecraft.client.gui.screens.TitleScreen)
+                ScreenKeyboardEvents.allowKeyPress(screen).register((current, event) -> {
+                    if (!openSettings.matches(event)) return true;
+                    client.schedule(() -> client.gui.setScreen(new TaggerSettingsScreen(current)));
+                    return false;
+                });
+        });
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             observedWorld = null;
             observedPlayer = null;
