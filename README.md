@@ -14,7 +14,7 @@ A client-side Fabric mod for **Minecraft Java 26.2**. Display PvP tiers from **A
 
 ## Install
 
-Download [crits-tier-tagger-2.2.2.jar](releases/crits-tier-tagger-2.2.2.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
+Download [crits-tier-tagger-2.2.3.jar](releases/crits-tier-tagger-2.2.3.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
 
 | Requirement | Version |
 | --- | --- |
@@ -82,12 +82,12 @@ Queues are checked about every 30 seconds while watching in game or browsing thi
 
 ## Build
 
-Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.2.2.jar`.
+Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.2.3.jar`.
 
-The repository includes production source, assets, build files, editable mode artwork in `artwork/modes/`, and the latest packaged JAR. Local verification tools, fixtures and debug files are excluded.
+The repository includes production source, canonical runtime assets, build files, provenance documentation and the latest packaged JAR. See [Codebase layout](docs/CODEBASE.md) for the source map. Local verification tools, fixtures and debug files are excluded.
 
 ## License
 
-All rights reserved. See [LICENSE](LICENSE). Third-party names, logos and mode icons belong to their respective owners; original asset links are in [artwork/PROVIDERS.md](artwork/PROVIDERS.md) and [artwork/MODES.md](artwork/MODES.md). This project is independent of the listed tierlist services.
+All rights reserved. See [LICENSE](LICENSE). Third-party names, logos and mode icons belong to their respective owners; original asset links are in [docs/PROVIDERS.md](docs/PROVIDERS.md) and [docs/MODES.md](docs/MODES.md). This project is independent of the listed tierlist services.
 
 Outfit is by The Outfit Project Authors, licensed under the SIL Open Font License 1.1. The bundled font license is included in the mod assets.
