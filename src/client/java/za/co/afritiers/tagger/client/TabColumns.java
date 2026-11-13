@@ -62,7 +62,7 @@ public final class TabColumns {
     }
 
     private static Component tierText(Tier tier, TaggerConfig config) {
-        return Component.literal(tier.level() + (tier.retired() ? " (retired)" : ""))
+        return Component.literal(tier.displayLevel())
                 .withStyle(style -> style.withFont(FontDescription.DEFAULT).withColor(config.colour(tier.level())));
     }
 

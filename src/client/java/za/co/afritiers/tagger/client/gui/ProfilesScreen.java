@@ -128,8 +128,7 @@ public final class ProfilesScreen extends Screen {
         tiers.stream().sorted(Comparator.comparing(Tier::retired).thenComparingInt(Tier::strength).thenComparing(Tier::mode)).forEach(tier -> {
             Component text = Component.empty().append(ModeIcons.component(tier.mode()))
                     .append(Component.literal(" " + provider.modeLabel(tier.mode()) + ": ").withColor(TaggerWidgets.TEXT))
-                    .append(Component.literal(tier.level()).withColor(new za.co.afritiers.tagger.config.TaggerConfig().colour(tier.level())))
-                    .append(Component.literal(tier.retired() ? " (retired)" : "").withColor(TaggerWidgets.MUTED));
+                    .append(Component.literal(tier.displayLevel()).withColor(new za.co.afritiers.tagger.config.TaggerConfig().colour(tier.level())));
             rows.addChild(new ProfileLine(contentWidth, text));
         });
         if (tiers.isEmpty()) rows.addChild(new ProfileLine(contentWidth, Component.literal("No recorded tiers").withColor(TaggerWidgets.MUTED)));
