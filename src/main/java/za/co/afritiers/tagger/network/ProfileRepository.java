@@ -8,7 +8,7 @@ import java.util.concurrent.*;
 import static za.co.afritiers.tagger.network.RankingRepository.Phase;
 import static za.co.afritiers.tagger.network.RankingRepository.State;
 
-/** A bounded, throttled username cache. Rendering never initiates or waits for HTTP requests. */
+/** A bounded, throttled UUID cache. Rendering never initiates or waits for HTTP requests. */
 public final class ProfileRepository implements TierRepository {
     private record Entry(PlayerProfileParser.Profile profile, LookupStatus status, Instant expires, Instant updated) { }
     private final PlayerProfileSource source;
@@ -58,12 +58,19 @@ public final class ProfileRepository implements TierRepository {
     }
 
     @Override public synchronized void requestPlayer(String username, boolean priority) {
-        if (closed || !connected || !enabled || username == null || !username.matches("[A-Za-z0-9_]{1,16}")) return;
-        String key = Tier.normalizeUsername(username);
+        if (closed || !connected || !enabled) return;
+        String key = PlayerIdentity.uuid(username);
+        if (key == null) return;
         if (priority && queue.remove(key)) queue.addFirst(key);
         Entry previous = entries.get(key);
         if (previous != null && (previous.status == LookupStatus.LOADING || clock.instant().isBefore(previous.expires))) return;
-        if (queue.size() >= 128) return;
+        if (queue.size() >= 128) {
+            if (!priority) return;
+            String displaced = queue.removeLast();
+            Entry entry = entries.get(displaced);
+            if (entry.profile == null) entries.remove(displaced);
+            else entries.put(displaced, new Entry(entry.profile, LookupStatus.FOUND, Instant.MIN, entry.updated));
+        }
         if (entries.size() >= 512 && previous == null) {
             var evict = entries.entrySet().stream().filter(entry -> entry.getValue().status != LookupStatus.LOADING).findFirst();
             if (evict.isEmpty()) return;
@@ -74,7 +81,9 @@ public final class ProfileRepository implements TierRepository {
         if (priority) queue.addFirst(key); else queue.add(key);
     }
     @Override public synchronized LookupStatus lookupStatus(String username) {
-        Entry entry = entries.get(Tier.normalizeUsername(username));
+        String key = PlayerIdentity.uuid(username);
+        if (key == null) return LookupStatus.NOT_FOUND;
+        Entry entry = entries.get(key);
         if (entry != null) return entry.status;
         return state.phase() == Phase.ERROR ? LookupStatus.ERROR : LookupStatus.LOADING;
     }
@@ -119,11 +128,12 @@ public final class ProfileRepository implements TierRepository {
         // At most 80 profile requests/minute per service, also respecting service Retry-After responses.
         allowedAt = attempted.plusMillis(750);
         state = new State(username == null && entries.isEmpty() ? Phase.LOADING : state.phase(), state.rankings(), attempted,
-                state.lastSuccess(), allowedAt, username == null ? "Loading " + provider().label() + " modes" : "Checking " + username);
+                state.lastSuccess(), allowedAt, username == null ? "Loading " + provider().label() + " modes" : "Loading player tiers");
         request = worker.submit(() -> {
             try {
                 List<String> fetchedModes = username == null ? source.fetchModes() : null;
                 var profile = username == null ? Optional.<PlayerProfileParser.Profile>empty() : source.fetchPlayer(username);
+                if (profile.isPresent() && !profile.get().key().equals(username)) throw new IllegalArgumentException("Profile UUID did not match the request");
                 synchronized (this) {
                     if (closed || !connected || token != generation) return;
                     running = false; failures = 0; retryAt = Instant.MIN;
