@@ -26,7 +26,7 @@ public final class TaggerSettingsScreen extends Screen {
     private TaggerFrame frame;
 
     public TaggerSettingsScreen(Screen parent) {
-        super(Component.translatable("afritiers_tagger.title"));
+        super(net.minecraft.client.Minecraft.getInstance(), TaggerFonts.body(), Component.translatable("afritiers_tagger.title"));
         this.parent = parent;
         draft = AfriTiersClient.instance().config();
         draftProvider = draft.tierlist;
@@ -44,12 +44,12 @@ public final class TaggerSettingsScreen extends Screen {
         int contentWidth = panelWidth - 34;
         boolean columns = panelWidth >= 320;
         int columnWidth = columns ? (contentWidth - 12) / 2 : contentWidth;
-        LinearLayout display = section("VISIBILITY", columnWidth);
+        LinearLayout display = section("Visibility", columnWidth);
         display.addChild(new TaggerWidgets.Toggle("Enabled", "Show tier tags", columnWidth, compact, () -> draft.enabled, value -> { draft.enabled = value; persist(); }));
         display.addChild(new TaggerWidgets.Toggle("Nameplates", "Above players", columnWidth, compact, () -> draft.nameplates, value -> { draft.nameplates = value; persist(); }));
         display.addChild(new TaggerWidgets.Toggle("Tab list", "In the player list", columnWidth, compact, () -> draft.tabList, value -> { draft.tabList = value; persist(); }));
         display.addChild(new TaggerWidgets.Toggle("Top 10 rank", "Gold labels #1–#10", columnWidth, compact, () -> draft.showTopTen, value -> { draft.showTopTen = value; persist(); }));
-        LinearLayout appearance = section("RANKINGS & COLOUR", columnWidth);
+        LinearLayout appearance = section("Rankings & colour", columnWidth);
         appearance.addChild(new TaggerWidgets.Mode(columnWidth, compact, this::modeText,
                 pressed -> minecraft.gui.setScreen(new ModePickerScreen(this, draft.mode))));
         appearance.addChild(new TaggerWidgets.Toggle("Retired tiers", "Include past tiers", columnWidth, compact, () -> draft.includeRetired, value -> { draft.includeRetired = value; persist(); }));
@@ -119,7 +119,7 @@ public final class TaggerSettingsScreen extends Screen {
 
     private LinearLayout section(String heading, int sectionWidth) {
         LinearLayout layout = LinearLayout.vertical().spacing(3);
-        layout.addChild(new StringWidget(sectionWidth, 18, Component.literal(heading).withColor(TaggerWidgets.GREEN), font));
+        layout.addChild(new StringWidget(sectionWidth, 18, Component.literal(heading).withColor(TaggerWidgets.TEXT), font));
         return layout;
     }
 
@@ -178,10 +178,9 @@ public final class TaggerSettingsScreen extends Screen {
         frame.draw(g, "Display settings");
         int x = panelX + 12, y = panelY + (compact ? 34 : 42) + navigationOffset, w = panelWidth - 24;
         int previewHeight = compact ? 36 : 50;
-        g.fill(x, y, x + w, y + previewHeight, 0xFF171D21);
-        g.outline(x, y, w, previewHeight, TaggerWidgets.LINE);
+        TaggerWidgets.surface(g, x, y, w, previewHeight, 3, 0xFF111111, TaggerWidgets.LINE);
         g.text(font, "Live preview", x + 10, y + (compact ? 6 : 8), TaggerWidgets.MUTED, false);
-        g.centeredText(font, preview, x + w / 2, y + (compact ? 22 : 29), TaggerWidgets.TEXT);
+        g.centeredText(minecraft.font, preview, x + w / 2, y + (compact ? 22 : 29), TaggerWidgets.TEXT);
         var state = AfriTiersClient.instance().repository().state();
         int statusColor = switch (state.phase()) {
             case READY -> TaggerWidgets.GREEN;

@@ -11,7 +11,7 @@ final class ProfileProviderScreen extends Screen {
     private final TierlistProvider selected;
     private int x, y, w, h;
     ProfileProviderScreen(ProfilesScreen owner, TierlistProvider selected) {
-        super(Component.literal("Profile tierlist")); this.owner = owner; this.selected = selected;
+        super(net.minecraft.client.Minecraft.getInstance(), TaggerFonts.body(), Component.literal("Profile tierlist")); this.owner = owner; this.selected = selected;
     }
     @Override protected void init() {
         w = Math.min(420, width - 20); h = Math.min(220, height - 16);

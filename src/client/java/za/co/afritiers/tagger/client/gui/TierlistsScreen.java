@@ -14,7 +14,7 @@ public final class TierlistsScreen extends Screen {
     private int x, y, w, h, offset;
     private String feedback = "";
     private TaggerFrame frame;
-    TierlistsScreen(TaggerSettingsScreen owner) { super(Component.literal("Tierlists")); this.owner = owner; }
+    TierlistsScreen(TaggerSettingsScreen owner) { super(net.minecraft.client.Minecraft.getInstance(), TaggerFonts.body(), Component.literal("Tierlists")); this.owner = owner; }
     @Override protected void init() {
         AfriTiersClient.instance().loadSelectedTierlist();
         frame = TaggerFrame.fit(width, height);

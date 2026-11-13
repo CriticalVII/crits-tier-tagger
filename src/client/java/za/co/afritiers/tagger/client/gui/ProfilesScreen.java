@@ -31,7 +31,7 @@ public final class ProfilesScreen extends Screen {
     private TaggerFrame frame;
 
     public ProfilesScreen(TaggerSettingsScreen owner) {
-        super(Component.literal("Crit's profiles"));
+        super(net.minecraft.client.Minecraft.getInstance(), TaggerFonts.body(), Component.literal("Crit's profiles"));
         this.owner = owner;
         provider = AfriTiersClient.instance().defaultProfileProvider();
         requested = net.minecraft.client.Minecraft.getInstance().getUser().getName();
