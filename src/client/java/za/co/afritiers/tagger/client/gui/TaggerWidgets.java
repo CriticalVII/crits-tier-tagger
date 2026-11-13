@@ -73,6 +73,34 @@ final class TaggerWidgets {
         }
     }
 
+    static final class Tile extends Action {
+        private final String title;
+        private final boolean selected;
+        private final net.minecraft.resources.Identifier sprite;
+        Tile(String title, int width, int height, boolean selected, net.minecraft.resources.Identifier sprite, OnPress action) {
+            super(title, width, height, false, action);
+            this.title = title; this.selected = selected; this.sprite = sprite;
+        }
+        @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
+            float hover = hoverAmount();
+            int lift = Minecraft.getInstance().options.screenEffectScale().get() == 0 ? 0 : Math.round(hover);
+            surface(g, getX(), getY() + 1 - lift, width, height - 1, 3,
+                    selected ? 0xFF10152D : mix(0xFF242424, 0xFF2D2D2D, hover),
+                    selected || isFocused() ? BLUE : 0xFF242424);
+            var font = TaggerFonts.body();
+            String text = font.plainSubstrByWidth(title, width - 12);
+            g.text(font, text, getX() + (width - font.width(text)) / 2, getY() + 7 - lift, TEXT, false);
+            int size = Math.min(36, height - 25);
+            g.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, sprite,
+                    getX() + (width - size) / 2, getY() + 21 - lift, size, size);
+            if (selected) g.outline(getRight() - 11, getBottom() - 10 - lift, 5, 5, TEXT);
+        }
+        @Override public void updateWidgetNarration(net.minecraft.client.gui.narration.NarrationElementOutput output) {
+            super.updateWidgetNarration(output);
+            if (selected) output.add(net.minecraft.client.gui.narration.NarratedElementType.USAGE, Component.literal("Selected"));
+        }
+    }
+
     static final class Tab extends Action {
         private final boolean selected;
         private boolean rail;
@@ -117,7 +145,7 @@ final class TaggerWidgets {
                 button.setMessage(Component.literal(label + ": " + (value.getAsBoolean() ? "ON" : "OFF")));
             });
             this.label = label; this.description = description; this.value = value;
-            setTooltip(Tooltip.create(Component.literal(label + ": " + description)));
+            setTooltip(TaggerFonts.tooltip(Component.literal(label + ": " + description)));
         }
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             row(g, this, hoverAmount());
@@ -143,7 +171,7 @@ final class TaggerWidgets {
             });
             this.value = value;
             setMessage(Component.literal("Ranking mode: ").append(value.get()));
-            setTooltip(Tooltip.create(Component.literal("Choose from every mode. Strongest tier selects each player's best eligible ranking.")));
+            setTooltip(TaggerFonts.tooltip(Component.literal("Choose from every mode. Strongest tier selects each player's best eligible ranking.")));
         }
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             row(g, this, hoverAmount());

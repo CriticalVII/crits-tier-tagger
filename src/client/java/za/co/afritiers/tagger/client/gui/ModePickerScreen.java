@@ -36,20 +36,21 @@ public final class ModePickerScreen extends Screen {
         // Alias IDs refer to one icon/mode, so a service cannot produce duplicate choices.
         var seen = new java.util.HashSet<Object>();
         modes.removeIf(mode -> !seen.add(ModeIcon.find(mode).<Object>map(icon -> icon).orElse(mode)));
-        int columns = w >= 320 ? 2 : 1;
-        int cellWidth = (w - 36 - (columns - 1) * 8) / columns;
-        LinearLayout list = LinearLayout.vertical().spacing(3);
+        int columns = w >= 480 ? 4 : w >= 360 ? 3 : 2;
+        int cellWidth = (w - 36 - (columns - 1) * 6) / columns;
+        LinearLayout list = LinearLayout.vertical().spacing(6);
         LinearLayout row = null;
         int index = 0;
         for (String mode : modes) {
-            if (index++ % columns == 0) { row = LinearLayout.horizontal().spacing(8); list.addChild(row); }
+            if (index++ % columns == 0) { row = LinearLayout.horizontal().spacing(6); list.addChild(row); }
             String name = provider.modeLabel(mode);
-            int buttonWidth = columns == 2 && modes.size() % 2 == 1 && index == modes.size() ? 2 * cellWidth + 8 : cellWidth;
-            var button = new TaggerWidgets.Action(name, buttonWidth, 24, isSelected(mode), pressed -> {
+            int buttonWidth = cellWidth;
+            var button = new TaggerWidgets.Tile(name, buttonWidth, 60, isSelected(mode),
+                    ModeIcons.sprite(ModeIcon.forMode(mode)).spriteId(), pressed -> {
                 owner.selectMode(mode); onClose();
             });
             button.setMessage(Component.empty().append(ModeIcons.component(mode)).append(" " + name));
-            button.setTooltip(Tooltip.create(Component.literal(mode.equals("strongest")
+            button.setTooltip(TaggerFonts.tooltip(Component.literal(mode.equals("strongest")
                     ? "Each player's best eligible tier across all modes" : "Display " + name + " tiers only")));
             row.addChild(button);
         }

@@ -13,6 +13,9 @@ final class TaggerFonts {
     private static final FontDescription BODY = new FontDescription.Resource(Identifier.fromNamespaceAndPath("afritiers_tagger", "ui_body"));
     private static Font base, body;
     private TaggerFonts() { }
+    static net.minecraft.client.gui.components.Tooltip tooltip(net.minecraft.network.chat.Component text) {
+        return net.minecraft.client.gui.components.Tooltip.create(text.copy().withStyle(style -> style.withFont(BODY)));
+    }
     static Font body() {
         Font original = Minecraft.getInstance().font;
         if (body == null || base != original) {

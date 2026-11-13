@@ -31,4 +31,9 @@ final class TierlistLogo {
             }
         };
     }
+
+    static Button tile(TierlistProvider provider, int width, int height, boolean selected, Button.OnPress action) {
+        return new TaggerWidgets.Tile(provider.label(), width, height, selected,
+                Identifier.fromNamespaceAndPath("afritiers_tagger", "provider/" + provider.id()), action);
+    }
 }
