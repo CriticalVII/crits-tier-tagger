@@ -12,7 +12,7 @@ public final class ModeIcons {
     static {
         for (ModeIcon icon : ModeIcon.values()) {
             FONTS.put(icon, new FontDescription.AtlasSprite(AtlasIds.GUI,
-                    Identifier.fromNamespaceAndPath("afritiers_tagger", "mode/remade/" + icon.texture())));
+                    Identifier.fromNamespaceAndPath("afritiers_tagger", "mode/" + icon.texture())));
             TAB_FONTS.put(icon, new FontDescription.Resource(Identifier.fromNamespaceAndPath("afritiers_tagger", "tab/" + icon.texture())));
         }
     }
