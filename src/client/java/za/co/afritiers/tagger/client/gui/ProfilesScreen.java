@@ -67,14 +67,14 @@ public final class ProfilesScreen extends Screen {
         w = frame.w(); h = frame.h(); x = frame.x(); y = frame.y();
         contentOffset = frame.offset() + (w < 440 ? 24 : 0);
         TaggerTabs.add(this::addRenderableWidget, owner, "Profiles", frame);
-        var source = TierlistLogo.button(provider, provider.label() + " >", w < 440 ? w - 24 : 94, 20, false,
+        var source = TierlistLogo.button(provider, provider.label() + " >", w < 440 ? w - 24 : 112, 20, false,
                 pressed -> minecraft.gui.setScreen(new ProfileProviderScreen(this, provider)));
         source.setTooltip(TaggerFonts.tooltip(Component.literal("Profile tierlist. This does not change in-game tags.")));
         source.setPosition(x + 12, y + 42 + frame.offset()); addRenderableWidget(source);
         searchButton = TaggerWidgets.action("Search", 60, true, pressed -> search());
         searchButton.setPosition(x + w - 148, y + 42 + contentOffset);
-        searchField = new TaggerWidgets.Input(w < 440 ? w - 166 : w - 270, 20, Component.literal("Player username"));
-        searchField.setPosition(x + (w < 440 ? 12 : 114), y + 42 + contentOffset);
+        searchField = new TaggerWidgets.Input(w < 440 ? w - 166 : w - 288, 20, Component.literal("Player username"));
+        searchField.setPosition(x + (w < 440 ? 12 : 132), y + 42 + contentOffset);
         searchField.setMaxLength(16);
         searchField.setCentered(true);
         searchField.setBordered(false);
@@ -127,9 +127,7 @@ public final class ProfilesScreen extends Screen {
             rows.addChild(new TaggerWidgets.Label(contentWidth, 12, Component.literal("TIERS").withColor(TaggerWidgets.MUTED), font));
             var tiers = snapshot.players().getOrDefault(apiName, java.util.List.of()).stream()
                     .sorted(Comparator.comparing(Tier::retired).thenComparingInt(Tier::strength).thenComparing(Tier::mode)).toList();
-            int columns = Math.max(1, Math.min(8, (contentWidth - 12) / 36));
-            for (int index = 0; index < tiers.size(); index += columns)
-                rows.addChild(new TierStrip(contentWidth, tiers.subList(index, Math.min(tiers.size(), index + columns))));
+            if (!tiers.isEmpty()) rows.addChild(new TierStrip(contentWidth, tiers));
             if (tiers.isEmpty()) rows.addChild(new ProfileLine(contentWidth, Component.literal("No recorded tiers").withColor(TaggerWidgets.MUTED)));
         }
         var scroll = new ScrollableLayout(minecraft, rows, Math.max(32, h - 128 - contentOffset), ScrollableLayout.ReserveStrategy.RIGHT);
@@ -221,7 +219,8 @@ public final class ProfilesScreen extends Screen {
             int centre = getX() + width / 2;
             TaggerWidgets.surface(g, centre - 22, getY(), 44, 44, 22, 0xFF171717, 0xFF937A2B);
             PlayerFaceExtractor.extractRenderState(g, skin.get(), centre - 14, getY() + 8, 28);
-            g.text(font, TaggerFrame.heading(requested), centre - font.width(TaggerFrame.heading(requested)) / 2,
+            String displayName = profile != null && requested.equalsIgnoreCase(profile.name()) ? profile.name() : requested;
+            g.text(font, TaggerFrame.heading(displayName), centre - font.width(TaggerFrame.heading(displayName)) / 2,
                     getY() + 49, TaggerWidgets.TEXT, false);
             String title = profile != null && !profile.combatTitle().isBlank() ? profile.combatTitle() : provider.label() + " profile";
             int pillWidth = Math.min(width - 12, font.width(title) + 20);
@@ -260,29 +259,35 @@ public final class ProfilesScreen extends Screen {
 
     private final class TierStrip extends AbstractWidget {
         private final java.util.List<Tier> tiers;
+        private final int columns;
         private int tooltipIndex = -2;
         TierStrip(int width, java.util.List<Tier> tiers) {
-            super(0, 0, width, 50, Component.literal(tiers.stream().map(tier -> provider.modeLabel(tier.mode()) + ": " + tier.displayLevel())
+            super(0, 0, width, 48 * ((tiers.size() + columnsFor(width) - 1) / columnsFor(width)) + 2,
+                    Component.literal(tiers.stream().map(tier -> provider.modeLabel(tier.mode()) + ": " + tier.displayLevel())
                     .collect(java.util.stream.Collectors.joining(" · "))));
             this.tiers = java.util.List.copyOf(tiers);
+            this.columns = columnsFor(width);
         }
+        private static int columnsFor(int width) { return Math.max(1, Math.min(8, (width - 12) / 36)); }
         @Override protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             TaggerWidgets.surface(g, getX(), getY(), width, height, 4, 0xFF121212, isFocused() ? TaggerWidgets.BLUE : TaggerWidgets.LINE);
-            int hovered = isHovered() ? (mouseX - getX() - 6) / 36 : -1;
-            if (mouseX < getX() + 6 || hovered >= tiers.size()) hovered = -1;
+            int column = (mouseX - getX() - 6) / 36;
+            int hovered = isHovered() ? ((mouseY - getY()) / 48) * columns + column : -1;
+            if (mouseX < getX() + 6 || column >= columns || hovered >= tiers.size()) hovered = -1;
             if (tooltipIndex != hovered) {
                 tooltipIndex = hovered;
                 setTooltip(hovered < 0 ? null : TaggerFonts.tooltip(Component.literal(provider.modeLabel(tiers.get(hovered).mode()) + ": " + tiers.get(hovered).displayLevel())));
             }
             for (int index = 0; index < tiers.size(); index++) {
-                Tier tier = tiers.get(index); int left = getX() + 6 + index * 36;
+                Tier tier = tiers.get(index); int left = getX() + 6 + (index % columns) * 36;
+                int top = getY() + (index / columns) * 48;
                 int colour = 0xFF000000 | TIER_COLOURS.colour(tier.level());
-                TaggerWidgets.surface(g, left + 4, getY() + 5, 26, 26, 13, 0xFF090C0E, hovered == index ? colour : TaggerWidgets.LINE);
+                TaggerWidgets.surface(g, left + 4, top + 5, 26, 26, 13, 0xFF090C0E, hovered == index ? colour : TaggerWidgets.LINE);
                 g.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
-                        ModeIcons.sprite(ModeIcon.forMode(tier.mode())).spriteId(), left + 9, getY() + 10, 16, 16);
-                TaggerWidgets.rounded(g, left + 1, getY() + 32, 32, 13, 6, 0xFF252525);
+                        ModeIcons.sprite(ModeIcon.forMode(tier.mode())).spriteId(), left + 9, top + 10, 16, 16);
+                TaggerWidgets.rounded(g, left + 1, top + 32, 32, 13, 6, 0xFF252525);
                 String level = tier.displayLevel();
-                g.text(font, level, left + (34 - font.width(level)) / 2, getY() + 35, colour, false);
+                g.text(font, level, left + (34 - font.width(level)) / 2, top + 35, colour, false);
             }
         }
         @Override protected void updateWidgetNarration(net.minecraft.client.gui.narration.NarrationElementOutput output) {
