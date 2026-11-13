@@ -26,9 +26,12 @@ record TaggerFrame(int left, int top, int width, int height, int rail, long appe
         TaggerWidgets.backdrop(g, client.getWindow().getGuiScaledWidth(), client.getWindow().getGuiScaledHeight());
             g.fill(left, top, x(), top + height, 0xFF0B0B0B);
             g.fill(x() - 1, top, x(), top + height, TaggerWidgets.LINE);
-            TaggerWidgets.rounded(g, left + 9, top + 10, 17, 17, 3, 0xFF252525);
-            g.text(font, "C", left + 13, top + 15, TaggerWidgets.TEXT, false);
-            g.text(font, "Crit's", left + 31, top + 15, TaggerWidgets.TEXT, false);
+            if (font.width("Crit's Tier Tagger") <= rail - 20) {
+                g.text(font, "Crit's Tier Tagger", left + 10, top + 16, TaggerWidgets.TEXT, false);
+            } else {
+                g.text(font, "Crit's", left + 10, top + 12, TaggerWidgets.TEXT, false);
+                g.text(font, "Tier Tagger", left + 10, top + 25, TaggerWidgets.TEXT, false);
+            }
         float reveal = client.options.screenEffectScale().get() == 0 ? 1 : Math.min(1, (System.nanoTime() - appearedAt) / 180_000_000F);
         int headingColor = ((int) (255 * (0.85F + 0.15F * reveal)) << 24) | (TaggerWidgets.TEXT & 0xFFFFFF);
         g.text(font, heading(page), x() + 14, top + 11, headingColor, false);
