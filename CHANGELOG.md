@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.2.0 — 2026-11-13
+
+### Pandora-inspired GUI
+
+- Replaced the framed workspace with an edge-to-edge black layout, slimmer grouped navigation, account footer and compact page headers.
+- Added clean Outfit text throughout this mod's GUI, including text fields and tooltips. Minecraft's HUD font, in-game tags and live tag preview retain their original rendering.
+- Restyled controls with subtle rounded corners, green/cyan actions, switches and blue-outlined selections.
+- Converted mode/provider selection to image galleries and profile rankings to consistent mode tiles with coloured tier labels.
+- Enlarged the profile portrait and simplified its surroundings to match the launcher reference. Smaller GUI sizes retain responsive top navigation and scrolling.
+- Added restrained tile lift and portrait fades, respecting Minecraft's Screen Effects setting.
+
+Includes 2.1.1's verified UUID-only lookup for MCTiers/PvPTiers/SubTiers and `RHT`/`RLT` retired labels. AfriTiers matching, original mode/provider artwork, automatic saving, main-menu access, waitlists and request safeguards remain intact.
+
 ## 2.1.1 — 2026-11-13
 
 ### UUID matching
