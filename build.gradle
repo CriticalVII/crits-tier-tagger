@@ -21,6 +21,17 @@ loom {
     }
 }
 
+sourceSets {
+    main {
+        java.setSrcDirs(['src/common'])
+        resources.setSrcDirs(['resources'])
+    }
+    client {
+        java.setSrcDirs(['src/client'])
+        resources.setSrcDirs([])
+    }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
