@@ -1,1 +1,1 @@
-8ce506db69b4d2bb69b21ea17519bf35071f86d78ba0b01fa44f112dd14d5462  crits-tier-tagger-2.0.0.jar
+4a7baaa1439ba90cb83954eeb18eeea5fdc491f70e6d6b53d12a91a16ce5a4e0  crits-tier-tagger-2.0.1.jar
