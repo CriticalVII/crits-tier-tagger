@@ -173,7 +173,7 @@ public final class TaggerSettingsScreen extends Screen {
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         g.fill(0, 0, width, height, 0x28090A13);
         TaggerWidgets.panel(g, panelX, panelY, panelWidth, panelHeight);
-        g.text(font, Component.literal("AfriTiers").withStyle(style -> style.withBold(true)), panelX + 12, panelY + (compact ? 13 : 10), TaggerWidgets.TEXT);
+        g.text(font, Component.literal("Crit's").withStyle(style -> style.withBold(true)), panelX + 12, panelY + (compact ? 13 : 10), TaggerWidgets.TEXT);
         if (!compact && panelWidth >= 380) g.text(font, "TIER TAGGER", panelX + 12, panelY + 22, TaggerWidgets.MUTED);
         g.fill(panelX + 12, panelY + (compact ? 26 : 32) + navigationOffset, panelX + panelWidth - 12, panelY + (compact ? 27 : 33) + navigationOffset, TaggerWidgets.LINE);
         int x = panelX + 12, y = panelY + (compact ? 34 : 42) + navigationOffset, w = panelWidth - 24;

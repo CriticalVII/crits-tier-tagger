@@ -30,7 +30,7 @@ public final class ProfilesScreen extends Screen {
     private TierlistProvider provider;
 
     public ProfilesScreen(TaggerSettingsScreen owner) {
-        super(Component.literal("AfriTiers profiles"));
+        super(Component.literal("Crit's profiles"));
         this.owner = owner;
         provider = AfriTiersClient.instance().defaultProfileProvider();
         requested = net.minecraft.client.Minecraft.getInstance().getUser().getName();
@@ -80,7 +80,9 @@ public final class ProfilesScreen extends Screen {
         searchField.setHint(Component.literal("Player username"));
         searchField.setValue(input);
         searchField.setResponder(value -> { input = value; searchButton.active = validInput(); });
-        searchField.setTooltip(Tooltip.create(Component.literal("Search a Minecraft username or a saved alias. Paid name changes are resolved automatically.")));
+        searchField.setTooltip(Tooltip.create(Component.literal(provider == TierlistProvider.AFRITIERS
+                ? "Search a username or saved alias. Verified paid-account name changes are resolved automatically."
+                : "Search " + provider.label() + " by Minecraft username or a saved alias.")));
         addRenderableWidget(searchField); addRenderableWidget(searchButton);
         Button self = TaggerWidgets.action("My profile", 70, false, pressed -> {
             input = "";
@@ -180,7 +182,7 @@ public final class ProfilesScreen extends Screen {
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         g.fill(0, 0, width, height, 0x28090A13);
         TaggerWidgets.panel(g, x, y, w, h);
-        g.text(font, Component.literal("AfriTiers").withStyle(style -> style.withBold(true)), x + 12, y + 10, TaggerWidgets.TEXT);
+        g.text(font, Component.literal("Crit's").withStyle(style -> style.withBold(true)), x + 12, y + 10, TaggerWidgets.TEXT);
         if (w >= 400) g.text(font, "PROFILES · " + provider.label(), x + 12, y + 22, TaggerWidgets.MUTED);
         g.fill(x + 12, y + 32 + TaggerTabs.offset(w), x + w - 12, y + 33 + TaggerTabs.offset(w), TaggerWidgets.LINE);
         var state = AfriTiersClient.instance().playerSearchRepository().state();

@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import java.util.function.Consumer;
 
-/** Shared navigation keeps all three configuration tabs aligned at every GUI scale. */
+/** Shared navigation keeps all configuration tabs aligned at every GUI scale. */
 final class TaggerTabs {
     private TaggerTabs() { }
     static void add(Consumer<Button> add, TaggerSettingsScreen owner, String active, int x, int y, int width) {

@@ -4,4 +4,4 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = 'afritiers-tagger'
+rootProject.name = 'crits-tier-tagger'
