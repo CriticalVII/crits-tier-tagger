@@ -36,11 +36,13 @@ record TaggerFrame(int left, int top, int width, int height, int rail, long appe
             g.fill(left + 12, top + height - 47, x() - 12, top + height - 46, TaggerWidgets.LINE);
             g.fill(left + 12, top + height - 29, left + 15, top + height - 26, TaggerWidgets.GREEN);
             g.text(font, "Auto saved", left + 21, top + height - 31, TaggerWidgets.MUTED, false);
+        } else {
+            g.text(font, "crit's", x() + w() - font.width("crit's") - 14, top + 17, TaggerWidgets.MUTED, false);
         }
         float reveal = client.options.screenEffectScale().get() == 0 ? 1 : Math.min(1, (System.nanoTime() - appearedAt) / 180_000_000F);
         int headingColor = ((int) (255 * (0.65F + 0.35F * reveal)) << 24) | (TaggerWidgets.TEXT & 0xFFFFFF);
         g.text(font, heading(page), x() + 14, top + 11, headingColor, false);
         g.fill(x() + 12, top + 32 + offset(), left + width - 12, top + 33 + offset(), TaggerWidgets.LINE);
-        g.fill(x() + 12, top + height - 36, left + width - 12, top + height - 35, TaggerWidgets.LINE);
+        g.fill(x() + 12, top + height - 33, left + width - 12, top + height - 32, TaggerWidgets.LINE);
     }
 }

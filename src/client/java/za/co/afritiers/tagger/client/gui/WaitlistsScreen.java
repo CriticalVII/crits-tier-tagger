@@ -58,7 +58,8 @@ public final class WaitlistsScreen extends Screen {
         int index = 0;
         for (String mode : modes) {
             if (index++ % 2 == 0) { row = LinearLayout.horizontal().spacing(12); rows.addChild(row); }
-            var toggle = new TaggerWidgets.Toggle(Tier.modeLabel(mode), "Notify when this waitlist opens", column, true,
+            int rowWidth = modes.size() % 2 == 1 && index == modes.size() ? 2 * column + 12 : column;
+            var toggle = new TaggerWidgets.Toggle(Tier.modeLabel(mode), "Notify when this waitlist opens", rowWidth, true,
                     () -> config.waitlistModes.contains(mode), value -> save(edited -> {
                         if (value) edited.waitlistModes.add(mode); else edited.waitlistModes.remove(mode);
                     }));

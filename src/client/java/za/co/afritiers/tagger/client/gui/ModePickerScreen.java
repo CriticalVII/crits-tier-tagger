@@ -44,7 +44,8 @@ public final class ModePickerScreen extends Screen {
         for (String mode : modes) {
             if (index++ % columns == 0) { row = LinearLayout.horizontal().spacing(8); list.addChild(row); }
             String name = provider.modeLabel(mode);
-            var button = new TaggerWidgets.Action(name, cellWidth, 24, isSelected(mode), pressed -> {
+            int buttonWidth = columns == 2 && modes.size() % 2 == 1 && index == modes.size() ? 2 * cellWidth + 8 : cellWidth;
+            var button = new TaggerWidgets.Action(name, buttonWidth, 24, isSelected(mode), pressed -> {
                 owner.selectMode(mode); onClose();
             });
             button.setMessage(Component.empty().append(ModeIcons.component(mode)).append(" " + name));
