@@ -52,7 +52,7 @@ final class ConnectionDetailsScreen extends Screen {
         boolean bulk = provider == za.co.afritiers.tagger.provider.TierlistProvider.AFRITIERS;
         List<String> lines = List.of(
                 provider.label() + ": " + state.message(),
-                "Ranked usernames: " + rankings.players().size(),
+                (bulk ? "Ranked usernames: " : "Cached UUID profiles: ") + rankings.players().size(),
                 "Last attempt: " + time(state.lastAttempt()),
                 "Last success: " + time(state.lastSuccess()),
                 (bulk ? "Source updated: " : "Last profile update: ") + (rankings.updatedAt() == null ? "Unknown" : DATE.format(rankings.updatedAt())),

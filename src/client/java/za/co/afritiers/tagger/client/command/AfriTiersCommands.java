@@ -93,7 +93,7 @@ public final class AfriTiersCommands {
         var state = mod.repository().state();
         var config = mod.config();
         source.sendFeedback(Component.literal("Crit's tiers · " + mod.selectedProvider().label() + ": " + state.message()
-                + " | " + state.rankings().players().size() + " usernames"
+                + " | " + state.rankings().players().size() + (mod.selectedProvider() == TierlistProvider.AFRITIERS ? " usernames" : " UUID profiles")
                 + " | ambiguous: " + state.rankings().ambiguousNames()
                 + " | Nameplates: " + (config.nameplates ? "ON" : "OFF")
                 + " | Tab: " + (config.tabList ? "ON" : "OFF")
