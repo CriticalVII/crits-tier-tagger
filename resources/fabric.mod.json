@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "afritiers_tagger",
+  "version": "${version}",
+  "name": "Crit's Tier Tagger",
+  "icon": "assets/afritiers_tagger/icon.png",
+  "description": "PvP tiers from AfriTiers, MCTiers, PvPTiers and SubTiers on player nameplates and Tab. Search profiles and watch AfriTiers waitlists.",
+  "environment": "client",
+  "license": "LicenseRef-All-Rights-Reserved",
+  "contact": { "homepage": "https://github.com/CriticalVII/afritiers-tagger", "sources": "https://github.com/CriticalVII/afritiers-tagger", "issues": "https://github.com/CriticalVII/afritiers-tagger/issues" },
+  "entrypoints": {
+    "client": ["crits.CritsTierTaggerClient"],
+    "modmenu": ["crits.ModMenuIntegration"]
+  },
+  "mixins": ["afritiers_tagger.client.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "26.2",
+    "java": ">=25",
+    "fabric-api": ">=0.161.0"
+  },
+  "suggests": { "modmenu": ">=20.0.3 <21" }
+}
