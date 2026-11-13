@@ -24,37 +24,22 @@ public final class TierlistsScreen extends Screen {
         int index = 0;
         for (var provider : TierlistProvider.values()) {
             if (index++ % 2 == 0) { row = LinearLayout.horizontal().spacing(12); grid.addChild(row); }
-            row.addChild(new ProviderCard(provider, (w - 36) / 2, h < 280 ? 58 : 72));
+            var button = TierlistLogo.button(provider, provider.label(), (w - 36) / 2, 34,
+                    provider == AfriTiersClient.instance().selectedProvider(), pressed -> {
+                        try {
+                            AfriTiersClient.instance().selectTierlist(provider);
+                            feedback = "Saved · now showing " + provider.label();
+                            rebuildWidgets();
+                        } catch (java.io.IOException exception) { feedback = "Could not save. Check config permissions."; }
+                    });
+            button.setTooltip(Tooltip.create(Component.literal(provider.description() + "\n" + provider.website())));
+            row.addChild(button);
         }
         var scroll = new ScrollableLayout(minecraft, grid, Math.max(32, h - 121 - offset), ScrollableLayout.ReserveStrategy.RIGHT);
         scroll.setMinWidth(w - 24); scroll.arrangeElements(); scroll.setX(x + 12); scroll.setY(y + 72 + offset);
         scroll.visitWidgets(this::addRenderableWidget);
         var back = TaggerWidgets.action("Back", 80, false, button -> onClose());
         back.setPosition(x + w - 92, y + h - 30); addRenderableWidget(back);
-    }
-    private final class ProviderCard extends TaggerWidgets.Action {
-        private final TierlistProvider provider;
-        ProviderCard(TierlistProvider provider, int width, int height) {
-            super(provider.label(), width, height, false, button -> {
-                try { AfriTiersClient.instance().selectTierlist(provider); feedback = "Saved · now showing " + provider.label(); }
-                catch (java.io.IOException exception) { feedback = "Could not save. Check config permissions."; }
-            });
-            this.provider = provider;
-            setTooltip(Tooltip.create(Component.literal(provider.description() + "\n" + provider.website())));
-        }
-        @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-            boolean selected = provider == AfriTiersClient.instance().selectedProvider();
-            g.fill(getX(), getY(), getRight(), getBottom(), selected ? 0x90694C8C : isHoveredOrFocused() ? 0x70584C6C : 0x40352E45);
-            g.fill(getX(), getY(), getX() + 2, getBottom(), selected ? TaggerWidgets.GREEN : TaggerWidgets.LINE);
-            if (isFocused()) g.outline(getX(), getY(), getWidth(), getHeight(), TaggerWidgets.GREEN);
-            TierlistLogo.draw(g, provider, getX() + 10, getY() + 7, 14);
-            g.text(font, Component.literal(provider.label()).withStyle(style -> style.withBold(true)), getX() + 29, getY() + 10, TaggerWidgets.TEXT);
-            g.text(font, font.plainSubstrByWidth(selected ? "SELECTED" : "Select tierlist", getWidth() - 20), getX() + 10, getY() + 26,
-                    selected ? 0xFFFFD700 : TaggerWidgets.MUTED);
-            if (getHeight() >= 68) g.text(font, font.plainSubstrByWidth(provider.description(), getWidth() - 20), getX() + 10, getY() + 43, TaggerWidgets.MUTED);
-            g.text(font, font.plainSubstrByWidth(AfriTiersClient.instance().providerStatus(provider), getWidth() - 20),
-                    getX() + 10, getBottom() - 13, TaggerWidgets.MUTED);
-        }
     }
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         g.fill(0, 0, width, height, 0x28090A13); TaggerWidgets.panel(g, x, y, w, h);
