@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.2 — 2026-11-13
+
+- Replaced all redrawn mode icons with the original MCTiers and SubTiers assets shown in the supplied references. Original SVG/PNG files and source links are retained; sprites only receive proportional resizing and transparent padding for Minecraft.
+- Changed the main Tierlists tab to the reference's simple two-by-two button grid, with centred official logos and names and a highlighted selection. Removed the detailed provider cards.
+- Preserved the profile source selector, approved Tab/nametag icon dimensions, main-menu updates, title-screen shortcut and API safeguards.
+
 ## 2.0.1 — 2026-11-13
 
 ### Changed
