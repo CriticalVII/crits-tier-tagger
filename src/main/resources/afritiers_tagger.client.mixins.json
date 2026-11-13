@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "za.co.afritiers.tagger.client.mixin",
+  "package": "dev.crits.tiertagger.client.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": ["PlayerRendererMixin", "PlayerTabOverlayMixin", "ModeIconFontMixin", "ClientPacketListenerMixin", "FontProviderAccessor", "SmoothGuiTextMixin", "MenuInputAlignmentMixin"],
   "injectors": { "defaultRequire": 1 }
