@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.2.1 — 2026-11-13
+
+- Smoothed Outfit menu text with 4× glyph oversampling and linear filtering scoped to this mod's UI. Labels, fields and tooltips use the same font; Minecraft's HUD and in-game tags remain unchanged.
+- Moved the in-game tierlist selector into Settings with all four providers and their original logos. Profile source selection stays independent.
+- Simplified navigation to Settings, Profiles and Waitlists at the side, including compact layouts. Removed sidebar category headings and the My account footer.
+- Redesigned Profiles around a centred skin portrait and player identity, a position/points banner, and one tier panel inspired by the supplied reference. Original mode icons sit in circular wells above coloured tier pills, with per-mode hover details and wrapping rows inside the same panel. Columns fill its width and shorter final rows are centred.
+- Centred profile search names, placeholders and native caret/selection baselines. Replaced the sidebar monogram with the full Crit's Tier Tagger wordmark.
+- Removed the top-ten tag feature, its setting, rank-only prefixes, preview rank and associated Tab indentation. Overall rank remains available in Profiles. Older configs safely ignore the removed option.
+
 ## 2.2.0 — 2026-11-13
 
 ### Pandora-inspired GUI

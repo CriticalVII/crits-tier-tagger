@@ -52,7 +52,7 @@ final class TaggerWidgets {
         @Override public void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             var font = TaggerFonts.body();
             var text = font.width(getMessage()) > getWidth()
-                    ? net.minecraft.client.gui.components.ComponentRenderUtils.clipText(getMessage(), font, getWidth()) : getMessage();
+                    ? net.minecraft.client.gui.components.ComponentRenderUtils.clipText(getMessage(), font, getWidth()) : getMessage().getVisualOrderText();
             g.text(font, text, getX(), getY() + (getHeight() - 9) / 2, TEXT, false);
         }
     }
@@ -146,14 +146,14 @@ final class TaggerWidgets {
         }
         @Override public int menuTextY() { return getY() + Math.max(0, (height - 10) / 2); }
         @Override public void setCentered(boolean centred) { this.centred = centred; super.setCentered(centred); }
-        @Override public void setHint(Component hint) { this.hint = hint; super.setHint(null); }
+        @Override public void setHint(Component hint) { this.hint = hint; }
         @Override public void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             surface(g, getX() - 4, getY() - 3, width + 6, height + 4, 3, 0xFF111111, isFocused() ? CYAN : LINE);
             super.extractWidgetRenderState(g, mouseX, mouseY, delta);
             if (visible && hint != null && getValue().isEmpty() && !isFocused()) {
                 var font = TaggerFonts.body();
                 String text = font.plainSubstrByWidth(hint.getString(), width - 8);
-                g.text(font, hint.copy().withStyle(style -> style.withColor(FAINT)),
+                g.text(font, Component.literal(text).withStyle(hint.getStyle()).withColor(FAINT),
                         centred ? getX() + (width - font.width(text)) / 2 : getX(), menuTextY(), FAINT, false);
             }
         }
