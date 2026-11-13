@@ -17,7 +17,7 @@ public final class ConfigStore {
     public TaggerConfig load() {
         if (!Files.exists(file)) return new TaggerConfig();
         try {
-            if (Files.size(file) > 16_384) throw new IllegalArgumentException("Config is too large");
+            if (Files.size(file) > 65_536) throw new IllegalArgumentException("Config is too large");
             TaggerConfig config = GSON.fromJson(Files.readString(file), TaggerConfig.class);
             if (config == null) throw new IllegalArgumentException("Empty config");
             config.validate();
