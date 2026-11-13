@@ -6,7 +6,7 @@ import java.util.function.IntSupplier;
 import za.co.afritiers.tagger.ranking.Rankings;
 
 /** All transitions are serialized; renderers read one immutable, volatile snapshot. */
-public final class RankingRepository implements AutoCloseable {
+public final class RankingRepository implements TierRepository {
     public enum Phase { DISCONNECTED, DISABLED, LOADING, READY, STALE, ERROR }
     public record State(Phase phase, Rankings rankings, Instant lastAttempt,
                         Instant lastSuccess, Instant nextRefresh, String message) { }
@@ -37,6 +37,9 @@ public final class RankingRepository implements AutoCloseable {
     }
 
     public State state() { return state; }
+    @Override public za.co.afritiers.tagger.provider.TierlistProvider provider() {
+        return za.co.afritiers.tagger.provider.TierlistProvider.AFRITIERS;
+    }
 
     public synchronized void connect() {
         if (closed) return;

@@ -24,6 +24,10 @@ import za.co.afritiers.tagger.network.PaidNameResolver;
 import za.co.afritiers.tagger.network.RankingRepository;
 import za.co.afritiers.tagger.network.HttpQueueSource;
 import za.co.afritiers.tagger.network.QueueRepository;
+import za.co.afritiers.tagger.network.TierRepository;
+import za.co.afritiers.tagger.network.ProfileRepository;
+import za.co.afritiers.tagger.network.HttpPlayerProfileSource;
+import za.co.afritiers.tagger.provider.TierlistProvider;
 import za.co.afritiers.tagger.ranking.Rankings;
 import za.co.afritiers.tagger.ranking.Tier;
 
@@ -35,9 +39,13 @@ public final class AfriTiersClient implements ClientModInitializer {
     private static AfriTiersClient instance;
     private ConfigStore store;
     private volatile TaggerConfig config;
-    private RankingRepository repository;
+    private TierRepository repository;
     private PaidNameResolver paidNames;
-    private RankingRepository browser;
+    private TierRepository browser;
+    private TierlistProvider selectedProvider = TierlistProvider.AFRITIERS;
+    private TierlistProvider profileProvider = TierlistProvider.AFRITIERS;
+    private final java.util.Map<TierlistProvider, TierRepository> gameRepositories = new java.util.EnumMap<>(TierlistProvider.class);
+    private final java.util.Map<TierlistProvider, TierRepository> profileRepositories = new java.util.EnumMap<>(TierlistProvider.class);
     private boolean browsingPlayers;
     private QueueRepository waitlists;
     private boolean browsingWaitlists;
@@ -48,7 +56,15 @@ public final class AfriTiersClient implements ClientModInitializer {
     public static AfriTiersClient instance() { return instance; }
     public TaggerConfig config() { return config.copy(); }
     TaggerConfig activeConfig() { return config; }
-    public RankingRepository repository() { return repository; }
+    public TierRepository repository() { return repository; }
+    public TierlistProvider selectedProvider() { return selectedProvider; }
+    public TierlistProvider defaultProfileProvider() {
+        return config.profileTierlist.isEmpty() ? selectedProvider : TierlistProvider.from(config.profileTierlist);
+    }
+    public String providerStatus(TierlistProvider provider) {
+        var service = provider == selectedProvider ? repository : gameRepositories.get(provider);
+        return service == null ? "Not selected" : service.state().message();
+    }
     public PaidNameResolver paidNames() { return paidNames; }
     public QueueRepository waitlists() { return waitlists; }
     public void browseWaitlists(boolean browsing) { browsingWaitlists = browsing; }
@@ -59,7 +75,8 @@ public final class AfriTiersClient implements ClientModInitializer {
         instance = this;
         store = new ConfigStore(FabricLoader.getInstance().getConfigDir().resolve("afritiers_tagger.json"));
         config = store.load();
-        repository = new RankingRepository(new HttpRankingSource());
+        selectedProvider = TierlistProvider.from(config.tierlist);
+        repository = createRepository(selectedProvider);
         browser = new RankingRepository(new HttpRankingSource());
         paidNames = new PaidNameResolver(new HttpProfileLookup());
         waitlists = new QueueRepository(new HttpQueueSource());
@@ -78,11 +95,16 @@ public final class AfriTiersClient implements ClientModInitializer {
             observedWorld = null; observedPlayer = null; worldRefreshRequested = false;
             repository.disconnect(); paidNames.setActive(false);
         });
-        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> { repository.close(); browser.close(); paidNames.close(); waitlists.close(); });
+        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
+            var services = new java.util.HashSet<TierRepository>(gameRepositories.values());
+            services.addAll(profileRepositories.values()); services.add(repository); services.add(browser);
+            services.forEach(TierRepository::close); paidNames.close(); waitlists.close();
+        });
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             updateWorldSession(client);
             repository.tick();
-            if (browsingPlayers) browser.tick();
+            if (browsingPlayers && playerSearchRepository() != repository) playerSearchRepository().tick();
+            updateVisibleProfiles(client);
             updatePaidNames(client);
             var watched = config.waitlistNotifications ? config.waitlistModes : java.util.Set.<String>of();
             var notifications = waitlists.tick(client.player != null && client.getConnection() != null, browsingWaitlists, watched);
@@ -108,17 +130,34 @@ public final class AfriTiersClient implements ClientModInitializer {
         validated.validate();
         store.save(validated);
         config = validated;
+        TierlistProvider next = TierlistProvider.from(validated.tierlist);
+        if (selectedProvider != next) {
+            repository.disconnect();
+            gameRepositories.put(selectedProvider, repository);
+            repository = gameRepositories.computeIfAbsent(next, AfriTiersClient::createRepository);
+            selectedProvider = next;
+            repository.setEnabled(validated.enabled);
+            if (Minecraft.getInstance().player != null) repository.connect();
+        }
         repository.setEnabled(validated.enabled);
         if (!validated.enabled) paidNames.setActive(false);
     }
 
     public String rankingUsername(String username) {
-        return rankingUsername(username, repository.state().rankings());
+        return rankingUsername(username, repository.state().rankings(), selectedProvider);
     }
 
     public String rankingUsername(String username, Rankings rankings) {
+        return rankingUsername(username, rankings, selectedProvider);
+    }
+
+    public String rankingUsername(String username, Rankings rankings, TierlistProvider provider) {
         String key = Tier.normalizeUsername(username);
         boolean direct = rankings.players().containsKey(key);
+        if (provider != TierlistProvider.AFRITIERS) {
+            String alias = config.aliases(provider).get(key);
+            return direct ? key : alias != null && rankings.players().containsKey(alias) ? alias : "";
+        }
         // Cracked records and paid records without a usable paid ID remain username-only.
         if (direct && !rankings.paidProfiles().containsValue(key)) return key;
         if (!direct) {
@@ -131,26 +170,60 @@ public final class AfriTiersClient implements ClientModInitializer {
         return direct ? key : "";
     }
 
-    public RankingRepository playerSearchRepository() {
-        return Minecraft.getInstance().player != null && config.enabled ? repository : browser;
+    public TierRepository playerSearchRepository() {
+        if (profileProvider == selectedProvider && Minecraft.getInstance().player != null && config.enabled) return repository;
+        return profileProvider == TierlistProvider.AFRITIERS ? browser
+                : profileRepositories.computeIfAbsent(profileProvider, AfriTiersClient::createRepository);
     }
 
     public void beginPlayerSearch() {
+        beginPlayerSearch(defaultProfileProvider());
+    }
+    public void beginPlayerSearch(TierlistProvider provider) {
+        profileProvider = provider;
         browsingPlayers = true;
-        if (playerSearchRepository() == browser && browser.state().phase() == RankingRepository.Phase.DISCONNECTED) browser.connect();
+        var service = playerSearchRepository();
+        if (service != repository && service.state().phase() == RankingRepository.Phase.DISCONNECTED) service.connect();
     }
 
     public void endPlayerSearch() {
+        if (playerSearchRepository() != repository) playerSearchRepository().disconnect();
         browsingPlayers = false;
-        browser.disconnect();
     }
 
     public void requestPlayerSearch(String username) {
         var rankings = playerSearchRepository().state().rankings();
         String key = Tier.normalizeUsername(username);
+        if (profileProvider != TierlistProvider.AFRITIERS) {
+            playerSearchRepository().requestPlayer(config.aliases(profileProvider).getOrDefault(key, username), true);
+            return;
+        }
         if (rankings.players().containsKey(key) && !rankings.paidProfiles().containsValue(key)) return;
         if (config.usernameAliases.containsKey(key)) return;
         if (!rankings.paidProfiles().isEmpty()) paidNames.request(username);
+    }
+
+    public void selectTierlist(TierlistProvider provider) throws IOException {
+        var edited = config();
+        edited.tierlistModes.put(edited.tierlist, edited.mode);
+        edited.tierlist = provider.id();
+        edited.mode = edited.tierlistModes.getOrDefault(provider.id(), "strongest");
+        saveConfig(edited);
+    }
+
+    private static TierRepository createRepository(TierlistProvider provider) {
+        return provider == TierlistProvider.AFRITIERS ? new RankingRepository(new HttpRankingSource())
+                : new ProfileRepository(new HttpPlayerProfileSource(provider));
+    }
+
+    private void updateVisibleProfiles(Minecraft client) {
+        if (!config.enabled || selectedProvider == TierlistProvider.AFRITIERS || client.player == null || client.level == null || client.getConnection() == null) return;
+        LinkedHashSet<String> names = new LinkedHashSet<>();
+        names.add(client.player.getGameProfile().name());
+        client.level.players().stream().limit(80).forEach(player -> names.add(player.getGameProfile().name()));
+        client.getConnection().getListedOnlinePlayers().stream().limit(80).forEach(info -> names.add(info.getProfile().name()));
+        names.stream().limit(80).forEach(name -> repository.requestPlayer(config.aliases(selectedProvider)
+                .getOrDefault(Tier.normalizeUsername(name), name), false));
     }
 
     private void updateWorldSession(Minecraft client) {
