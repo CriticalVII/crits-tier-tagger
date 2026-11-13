@@ -21,19 +21,26 @@ public final class TaggerSettingsScreen extends Screen {
     private int previewTier = 0;
     private int panelX, panelY, panelWidth, panelHeight;
     private boolean compact;
+    private int navigationOffset;
+    private String draftProvider;
 
     public TaggerSettingsScreen(Screen parent) {
         super(Component.translatable("afritiers_tagger.title"));
         this.parent = parent;
         draft = AfriTiersClient.instance().config();
+        draftProvider = draft.tierlist;
     }
 
     @Override protected void init() {
+        if (!draftProvider.equals(AfriTiersClient.instance().config().tierlist)) {
+            draft = AfriTiersClient.instance().config(); draftProvider = draft.tierlist;
+        }
         panelWidth = Math.min(520, width - 20);
         panelHeight = Math.min(348, height - 16);
         panelX = (width - panelWidth) / 2;
         panelY = (height - panelHeight) / 2;
         compact = panelHeight < 300;
+        navigationOffset = TaggerTabs.offset(panelWidth);
         int contentWidth = panelWidth - 34;
         boolean columns = panelWidth >= 320;
         int columnWidth = columns ? (contentWidth - 12) / 2 : contentWidth;
@@ -63,20 +70,20 @@ public final class TaggerSettingsScreen extends Screen {
         LinearLayout controls = columns ? LinearLayout.horizontal().spacing(12) : LinearLayout.vertical().spacing(12);
         controls.addChild(display);
         controls.addChild(appearance);
-        ScrollableLayout scroll = new ScrollableLayout(minecraft, controls, Math.max(32, panelHeight - (compact ? 128 : 174)), ScrollableLayout.ReserveStrategy.RIGHT);
+        ScrollableLayout scroll = new ScrollableLayout(minecraft, controls, Math.max(32, panelHeight - (compact ? 128 : 174) - navigationOffset), ScrollableLayout.ReserveStrategy.RIGHT);
         scroll.setMinWidth(contentWidth);
         scroll.arrangeElements();
         scroll.setX(panelX + 12);
-        scroll.setY(panelY + (compact ? 78 : 104));
+        scroll.setY(panelY + (compact ? 78 : 104) + navigationOffset);
         scroll.visitWidgets(this::addRenderableWidget);
 
         Button previous = new TaggerWidgets.Action("<", 16, 16, false, pressed -> cyclePreview(-1));
         previous.setTooltip(Tooltip.create(Component.literal("Previous preview tier")));
-        previous.setPosition(panelX + panelWidth - 50, panelY + (compact ? 38 : 48));
+        previous.setPosition(panelX + panelWidth - 50, panelY + (compact ? 38 : 48) + navigationOffset);
         addRenderableWidget(previous);
         Button next = new TaggerWidgets.Action(">", 16, 16, false, pressed -> cyclePreview(1));
         next.setTooltip(Tooltip.create(Component.literal("Next preview tier")));
-        next.setPosition(panelX + panelWidth - 30, panelY + (compact ? 38 : 48));
+        next.setPosition(panelX + panelWidth - 30, panelY + (compact ? 38 : 48) + navigationOffset);
         addRenderableWidget(next);
         Button refresh = TaggerWidgets.action("Refresh", 52, false, pressed -> feedback = AfriTiersClient.instance().repository().refresh());
         refresh.setTooltip(Tooltip.create(Component.literal("Refresh rankings using your saved settings.")));
@@ -120,7 +127,7 @@ public final class TaggerSettingsScreen extends Screen {
 
     private Component modeText() {
         return Component.empty().append(ModeIcons.component(draft.mode))
-                .append(" " + (draft.mode.equals("strongest") ? "Strongest tier" : Tier.modeLabel(draft.mode)));
+                .append(" " + AfriTiersClient.instance().selectedProvider().modeLabel(draft.mode));
     }
 
     private void cyclePreview(int direction) {
@@ -151,6 +158,7 @@ public final class TaggerSettingsScreen extends Screen {
         edited.showTopTen = draft.showTopTen;
         edited.includeRetired = draft.includeRetired;
         edited.mode = draft.mode;
+        edited.tierlistModes.put(edited.tierlist, draft.mode);
         edited.customColour = draft.customColour;
         // An unfinished colour entry must not prevent independent toggles from saving.
         if (!validationError.isEmpty()) edited.customColour = AfriTiersClient.instance().config().customColour;
@@ -165,10 +173,10 @@ public final class TaggerSettingsScreen extends Screen {
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         g.fill(0, 0, width, height, 0x28090A13);
         TaggerWidgets.panel(g, panelX, panelY, panelWidth, panelHeight);
-        g.text(font, Component.literal("AfriTiers").withStyle(style -> style.withBold(true)), panelX + 12, panelY + (compact ? 13 : 10), TaggerWidgets.TEXT);
+        g.text(font, Component.literal("Crit's").withStyle(style -> style.withBold(true)), panelX + 12, panelY + (compact ? 13 : 10), TaggerWidgets.TEXT);
         if (!compact && panelWidth >= 380) g.text(font, "TIER TAGGER", panelX + 12, panelY + 22, TaggerWidgets.MUTED);
-        g.fill(panelX + 12, panelY + (compact ? 26 : 32), panelX + panelWidth - 12, panelY + (compact ? 27 : 33), TaggerWidgets.LINE);
-        int x = panelX + 12, y = panelY + (compact ? 34 : 42), w = panelWidth - 24;
+        g.fill(panelX + 12, panelY + (compact ? 26 : 32) + navigationOffset, panelX + panelWidth - 12, panelY + (compact ? 27 : 33) + navigationOffset, TaggerWidgets.LINE);
+        int x = panelX + 12, y = panelY + (compact ? 34 : 42) + navigationOffset, w = panelWidth - 24;
         int previewHeight = compact ? 36 : 50;
         g.fill(x, y, x + w, y + previewHeight, 0x40110D20);
         g.fill(x, y, x + 2, y + previewHeight, 0xAA85DBDA);

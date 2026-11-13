@@ -4,11 +4,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import java.util.function.Consumer;
 
-/** Shared navigation keeps all three configuration tabs aligned at every GUI scale. */
+/** Shared navigation keeps all configuration tabs aligned at every GUI scale. */
 final class TaggerTabs {
     private TaggerTabs() { }
     static void add(Consumer<Button> add, TaggerSettingsScreen owner, String active, int x, int y, int width) {
-        String[] labels = {"Settings", "Profiles", "Waitlists"};
+        String[] labels = {"Settings", "Tierlists", "Profiles", "Waitlists"};
         for (int index = 0; index < labels.length; index++) {
             String label = labels[index];
             var tab = new TaggerWidgets.Tab(label, label.equals(active), pressed -> {
@@ -16,12 +16,17 @@ final class TaggerTabs {
                 Minecraft client = Minecraft.getInstance();
                 client.gui.setScreen(switch (label) {
                     case "Profiles" -> new ProfilesScreen(owner);
+                    case "Tierlists" -> new TierlistsScreen(owner);
                     case "Waitlists" -> new WaitlistsScreen(owner);
                     default -> owner;
                 });
             });
-            tab.setPosition(x + width - 218 + index * 70, y + 9);
+            int tabWidth = width < 400 ? (width - 42) / 4 : 64;
+            tab.setWidth(tabWidth);
+            tab.setPosition(width < 400 ? x + 12 + index * (tabWidth + 6) : x + width - 288 + index * 70,
+                    y + 9 + offset(width));
             add.accept(tab);
         }
     }
+    static int offset(int width) { return width < 400 ? 22 : 0; }
 }

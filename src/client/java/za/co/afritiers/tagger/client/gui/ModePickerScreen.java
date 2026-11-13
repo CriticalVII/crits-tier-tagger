@@ -12,7 +12,7 @@ import za.co.afritiers.tagger.ranking.ModeIcon;
 import za.co.afritiers.tagger.ranking.Tier;
 import java.util.*;
 
-/** All bundled modes remain selectable even before rankings have downloaded. */
+/** Provider-supported modes remain selectable before rankings have downloaded. */
 public final class ModePickerScreen extends Screen {
     private final TaggerSettingsScreen owner;
     private final String selected;
@@ -28,15 +28,14 @@ public final class ModePickerScreen extends Screen {
         w = Math.min(520, width - 20); h = Math.min(348, height - 16);
         x = (width - w) / 2; y = (height - h) / 2;
         var available = AfriTiersClient.instance().repository().state().rankings().modes();
+        var provider = AfriTiersClient.instance().selectedProvider();
         Set<String> modes = new LinkedHashSet<>();
         modes.add("strongest");
-        for (ModeIcon icon : ModeIcon.values()) {
-            if (icon == ModeIcon.OVERALL) continue;
-            modes.add(available.stream().filter(mode -> ModeIcon.find(mode).orElse(null) == icon)
-                    .sorted().findFirst().orElse(icon.primaryMode()));
-        }
-        available.stream().filter(mode -> ModeIcon.find(mode).isEmpty()).sorted().forEach(modes::add);
-        if (!selected.equals("strongest") && modes.stream().noneMatch(this::isSelected)) modes.add(selected);
+        modes.addAll(provider.modes());
+        modes.addAll(available);
+        // Alias IDs refer to one icon/mode, so a service cannot produce duplicate choices.
+        var seen = new java.util.HashSet<Object>();
+        modes.removeIf(mode -> !seen.add(ModeIcon.find(mode).<Object>map(icon -> icon).orElse(mode)));
         int columns = w >= 320 ? 2 : 1;
         int cellWidth = (w - 36 - (columns - 1) * 8) / columns;
         LinearLayout list = LinearLayout.vertical().spacing(3);
@@ -44,7 +43,7 @@ public final class ModePickerScreen extends Screen {
         int index = 0;
         for (String mode : modes) {
             if (index++ % columns == 0) { row = LinearLayout.horizontal().spacing(8); list.addChild(row); }
-            String name = mode.equals("strongest") ? "Strongest tier" : Tier.modeLabel(mode);
+            String name = provider.modeLabel(mode);
             var button = new TaggerWidgets.Action(name, cellWidth, 24, isSelected(mode), pressed -> {
                 owner.selectMode(mode); onClose();
             });

@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import za.co.afritiers.tagger.client.AfriTiersClient;
 import za.co.afritiers.tagger.client.gui.TaggerSettingsScreen;
 import za.co.afritiers.tagger.client.gui.ProfilesScreen;
+import za.co.afritiers.tagger.provider.TierlistProvider;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -28,8 +29,8 @@ public final class AfriTiersCommands {
     public static void register(AfriTiersClient mod) {
         var commands = new AfriTiersCommands(mod);
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            dispatcher.register(
-                literal("afritiers")
+            for (String root : new String[] {"crittiers", "ctiers", "afritiers"}) dispatcher.register(
+                literal(root)
                         .then(commands.aliases())
                         .then(literal("config").requires(FabricClientCommandSource::attended).executes(context -> {
                             Minecraft client = context.getSource().getClient();
@@ -56,11 +57,26 @@ public final class AfriTiersCommands {
                                         .limit(100).forEach(builder::suggest);
                                 return builder.buildFuture();
                             })
-                            .executes(context -> commands.openProfile(context.getSource(), StringArgumentType.getString(context, "player")))));
+                            .executes(context -> commands.openProfile(context.getSource(), StringArgumentType.getString(context, "player")))
+                            .then(argument("tierlist", StringArgumentType.word()).suggests((context, builder) -> {
+                                for (var provider : TierlistProvider.values()) if (provider.id().startsWith(builder.getRemainingLowerCase())) builder.suggest(provider.id());
+                                return builder.buildFuture();
+                            }).executes(context -> commands.openProviderProfile(context.getSource(), StringArgumentType.getString(context, "player"),
+                                    StringArgumentType.getString(context, "tierlist"))))));
         });
     }
 
     private int openProfile(FabricClientCommandSource source, String username) {
+        return openProfile(source, username, mod.defaultProfileProvider());
+    }
+
+    private int openProviderProfile(FabricClientCommandSource source, String username, String providerId) {
+        var provider = TierlistProvider.find(providerId.toLowerCase(Locale.ROOT));
+        if (provider.isEmpty()) { source.sendError(Component.literal("Choose afritiers, mctiers, pvptiers or subtiers.")); return 0; }
+        return openProfile(source, username, provider.get());
+    }
+
+    private int openProfile(FabricClientCommandSource source, String username, TierlistProvider provider) {
         if (username != null && !username.matches("[A-Za-z0-9_]{1,16}")) {
             source.sendError(Component.literal("Use a Minecraft username (1–16 letters, numbers or underscores)."));
             return 0;
@@ -68,7 +84,7 @@ public final class AfriTiersCommands {
         Minecraft client = source.getClient();
         client.schedule(() -> {
             var settings = new TaggerSettingsScreen(null);
-            client.gui.setScreen(username == null ? new ProfilesScreen(settings) : new ProfilesScreen(settings, username));
+            client.gui.setScreen(username == null ? new ProfilesScreen(settings) : new ProfilesScreen(settings, username, provider));
         });
         return 1;
     }
@@ -76,7 +92,7 @@ public final class AfriTiersCommands {
     private int status(FabricClientCommandSource source) {
         var state = mod.repository().state();
         var config = mod.config();
-        source.sendFeedback(Component.literal("AfriTiers: " + state.message()
+        source.sendFeedback(Component.literal("Crit's tiers · " + mod.selectedProvider().label() + ": " + state.message()
                 + " | " + state.rankings().players().size() + " usernames"
                 + " | ambiguous: " + state.rankings().ambiguousNames()
                 + " | Nameplates: " + (config.nameplates ? "ON" : "OFF")
@@ -89,12 +105,14 @@ public final class AfriTiersCommands {
         var rankings = mod.repository().state().rankings();
         var config = mod.config();
         String apiName = mod.rankingUsername(username);
+        String query = config.aliases(mod.selectedProvider()).getOrDefault(za.co.afritiers.tagger.ranking.Tier.normalizeUsername(username), username);
+        mod.repository().requestPlayer(query, true);
         String result = rankings.select(apiName, config.mode, config.includeRetired)
                 .map(tier -> tier.label())
                 .orElseGet(() -> rankings.players().containsKey(apiName)
                         ? "No tier matches the selected mode/retired settings"
-                        : "No matching ranking yet; " + mod.paidNames().status());
-        source.sendFeedback(Component.literal("AfriTiers: " + username + " | " + result
+                        : "No matching ranking yet; " + mod.repository().lookupStatus(query));
+        source.sendFeedback(Component.literal(mod.selectedProvider().label() + ": " + username + " | " + result
                 + (apiName.isEmpty() || apiName.equalsIgnoreCase(username) ? "" : " | API name: " + apiName)
                 + " | Nameplates: " + (config.nameplates ? "ON" : "OFF")));
         return 1;
@@ -118,14 +136,14 @@ public final class AfriTiersCommands {
                         .then(argument("current", StringArgumentType.word()).executes(context ->
                                 removeAlias(context.getSource(), StringArgumentType.getString(context, "current")))))
                 .then(literal("list").executes(context -> {
-                    context.getSource().sendFeedback(Component.literal("Username aliases: " + new TreeMap<>(mod.config().usernameAliases)));
+                    context.getSource().sendFeedback(Component.literal(mod.selectedProvider().label() + " username aliases: " + new TreeMap<>(mod.config().aliases(mod.selectedProvider()))));
                     return 1;
                 }));
     }
 
     private int setAlias(FabricClientCommandSource source, String current, String apiName) {
         var edited = mod.config();
-        edited.usernameAliases.put(current.toLowerCase(Locale.ROOT), apiName);
+        edited.editAliases(mod.selectedProvider()).put(current.toLowerCase(Locale.ROOT), apiName);
         try {
             mod.saveConfig(edited);
             source.sendFeedback(Component.literal("Saved username alias: " + current + " -> " + apiName));
@@ -138,7 +156,7 @@ public final class AfriTiersCommands {
 
     private int removeAlias(FabricClientCommandSource source, String current) {
         var edited = mod.config();
-        edited.usernameAliases.remove(current.toLowerCase(Locale.ROOT));
+        edited.editAliases(mod.selectedProvider()).remove(current.toLowerCase(Locale.ROOT));
         try {
             mod.saveConfig(edited);
             source.sendFeedback(Component.literal("Removed username alias: " + current));

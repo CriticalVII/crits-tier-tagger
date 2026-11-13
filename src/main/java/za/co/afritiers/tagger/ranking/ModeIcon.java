@@ -6,17 +6,17 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-/** Stable glyphs reference the original supplied textures through our bundled bitmap font. */
+/** Stable glyphs and provider aliases for the bundled smooth mode artwork. */
 public enum ModeIcon {
     AXE('\uE000', "axe", "Axe", "axe"),
     BED('\uE001', "bed-pvp", "Bed PvP", "bed", "bed_pvp"),
-    CART('\uE002', "cart", "Cart", "cart"),
+    CART('\uE002', "cart", "Cart", "cart", "minecart"),
     CREEPER('\uE003', "creeper", "Creeper", "creeper"),
-    DIAMOND_VANILLA('\uE004', "diamond-vanilla", "Diamond Vanilla", "diavanilla", "diamond_vanilla"),
+    DIAMOND_VANILLA('\uE004', "diamond-vanilla", "Diamond Vanilla", "diavanilla", "diamond_vanilla", "dia_crystal"),
     DIAPOT('\uE005', "diapot", "DiaPot", "diapot", "diamond_pot", "pot"),
-    DIASMP('\uE006', "diasmp", "DiaSMP", "diasmp", "diamond_smp"),
+    DIASMP('\uE006', "diasmp", "DiaSMP", "diasmp", "diamond_smp", "dia_smp"),
     MACE('\uE007', "mace", "Mace", "mace"),
-    NETHOP('\uE008', "nethop", "NethOP", "nethop", "nethpot", "nether_pot"),
+    NETHOP('\uE008', "nethop", "NethOP", "nethop", "nethpot", "nether_pot", "neth_pot"),
     OG_VANILLA('\uE009', "og-vanilla", "OG Vanilla", "ogv", "og_vanilla"),
     OVERALL('\uE00A', "overall", "Overall", "overall"),
     SMP('\uE00B', "smp", "SMP", "smp"),
@@ -24,7 +24,12 @@ public enum ModeIcon {
     SPEED('\uE00D', "speed", "Speed", "speed"),
     SWORD('\uE00E', "sword", "Sword", "sword"),
     UHC('\uE00F', "uhc", "UHC", "uhc"),
-    VANILLA('\uE010', "vanilla", "Vanilla", "vanilla");
+    VANILLA('\uE010', "vanilla", "Vanilla", "vanilla", "crystal"),
+    BOW('\uE011', "bow", "Bow", "bow"),
+    DEBUFF('\uE012', "debuff", "Debuff", "debuff"),
+    ELYTRA('\uE013', "elytra", "Elytra", "elytra"),
+    MANHUNT('\uE014', "manhunt", "Manhunt", "manhunt"),
+    TRIDENT('\uE015', "trident", "Trident", "trident");
 
     private final char glyph;
     private final String texture;
@@ -56,6 +61,6 @@ public enum ModeIcon {
         return Optional.ofNullable(BY_MODE.get(normalized));
     }
 
-    /** New API modes get the supplied general-purpose icon until a dedicated asset is added. */
+    /** Unexpected future API modes use a neutral trophy until artwork is added. */
     public static ModeIcon forMode(String mode) { return find(mode).orElse(OVERALL); }
 }
