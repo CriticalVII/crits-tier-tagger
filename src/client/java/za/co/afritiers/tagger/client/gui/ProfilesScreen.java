@@ -66,7 +66,7 @@ public final class ProfilesScreen extends Screen {
         x = (width - w) / 2; y = (height - h) / 2;
         contentOffset = TaggerTabs.offset(w) + (w < 440 ? 24 : 0);
         TaggerTabs.add(this::addRenderableWidget, owner, "Profiles", x, y, w);
-        var source = TaggerWidgets.action(provider.label() + " >", w < 440 ? w - 24 : 94, false,
+        var source = TierlistLogo.button(provider, provider.label() + " >", w < 440 ? w - 24 : 94, 20, false,
                 pressed -> minecraft.gui.setScreen(new ProfileProviderScreen(this, provider)));
         source.setTooltip(Tooltip.create(Component.literal("Profile tierlist. This does not change in-game tags.")));
         source.setPosition(x + 12, y + 42 + TaggerTabs.offset(w)); addRenderableWidget(source);

@@ -32,6 +32,7 @@ public final class TaggerSettingsScreen extends Screen {
     }
 
     @Override protected void init() {
+        AfriTiersClient.instance().loadSelectedTierlist();
         if (!draftProvider.equals(AfriTiersClient.instance().config().tierlist)) {
             draft = AfriTiersClient.instance().config(); draftProvider = draft.tierlist;
         }
@@ -195,7 +196,7 @@ public final class TaggerSettingsScreen extends Screen {
             case LOADING -> "Updating rankings";
             case ERROR -> "Connection issue";
             case DISABLED -> "Tagger disabled";
-            case DISCONNECTED -> "Join a world to sync";
+            case DISCONNECTED -> "Not loaded";
         };
         int statusY = panelY + panelHeight - (compact ? 44 : 62);
         if (compact && !validationError.isEmpty()) summary = validationError;

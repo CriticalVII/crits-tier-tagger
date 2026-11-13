@@ -1,9 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs>
- <linearGradient id="cyan" x2=".8" y2="1"><stop stop-color="#c8ffff"/><stop offset=".5" stop-color="#63e6e0"/><stop offset="1" stop-color="#3398af"/></linearGradient>
- <linearGradient id="silver" x2=".8" y2="1"><stop stop-color="#f0efff"/><stop offset=".5" stop-color="#b9b6d7"/><stop offset="1" stop-color="#77769c"/></linearGradient>
- <linearGradient id="gold" x2=".8" y2="1"><stop stop-color="#fff1a0"/><stop offset=".5" stop-color="#ffd85d"/><stop offset="1" stop-color="#ce8c31"/></linearGradient>
- <linearGradient id="violet" x2=".8" y2="1"><stop stop-color="#ecc5ff"/><stop offset=".5" stop-color="#b58ae8"/><stop offset="1" stop-color="#8054be"/></linearGradient>
- <linearGradient id="green" x2=".8" y2="1"><stop stop-color="#bff79c"/><stop offset=".5" stop-color="#6bd88f"/><stop offset="1" stop-color="#369c7a"/></linearGradient>
- <linearGradient id="red" x2=".8" y2="1"><stop stop-color="#ffb2ad"/><stop offset=".5" stop-color="#fb677b"/><stop offset="1" stop-color="#c54064"/></linearGradient>
- <linearGradient id="wood" x2=".8" y2="1"><stop stop-color="#dcae83"/><stop offset="1" stop-color="#986c66"/></linearGradient>
-</defs><g transform="translate(4.00000 4.47500) scale(1.00000)"><path d="M12 22C8 19 1 13 1 7c0-7 8-8 11-2 3-6 11-5 11 2 0 6-7 12-11 15Z" fill="url(#red)"/><path d="M5 5c2-2 4-1 5 1" stroke="#ffd1c4" stroke-width="2" stroke-linecap="round"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><g transform="translate(4.00000 4.47500) scale(1.00000)"><path d="M12 22C8 19 1 13 1 7c0-7 8-8 11-2 3-6 11-5 11 2 0 6-7 12-11 15Z" fill="#d64c50"/><path d="m7 6 3 4m7-4-6 9" stroke="#992f40" stroke-width="2.5" stroke-linecap="round"/></g></svg>

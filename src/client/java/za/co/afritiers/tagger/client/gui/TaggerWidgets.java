@@ -43,13 +43,16 @@ final class TaggerWidgets {
             return hover;
         }
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
+            extractBackground(g);
+            g.centeredText(Minecraft.getInstance().font, getMessage(), getX() + width / 2, getY() + (height - 8) / 2, active ? TEXT : MUTED);
+        }
+        protected void extractBackground(GuiGraphicsExtractor g) {
             float over = hoverAmount();
             int fill = primary ? mix(0x806C4D95, 0xB08B67B8, over) : mix(0x50322C40, 0x904C405E, over);
             if (!active) fill = 0x352B2832;
             g.fill(getX(), getY(), getRight(), getBottom(), fill);
             g.fill(getX(), getBottom() - 1, getRight(), getBottom(), primary ? 0xAAC8ACF2 : LINE);
             if (isFocused()) g.outline(getX(), getY(), width, height, GREEN);
-            g.centeredText(Minecraft.getInstance().font, getMessage(), getX() + width / 2, getY() + (height - 8) / 2, active ? TEXT : MUTED);
         }
     }
 
