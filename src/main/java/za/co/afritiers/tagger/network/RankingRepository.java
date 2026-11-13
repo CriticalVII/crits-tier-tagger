@@ -14,7 +14,7 @@ public final class RankingRepository implements TierRepository {
     private final ExecutorService worker;
     private final Clock clock;
     private final IntSupplier jitter;
-    private volatile State state = new State(Phase.DISCONNECTED, Rankings.EMPTY, null, null, null, "Join a world to fetch tiers");
+    private volatile State state = new State(Phase.DISCONNECTED, Rankings.EMPTY, null, null, null, "Open settings to load tiers");
     private boolean connected;
     private boolean enabled = true;
     private boolean closed;
@@ -79,8 +79,8 @@ public final class RankingRepository implements TierRepository {
     }
 
     public synchronized String refresh() {
-        if (closed || !connected) return "Join a world before refreshing";
-        if (!enabled) return "Enable AfriTiers in settings first";
+        if (closed || !connected) return "Open settings before refreshing";
+        if (!enabled) return "Enable tier tags in settings first";
         if (state.phase() == Phase.LOADING) return "A refresh is already running";
         Instant now = clock.instant();
         Instant allowed = manualAllowedAt.isAfter(retryNotBefore) ? manualAllowedAt : retryNotBefore;
@@ -139,7 +139,7 @@ public final class RankingRepository implements TierRepository {
 
     private void inactive() {
         state = new State(enabled ? Phase.DISCONNECTED : Phase.DISABLED, Rankings.EMPTY,
-                state.lastAttempt(), state.lastSuccess(), null, enabled ? "Join a world to fetch tiers" : "AfriTiers is disabled");
+                state.lastAttempt(), state.lastSuccess(), null, enabled ? "Open settings to load tiers" : "Tier tags are disabled");
     }
 
     @Override public synchronized void close() {

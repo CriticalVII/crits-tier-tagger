@@ -15,6 +15,7 @@ public final class TierlistsScreen extends Screen {
     private String feedback = "";
     TierlistsScreen(TaggerSettingsScreen owner) { super(Component.literal("Tierlists")); this.owner = owner; }
     @Override protected void init() {
+        AfriTiersClient.instance().loadSelectedTierlist();
         w = Math.min(520, width - 20); h = Math.min(348, height - 16);
         x = (width - w) / 2; y = (height - h) / 2; offset = TaggerTabs.offset(w);
         TaggerTabs.add(this::addRenderableWidget, owner, "Tierlists", x, y, w);
