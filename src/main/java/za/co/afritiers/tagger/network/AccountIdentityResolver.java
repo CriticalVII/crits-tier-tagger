@@ -71,13 +71,18 @@ public final class AccountIdentityResolver implements AutoCloseable {
         } catch (Exception exception) { failure = exception; }
         synchronized (this) {
             inFlight = null;
-            if (closed || !active || token != generation) return;
             Instant now = clock.instant();
+            // Service cooldowns also apply when the user leaves the screen during a request.
+            if (failure != null) {
+                Instant next = now.plusSeconds(30);
+                if (failure instanceof RankingSource.ApiException api && api.retryAfter() != null && api.retryAfter().isAfter(next)) next = api.retryAfter();
+                if (next.isAfter(retryAt)) retryAt = next;
+            }
+            if (closed || !active || token != generation) return;
             var status = failure != null ? TierRepository.LookupStatus.ERROR : uuid == null ? TierRepository.LookupStatus.NOT_FOUND : TierRepository.LookupStatus.FOUND;
             Instant expires = now.plusSeconds(failure != null ? 30 : uuid == null ? 60 : 300);
             if (failure != null) {
-                if (failure instanceof RankingSource.ApiException api && api.retryAfter() != null && api.retryAfter().isAfter(expires)) expires = api.retryAfter();
-                retryAt = expires; uuid = null;
+                expires = retryAt; uuid = null;
             } else retryAt = Instant.MIN;
             if (cache.size() >= 512) cache.remove(cache.keySet().iterator().next());
             cache.put(name, new Entry(uuid, status, expires));

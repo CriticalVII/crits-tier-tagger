@@ -112,7 +112,7 @@ public final class AfriTiersCommands {
                         ? "No tier matches the selected mode/retired settings"
                         : "No matching ranking yet; " + mod.playerLookupStatus(username, mod.selectedProvider(), mod.repository()));
         source.sendFeedback(Component.literal(mod.selectedProvider().label() + ": " + username + " | " + result
-                + (apiName.isEmpty() || apiName.equalsIgnoreCase(username) ? "" : " | API name: " + apiName)
+                + (apiName.isEmpty() || apiName.equalsIgnoreCase(username) ? "" : (mod.selectedProvider() == TierlistProvider.AFRITIERS ? " | API name: " : " | UUID: ") + apiName)
                 + " | Nameplates: " + (config.nameplates ? "ON" : "OFF")));
         return 1;
     }
