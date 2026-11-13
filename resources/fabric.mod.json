@@ -7,7 +7,7 @@
   "description": "PvP tiers from AfriTiers, MCTiers, PvPTiers and SubTiers on player nameplates and Tab. Search profiles and watch AfriTiers waitlists.",
   "environment": "client",
   "license": "LicenseRef-All-Rights-Reserved",
-  "contact": { "homepage": "https://github.com/CriticalVII/afritiers-tagger", "sources": "https://github.com/CriticalVII/afritiers-tagger", "issues": "https://github.com/CriticalVII/afritiers-tagger/issues" },
+  "contact": { "homepage": "https://github.com/CriticalVII/crits-tier-tagger", "sources": "https://github.com/CriticalVII/crits-tier-tagger", "issues": "https://github.com/CriticalVII/crits-tier-tagger/issues" },
   "entrypoints": {
     "client": ["crits.CritsTierTaggerClient"],
     "modmenu": ["crits.ModMenuIntegration"]
