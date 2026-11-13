@@ -23,6 +23,7 @@ public final class TaggerSettingsScreen extends Screen {
     private boolean compact;
     private int navigationOffset;
     private String draftProvider;
+    private TaggerFrame frame;
 
     public TaggerSettingsScreen(Screen parent) {
         super(Component.translatable("afritiers_tagger.title"));
@@ -36,12 +37,10 @@ public final class TaggerSettingsScreen extends Screen {
         if (!draftProvider.equals(AfriTiersClient.instance().config().tierlist)) {
             draft = AfriTiersClient.instance().config(); draftProvider = draft.tierlist;
         }
-        panelWidth = Math.min(520, width - 20);
-        panelHeight = Math.min(348, height - 16);
-        panelX = (width - panelWidth) / 2;
-        panelY = (height - panelHeight) / 2;
+        frame = TaggerFrame.fit(width, height);
+        panelWidth = frame.w(); panelHeight = frame.h(); panelX = frame.x(); panelY = frame.y();
         compact = panelHeight < 300;
-        navigationOffset = TaggerTabs.offset(panelWidth);
+        navigationOffset = frame.offset();
         int contentWidth = panelWidth - 34;
         boolean columns = panelWidth >= 320;
         int columnWidth = columns ? (contentWidth - 12) / 2 : contentWidth;
@@ -68,6 +67,10 @@ public final class TaggerSettingsScreen extends Screen {
         field.setTooltip(Tooltip.create(Component.literal("Optional six-digit hex colour, for example FFD700. Leave blank for gold, silver, bronze and purple. Icons keep their own colours.")));
         colour.addChild(field);
         appearance.addChild(colour);
+        var source = new TaggerWidgets.Action("Tierlist: " + AfriTiersClient.instance().selectedProvider().label() + " >",
+                columnWidth, 26, false, pressed -> minecraft.gui.setScreen(new TierlistsScreen(this)));
+        source.setTooltip(Tooltip.create(Component.literal("Choose the source for Tab and nametag tiers.")));
+        appearance.addChild(source);
         LinearLayout controls = columns ? LinearLayout.horizontal().spacing(12) : LinearLayout.vertical().spacing(12);
         controls.addChild(display);
         controls.addChild(appearance);
@@ -111,7 +114,7 @@ public final class TaggerSettingsScreen extends Screen {
     }
 
     private void addTabs() {
-        TaggerTabs.add(this::addRenderableWidget, this, "Settings", panelX, panelY, panelWidth);
+        TaggerTabs.add(this::addRenderableWidget, this, "Settings", frame);
     }
 
     private LinearLayout section(String heading, int sectionWidth) {
@@ -172,16 +175,12 @@ public final class TaggerSettingsScreen extends Screen {
     @Override public void tick() { updatePreview(); }
 
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        g.fill(0, 0, width, height, 0x28090A13);
-        TaggerWidgets.panel(g, panelX, panelY, panelWidth, panelHeight);
-        g.text(font, Component.literal("Crit's").withStyle(style -> style.withBold(true)), panelX + 12, panelY + (compact ? 13 : 10), TaggerWidgets.TEXT);
-        if (!compact && panelWidth >= 380) g.text(font, "TIER TAGGER", panelX + 12, panelY + 22, TaggerWidgets.MUTED);
-        g.fill(panelX + 12, panelY + (compact ? 26 : 32) + navigationOffset, panelX + panelWidth - 12, panelY + (compact ? 27 : 33) + navigationOffset, TaggerWidgets.LINE);
+        frame.draw(g, "Display settings");
         int x = panelX + 12, y = panelY + (compact ? 34 : 42) + navigationOffset, w = panelWidth - 24;
         int previewHeight = compact ? 36 : 50;
-        g.fill(x, y, x + w, y + previewHeight, 0x40110D20);
-        g.fill(x, y, x + 2, y + previewHeight, 0xAA85DBDA);
-        g.text(font, "NAMEPLATE PREVIEW", x + 10, y + (compact ? 6 : 8), TaggerWidgets.MUTED);
+        g.fill(x, y, x + w, y + previewHeight, 0xFF171D21);
+        g.outline(x, y, w, previewHeight, TaggerWidgets.LINE);
+        g.text(font, "Live preview", x + 10, y + (compact ? 6 : 8), TaggerWidgets.MUTED, false);
         g.centeredText(font, preview, x + w / 2, y + (compact ? 22 : 29), TaggerWidgets.TEXT);
         var state = AfriTiersClient.instance().repository().state();
         int statusColor = switch (state.phase()) {

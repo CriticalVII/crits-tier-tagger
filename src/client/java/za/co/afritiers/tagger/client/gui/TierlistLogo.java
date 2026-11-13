@@ -24,7 +24,7 @@ final class TierlistLogo {
                 String text = font.plainSubstrByWidth(getMessage().getString(), getWidth() - 27);
                 int left = getX() + (getWidth() - font.width(text) - 17) / 2;
                 draw(g, provider, left, getY() + (getHeight() - 12) / 2, 12);
-                g.text(font, text, left + 17, getY() + (getHeight() - 8) / 2, active ? TaggerWidgets.TEXT : TaggerWidgets.MUTED);
+                g.text(font, text, left + 17, getY() + (getHeight() - 8) / 2, active ? selected ? TaggerWidgets.INK : TaggerWidgets.TEXT : TaggerWidgets.FAINT, false);
             }
         };
     }

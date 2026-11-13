@@ -12,14 +12,20 @@ import java.util.function.Supplier;
 
 /** Pixel-aligned native widgets retain vanilla input, focus, narration and click sounds. */
 final class TaggerWidgets {
-    static final int TEXT = 0xFFF3F1FA, MUTED = 0xFFC0BCCD, GREEN = 0xFFC8ACF2, LINE = 0x35D9CBEF;
+    static final int TEXT = 0xFFF1F3F4, MUTED = 0xFFA3AAAF, FAINT = 0xFF727B82,
+            GREEN = 0xFF9BCBD8, LINE = 0xFF2D3236, INK = 0xFF141719, SURFACE = 0xFF191D20;
     private TaggerWidgets() { }
 
     static void panel(GuiGraphicsExtractor g, int x, int y, int w, int h) {
-        g.fill(x, y, x + w, y + h, 0x85100E1A);
-        g.fill(x, y, x + w, y + 1, LINE);
-        g.fill(x, y + h - 1, x + w, y + h, 0x20D9CBEF);
-        g.fill(x, y, x + 2, y + 28, GREEN);
+        g.fill(x + 3, y + 4, x + w + 3, y + h + 4, 0x40000000);
+        g.fill(x, y, x + w, y + h, 0xFA111416);
+        g.outline(x, y, w, h, LINE);
+    }
+
+    static void backdrop(GuiGraphicsExtractor g, int width, int height) {
+        g.fill(0, 0, width, height, 0xDA090B0D);
+        for (int x = 12; x < width; x += 16) for (int y = 12; y < height; y += 16)
+            g.fill(x, y, x + 1, y + 1, 0x182E373D);
     }
 
     static Action action(String text, int width, boolean primary, Button.OnPress action) {
@@ -44,28 +50,37 @@ final class TaggerWidgets {
         }
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             extractBackground(g);
-            g.centeredText(Minecraft.getInstance().font, getMessage(), getX() + width / 2, getY() + (height - 8) / 2, active ? TEXT : MUTED);
+            var font = Minecraft.getInstance().font;
+            g.text(font, getMessage(), getX() + (width - font.width(getMessage())) / 2, getY() + (height - 8) / 2, active ? primary ? INK : TEXT : FAINT, false);
         }
         protected void extractBackground(GuiGraphicsExtractor g) {
             float over = hoverAmount();
-            int fill = primary ? mix(0x806C4D95, 0xB08B67B8, over) : mix(0x50322C40, 0x904C405E, over);
-            if (!active) fill = 0x352B2832;
+            int fill = primary ? mix(0xFFE6EBED, 0xFFFFFFFF, over) : mix(SURFACE, 0xFF272D31, over);
+            if (!active) fill = 0xFF15191C;
             g.fill(getX(), getY(), getRight(), getBottom(), fill);
-            g.fill(getX(), getBottom() - 1, getRight(), getBottom(), primary ? 0xAAC8ACF2 : LINE);
+            g.outline(getX(), getY(), width, height, primary && active ? 0xFFF3F5F6 : LINE);
             if (isFocused()) g.outline(getX(), getY(), width, height, GREEN);
         }
     }
 
     static final class Tab extends Action {
         private final boolean selected;
+        private boolean rail;
+        void setRail(boolean value) { rail = value; }
         Tab(String label, boolean selected, OnPress action) {
             super(label, 64, 18, selected, action);
             this.selected = selected;
         }
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-            if (isHoveredOrFocused()) g.fill(getX(), getY(), getRight(), getBottom(), 0x405F4E75);
-            if (selected || isFocused()) g.fill(getX() + 7, getBottom() - 1, getRight() - 7, getBottom(), GREEN);
-            g.centeredText(Minecraft.getInstance().font, getMessage(), getX() + width / 2, getY() + 4, selected ? TEXT : MUTED);
+            float hover = hoverAmount();
+            if (selected || hover > 0) g.fill(getX(), getY(), getRight(), getBottom(), selected ? 0xFF242A2E : mix(0xFF121415, 0xFF202629, hover));
+            if (selected || isFocused()) {
+                if (rail) g.fill(getX(), getY() + 5, getX() + 2, getBottom() - 5, GREEN);
+                else g.fill(getX() + 5, getBottom() - 1, getRight() - 5, getBottom(), GREEN);
+            }
+            var font = Minecraft.getInstance().font;
+            if (rail) g.text(font, getMessage(), getX() + 10, getY() + (height - 8) / 2, selected ? TEXT : MUTED, false);
+            else g.text(font, getMessage(), getX() + (width - font.width(getMessage())) / 2, getY() + 4, selected ? TEXT : MUTED, false);
         }
     }
 
@@ -76,8 +91,8 @@ final class TaggerWidgets {
             setTextColor(TEXT);
         }
         @Override public void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-            g.fill(getX() - 4, getY() - 3, getRight() + 2, getBottom(), 0x50130F20);
-            g.fill(getX() - 4, getBottom(), getRight() + 2, getBottom() + 1, isFocused() ? GREEN : LINE);
+            g.fill(getX() - 4, getY() - 3, getRight() + 2, getBottom(), 0xFF0E1113);
+            g.outline(getX() - 4, getY() - 3, width + 6, height + 4, isFocused() ? GREEN : LINE);
             super.extractWidgetRenderState(g, mouseX, mouseY, delta);
         }
     }
@@ -105,9 +120,9 @@ final class TaggerWidgets {
             int right = getRight() - 7;
             boolean on = value.getAsBoolean();
             int chipY = getY() + (height < 34 ? 7 : 5);
-            g.fill(right - 27, chipY, right, chipY + 13, on ? 0x706C4D95 : 0x402B2832);
-            g.fill(right - 27, chipY, right - 25, chipY + 13, on ? GREEN : 0xFF787280);
-            g.centeredText(font, on ? "ON" : "OFF", right - 12, chipY + 3, on ? TEXT : MUTED);
+            g.fill(right - 27, chipY, right, chipY + 13, on ? 0xFFB6D7DF : 0xFF30373C);
+            String state = on ? "ON" : "OFF";
+            g.text(font, state, right - 13 - font.width(state) / 2, chipY + 3, on ? INK : MUTED, false);
         }
     }
 
@@ -135,8 +150,8 @@ final class TaggerWidgets {
     }
 
     private static void row(GuiGraphicsExtractor g, Button widget, float hover) {
-        g.fill(widget.getX(), widget.getY(), widget.getRight(), widget.getBottom(), mix(0x251E192A, 0x70604A7C, hover));
-        g.fill(widget.getX() + 7, widget.getBottom() - 1, widget.getRight() - 7, widget.getBottom(), LINE);
+        g.fill(widget.getX(), widget.getY(), widget.getRight(), widget.getBottom(), mix(SURFACE, 0xFF242B30, hover));
+        g.outline(widget.getX(), widget.getY(), widget.getWidth(), widget.getHeight(), LINE);
         if (widget.isFocused()) g.outline(widget.getX(), widget.getY(), widget.getWidth(), widget.getHeight(), GREEN);
     }
     private static int mix(int from, int to, float amount) {

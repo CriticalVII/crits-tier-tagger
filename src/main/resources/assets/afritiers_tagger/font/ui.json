@@ -1,0 +1,5 @@
+{
+  "providers": [
+    { "type": "ttf", "file": "afritiers_tagger:outfit.ttf", "size": 15, "oversample": 2, "shift": [0, 0] }
+  ]
+}
