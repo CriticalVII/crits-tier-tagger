@@ -2,8 +2,8 @@ package dev.crits.tiertagger.client.gui;
 
 import dev.crits.tiertagger.client.CritsTierTaggerClient;
 import dev.crits.tiertagger.client.render.ModeIcons;
+import dev.crits.tiertagger.config.TaggerConfig;
 import dev.crits.tiertagger.provider.TierlistProvider;
-import dev.crits.tiertagger.ranking.*;
 import dev.crits.tiertagger.ranking.ModeIcon;
 import dev.crits.tiertagger.ranking.PlayerStats;
 import dev.crits.tiertagger.ranking.Rankings;
@@ -21,7 +21,7 @@ import org.lwjgl.glfw.GLFW;
 
 /** A centred searchable profile, overall position and compact mode badges. */
 public final class ProfilesScreen extends Screen {
-    private static final dev.crits.tiertagger.config.TaggerConfig TIER_COLOURS = new dev.crits.tiertagger.config.TaggerConfig();
+    private static final TaggerConfig TIER_COLOURS = new TaggerConfig();
     private final TaggerSettingsScreen owner;
     private String input = "", requested = "", apiName = "", feedback = "";
     private Rankings snapshot = Rankings.EMPTY;
@@ -67,12 +67,12 @@ public final class ProfilesScreen extends Screen {
         apiName = requested.isEmpty() ? "" : mod.rankingUsername(requested, snapshot, provider);
         frame = TaggerFrame.fit(width, height);
         w = frame.w(); h = frame.h(); x = frame.x(); y = frame.y();
-        contentOffset = frame.offset() + (w < 440 ? 24 : 0);
+        contentOffset = (w < 440 ? 24 : 0);
         TaggerTabs.add(this::addRenderableWidget, owner, "Profiles", frame);
         var source = TierlistLogo.button(provider, provider.label() + " >", w < 440 ? w - 24 : 112, 20, false,
                 pressed -> minecraft.gui.setScreen(new ProfileProviderScreen(this, provider)));
         source.setTooltip(TaggerFonts.tooltip(Component.literal("Profile tierlist. This does not change in-game tags.")));
-        source.setPosition(x + 12, y + 42 + frame.offset()); addRenderableWidget(source);
+        source.setPosition(x + 12, y + 42); addRenderableWidget(source);
         searchButton = TaggerWidgets.action("Search", 60, true, pressed -> search());
         searchButton.setPosition(x + w - 148, y + 42 + contentOffset);
         searchField = new TaggerWidgets.Input(w < 440 ? w - 166 : w - 288, 20, Component.literal("Player username"));

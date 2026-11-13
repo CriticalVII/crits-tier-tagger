@@ -115,8 +115,6 @@ final class TaggerWidgets {
 
     static final class Tab extends Action {
         private final boolean selected;
-        private boolean rail;
-        void setRail(boolean value) { rail = value; }
         Tab(String label, boolean selected, OnPress action) {
             super(label, 64, 18, selected, action);
             this.selected = selected;
@@ -124,17 +122,13 @@ final class TaggerWidgets {
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             float hover = hoverAmount();
             if (selected || hover > 0) rounded(g, getX(), getY(), width, height, 3, selected ? 0xFF252525 : mix(0xFF0B0B0B, 0xFF1C1C1C, hover));
-            if (selected || isFocused()) {
-                if (rail) { if (isFocused()) g.outline(getX(), getY(), width, height, CYAN); }
-                else g.fill(getX() + 5, getBottom() - 1, getRight() - 5, getBottom(), CYAN);
-            }
+            if (isFocused()) g.outline(getX(), getY(), width, height, CYAN);
             var font = TaggerFonts.body();
-            if (rail) g.text(font, getMessage(), getX() + 10, getY() + (height - 8) / 2, selected ? TEXT : MUTED, false);
-            else g.text(font, getMessage(), getX() + (width - font.width(getMessage())) / 2, getY() + 4, selected ? TEXT : MUTED, false);
+            g.text(font, getMessage(), getX() + 10, getY() + (height - 8) / 2, selected ? TEXT : MUTED, false);
         }
     }
 
-    static final class Input extends EditBox implements dev.crits.tiertagger.client.gui.MenuTextInput {
+    static final class Input extends EditBox implements MenuTextInput {
         private Component hint;
         private boolean centred;
         Input(int width, int height, Component label) {

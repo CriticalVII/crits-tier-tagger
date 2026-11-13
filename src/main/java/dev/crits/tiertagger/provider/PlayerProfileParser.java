@@ -1,7 +1,6 @@
 package dev.crits.tiertagger.provider;
 
 import com.google.gson.*;
-import dev.crits.tiertagger.ranking.*;
 import dev.crits.tiertagger.ranking.PlayerStats;
 import dev.crits.tiertagger.ranking.Tier;
 import java.util.*;

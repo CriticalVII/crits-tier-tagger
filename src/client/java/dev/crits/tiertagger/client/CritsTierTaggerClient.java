@@ -70,11 +70,6 @@ public final class CritsTierTaggerClient implements ClientModInitializer {
     public TierlistProvider defaultProfileProvider() {
         return config.profileTierlist.isEmpty() ? selectedProvider : TierlistProvider.from(config.profileTierlist);
     }
-    public String providerStatus(TierlistProvider provider) {
-        if (provider != selectedProvider) return "Select to load";
-        var service = provider == selectedProvider ? repository : gameRepositories.get(provider);
-        return service == null ? "Not selected" : service.state().message();
-    }
     public PaidNameResolver paidNames() { return paidNames; }
     public QueueRepository waitlists() { return waitlists; }
     public void browseWaitlists(boolean browsing) { browsingWaitlists = browsing; }

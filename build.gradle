@@ -12,6 +12,7 @@ repositories {
 
 loom {
     splitEnvironmentSourceSets()
+    runs { client { runDir = '.local-dev/run-client' } }
     mods {
         afritiers_tagger {
             sourceSet sourceSets.main

@@ -4,7 +4,6 @@ import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import dev.crits.tiertagger.network.source.PlayerProfileSource;
 import dev.crits.tiertagger.network.source.RankingSource;
-import dev.crits.tiertagger.provider.*;
 import dev.crits.tiertagger.provider.PlayerIdentity;
 import dev.crits.tiertagger.provider.PlayerProfileParser;
 import dev.crits.tiertagger.provider.TierlistProvider;

@@ -12,7 +12,7 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-/** Translucent native settings with immediate persistence and a pinned reference preview. */
+/** Native dark settings with immediate persistence and a pinned reference preview. */
 public final class TaggerSettingsScreen extends Screen {
     private final Screen parent;
     private TaggerConfig draft;
@@ -22,7 +22,6 @@ public final class TaggerSettingsScreen extends Screen {
     private int previewTier = 0;
     private int panelX, panelY, panelWidth, panelHeight;
     private boolean compact;
-    private int navigationOffset;
     private String draftProvider;
     private TaggerFrame frame;
 
@@ -41,7 +40,6 @@ public final class TaggerSettingsScreen extends Screen {
         frame = TaggerFrame.fit(width, height);
         panelWidth = frame.w(); panelHeight = frame.h(); panelX = frame.x(); panelY = frame.y();
         compact = panelHeight < 300;
-        navigationOffset = frame.offset();
         int contentWidth = panelWidth - 34;
         boolean columns = panelWidth >= 320;
         int columnWidth = columns ? (contentWidth - 12) / 2 : contentWidth;
@@ -73,20 +71,20 @@ public final class TaggerSettingsScreen extends Screen {
         var settings = LinearLayout.vertical().spacing(10);
         settings.addChild(tierlistChoices(contentWidth));
         settings.addChild(controls);
-        ScrollableLayout scroll = new ScrollableLayout(minecraft, settings, Math.max(32, panelHeight - (compact ? 128 : 174) - navigationOffset), ScrollableLayout.ReserveStrategy.RIGHT);
+        ScrollableLayout scroll = new ScrollableLayout(minecraft, settings, Math.max(32, panelHeight - (compact ? 128 : 174)), ScrollableLayout.ReserveStrategy.RIGHT);
         scroll.setMinWidth(contentWidth);
         scroll.arrangeElements();
         scroll.setX(panelX + 12);
-        scroll.setY(panelY + (compact ? 78 : 104) + navigationOffset);
+        scroll.setY(panelY + (compact ? 78 : 104));
         scroll.visitWidgets(this::addRenderableWidget);
 
         Button previous = new TaggerWidgets.Action("<", 16, 16, false, pressed -> cyclePreview(-1));
         previous.setTooltip(TaggerFonts.tooltip(Component.literal("Previous preview tier")));
-        previous.setPosition(panelX + panelWidth - 50, panelY + (compact ? 38 : 48) + navigationOffset);
+        previous.setPosition(panelX + panelWidth - 50, panelY + (compact ? 38 : 48));
         addRenderableWidget(previous);
         Button next = new TaggerWidgets.Action(">", 16, 16, false, pressed -> cyclePreview(1));
         next.setTooltip(TaggerFonts.tooltip(Component.literal("Next preview tier")));
-        next.setPosition(panelX + panelWidth - 30, panelY + (compact ? 38 : 48) + navigationOffset);
+        next.setPosition(panelX + panelWidth - 30, panelY + (compact ? 38 : 48));
         addRenderableWidget(next);
         Button refresh = TaggerWidgets.action("Refresh", 52, false, pressed -> feedback = CritsTierTaggerClient.instance().repository().refresh());
         refresh.setTooltip(TaggerFonts.tooltip(Component.literal("Refresh rankings using your saved settings.")));
@@ -197,7 +195,7 @@ public final class TaggerSettingsScreen extends Screen {
 
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         frame.draw(g, "Settings");
-        int x = panelX + 12, y = panelY + (compact ? 34 : 42) + navigationOffset, w = panelWidth - 24;
+        int x = panelX + 12, y = panelY + (compact ? 34 : 42), w = panelWidth - 24;
         int previewHeight = compact ? 36 : 50;
         TaggerWidgets.surface(g, x, y, w, previewHeight, 3, 0xFF111111, TaggerWidgets.LINE);
         g.text(font, "Live preview", x + 10, y + (compact ? 6 : 8), TaggerWidgets.MUTED, false);

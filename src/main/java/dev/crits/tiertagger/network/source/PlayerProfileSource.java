@@ -1,6 +1,5 @@
 package dev.crits.tiertagger.network.source;
 
-import dev.crits.tiertagger.provider.*;
 import dev.crits.tiertagger.provider.PlayerProfileParser;
 import dev.crits.tiertagger.provider.TierlistProvider;
 import java.util.*;

@@ -2,7 +2,6 @@ package dev.crits.tiertagger.repository;
 
 import dev.crits.tiertagger.network.source.QueueSource;
 import dev.crits.tiertagger.network.source.RankingSource;
-import dev.crits.tiertagger.waitlist.*;
 import dev.crits.tiertagger.waitlist.WaitlistAlerts;
 import dev.crits.tiertagger.waitlist.Waitlists;
 import java.time.*;
