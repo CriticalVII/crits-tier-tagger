@@ -9,4 +9,4 @@ The provider selectors use the services' own public site icons, prepared as tran
 | PvPTiers | [Site icon](https://pvptiers.com/hex-logo.ico) |
 | SubTiers | [Site icon](https://subtiers.net/subtiers-icon.webp) |
 
-Names and logos identify the selected data source. They belong to their respective owners and do not imply endorsement. The project's original mode drawings are in `modes/`.
+Names and logos identify the selected data source. They belong to their respective owners and do not imply endorsement. The original mode assets and their sources are documented in [MODES.md](MODES.md).
