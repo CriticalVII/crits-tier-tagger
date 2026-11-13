@@ -52,4 +52,4 @@ Only runtime artwork is kept. The logo at `src/main/resources/assets/afritiers_t
 
 ## Local files and credentials
 
-Build caches and local verification tools are ignored. Account/config exports, environment files, private keys and signing stores must stay outside commits. The public APIs used by this mod require no embedded credentials. Keep licenses and asset provenance when removing files.
+Build caches and local verification tools are ignored. `runClient` keeps its development runtime in `.local-dev/run-client/`. Account/config exports, environment files, private keys and signing stores must stay outside commits. The public APIs used by this mod require no embedded credentials. Keep licenses and asset provenance when removing files.
