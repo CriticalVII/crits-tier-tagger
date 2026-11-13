@@ -32,7 +32,7 @@ final class ConnectionDetailsScreen extends Screen {
         x = (width - w) / 2;
         y = (height - h) / 2;
         LinearLayout content = LinearLayout.vertical().spacing(8);
-        for (int i = 0; i < 14; i++) values.add(content.addChild(new StringWidget(w - 44, 12, Component.empty(), font)));
+        for (int i = 0; i < 14; i++) values.add(content.addChild(new TaggerWidgets.Label(w - 44, 12, Component.empty(), font)));
         ScrollableLayout scroll = new ScrollableLayout(minecraft, content, h - 86, ScrollableLayout.ReserveStrategy.RIGHT);
         scroll.arrangeElements();
         scroll.setX(x + 14);

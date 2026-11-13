@@ -54,7 +54,7 @@ public final class TaggerSettingsScreen extends Screen {
                 pressed -> minecraft.gui.setScreen(new ModePickerScreen(this, draft.mode))));
         appearance.addChild(new TaggerWidgets.Toggle("Retired tiers", "Include past tiers", columnWidth, compact, () -> draft.includeRetired, value -> { draft.includeRetired = value; persist(); }));
         LinearLayout colour = compact ? LinearLayout.horizontal().spacing(4) : LinearLayout.vertical().spacing(3);
-        colour.addChild(new StringWidget(compact ? 43 : columnWidth, compact ? 20 : 12,
+        colour.addChild(new TaggerWidgets.Label(compact ? 43 : columnWidth, compact ? 20 : 12,
                 Component.literal(compact ? "Colour" : "Colour override").withColor(TaggerWidgets.MUTED), font));
         EditBox field = new TaggerWidgets.Input(compact ? columnWidth - 47 : columnWidth, 20, Component.literal("Colour override; blank uses tier colours"));
         colourField = field;
@@ -118,7 +118,7 @@ public final class TaggerSettingsScreen extends Screen {
 
     private LinearLayout tierlistChoices(int width) {
         var choices = LinearLayout.vertical().spacing(4);
-        choices.addChild(new StringWidget(width, 14, Component.literal("In-game tierlist").withColor(TaggerWidgets.TEXT), font));
+        choices.addChild(new TaggerWidgets.Label(width, 14, Component.literal("In-game tierlist").withColor(TaggerWidgets.TEXT), font));
         int columns = width >= 320 ? 4 : 2;
         int cellWidth = (width - (columns - 1) * 6) / columns;
         LinearLayout row = null;
@@ -141,7 +141,7 @@ public final class TaggerSettingsScreen extends Screen {
 
     private LinearLayout section(String heading, int sectionWidth) {
         LinearLayout layout = LinearLayout.vertical().spacing(3);
-        layout.addChild(new StringWidget(sectionWidth, 18, Component.literal(heading).withColor(TaggerWidgets.TEXT), font));
+        layout.addChild(new TaggerWidgets.Label(sectionWidth, 18, Component.literal(heading).withColor(TaggerWidgets.TEXT), font));
         return layout;
     }
 
@@ -221,10 +221,10 @@ public final class TaggerSettingsScreen extends Screen {
         if (compact && !validationError.isEmpty()) summary = validationError;
         else if (compact && !feedback.isEmpty()) summary = feedback;
         g.fill(x, statusY + 2, x + 3, statusY + 5, statusColor);
-        g.text(font, font.plainSubstrByWidth(summary, panelWidth - 152), x + 9, statusY, TaggerWidgets.MUTED);
+        g.text(font, font.plainSubstrByWidth(summary, panelWidth - 152), x + 9, statusY, TaggerWidgets.MUTED, false);
         String note = !validationError.isEmpty() ? validationError : !feedback.isEmpty() ? feedback : "Settings save automatically";
         if (!compact) g.text(font, font.plainSubstrByWidth(note, panelWidth - 24), x, panelY + panelHeight - 43,
-                validationError.isEmpty() ? TaggerWidgets.MUTED : 0xFFE0BE83);
+                validationError.isEmpty() ? TaggerWidgets.MUTED : 0xFFE0BE83, false);
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
 

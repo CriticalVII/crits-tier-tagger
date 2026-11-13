@@ -22,7 +22,10 @@ final class TaggerFonts {
             base = original;
             var delegate = ((FontProviderAccessor) (Object) original).crits$getProvider();
             body = new Font(new Font.Provider() {
-                @Override public GlyphSource glyphs(FontDescription font) { return delegate.glyphs(FontDescription.DEFAULT.equals(font) ? BODY : font); }
+                @Override public GlyphSource glyphs(FontDescription font) {
+                    if (FontDescription.DEFAULT.equals(font)) return ((FontProviderAccessor) (Object) original).crits$getGlyphSource(BODY);
+                    return delegate.glyphs(font);
+                }
                 @Override public EffectGlyph effect() { return delegate.effect(); }
             });
         }

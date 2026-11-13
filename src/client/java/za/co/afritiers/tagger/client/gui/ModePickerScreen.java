@@ -71,7 +71,7 @@ public final class ModePickerScreen extends Screen {
         TaggerWidgets.panel(g, x, y, w, h);
         g.text(font, TaggerFrame.heading("Choose a mode"), x + 12, y + 12, TaggerWidgets.TEXT, false);
         g.fill(x + 12, y + 29, x + w - 12, y + 30, TaggerWidgets.LINE);
-        g.text(font, "One mode, or everyone's strongest tier.", x + 12, y + 34, TaggerWidgets.MUTED);
+        g.text(font, "One mode, or everyone's strongest tier.", x + 12, y + 34, TaggerWidgets.MUTED, false);
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
     @Override public void onClose() { minecraft.gui.setScreen(owner); }

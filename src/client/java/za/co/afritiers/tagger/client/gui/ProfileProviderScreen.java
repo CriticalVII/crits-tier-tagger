@@ -31,7 +31,7 @@ final class ProfileProviderScreen extends Screen {
         TaggerWidgets.backdrop(g, width, height); TaggerWidgets.panel(g, x, y, w, h);
         g.text(font, TaggerFrame.heading("Profile tierlist"), x + 12, y + 12, TaggerWidgets.TEXT, false);
         g.fill(x + 12, y + 29, x + w - 12, y + 30, TaggerWidgets.LINE);
-        g.text(font, font.plainSubstrByWidth("Choose where to search this player's rankings.", w - 24), x + 12, y + 36, TaggerWidgets.MUTED);
+        g.text(font, font.plainSubstrByWidth("Choose where to search this player's rankings.", w - 24), x + 12, y + 36, TaggerWidgets.MUTED, false);
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
     @Override public void onClose() { minecraft.gui.setScreen(owner); }

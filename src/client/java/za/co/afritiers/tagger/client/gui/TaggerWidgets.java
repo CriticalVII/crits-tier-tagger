@@ -44,6 +44,18 @@ final class TaggerWidgets {
         return new Action(text, width, 20, primary, action);
     }
 
+    /** Vanilla StringWidget's active-text collector uses the global font when drawing. */
+    static final class Label extends net.minecraft.client.gui.components.StringWidget {
+        Label(int width, int height, Component message, net.minecraft.client.gui.Font font) {
+            super(width, height, message, font);
+        }
+        @Override public void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
+            var font = TaggerFonts.body();
+            var text = net.minecraft.client.gui.components.ComponentRenderUtils.clipText(getMessage(), font, getWidth());
+            g.text(font, text, getX(), getY() + (getHeight() - 9) / 2, TEXT, false);
+        }
+    }
+
     static class Action extends Button {
         private final boolean primary;
         private float hover;
@@ -127,6 +139,7 @@ final class TaggerWidgets {
             super(TaggerFonts.body(), width, height, label);
             setBordered(false);
             setTextColor(TEXT);
+            setTextShadow(false);
         }
         @Override public void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             surface(g, getX() - 4, getY() - 3, width + 6, height + 4, 3, 0xFF111111, isFocused() ? CYAN : LINE);
@@ -151,9 +164,9 @@ final class TaggerWidgets {
             row(g, this, hoverAmount());
             var font = TaggerFonts.body();
             int labelY = getY() + (height < 34 ? 9 : 6);
-            if (icon != null) g.text(font, icon, getX() + 7, labelY, TEXT);
-            g.text(font, font.plainSubstrByWidth(label, width - (icon == null ? 48 : 64)), getX() + (icon == null ? 8 : 24), labelY, TEXT);
-            if (height >= 34) g.text(font, font.plainSubstrByWidth(description, width - 16), getX() + 8, getY() + 21, MUTED);
+            if (icon != null) g.text(font, icon, getX() + 7, labelY, TEXT, false);
+            g.text(font, font.plainSubstrByWidth(label, width - (icon == null ? 48 : 64)), getX() + (icon == null ? 8 : 24), labelY, TEXT, false);
+            if (height >= 34) g.text(font, font.plainSubstrByWidth(description, width - 16), getX() + 8, getY() + 21, MUTED, false);
             int right = getRight() - 7;
             boolean on = value.getAsBoolean();
             int chipY = getY() + (height < 34 ? 7 : 5);
@@ -176,10 +189,10 @@ final class TaggerWidgets {
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             row(g, this, hoverAmount());
             var font = TaggerFonts.body();
-            if (height >= 34) g.text(font, "Ranking mode", getX() + 8, getY() + 5, MUTED);
+            if (height >= 34) g.text(font, "Ranking mode", getX() + 8, getY() + 5, MUTED, false);
             int textY = getY() + (height < 34 ? 9 : 21);
             g.enableScissor(getX() + 7, textY - 2, getRight() - 19, getBottom());
-            g.text(font, value.get(), getX() + 8, textY, TEXT);
+            g.text(font, value.get(), getX() + 8, textY, TEXT, false);
             g.disableScissor();
             g.text(font, ">", getRight() - 13, textY, MUTED, false);
         }
