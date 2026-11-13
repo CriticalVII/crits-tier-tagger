@@ -28,6 +28,7 @@ public final class ProfilesScreen extends Screen {
     private int x, y, w, h;
     private int contentOffset;
     private TierlistProvider provider;
+    private TaggerFrame frame;
 
     public ProfilesScreen(TaggerSettingsScreen owner) {
         super(Component.literal("Crit's profiles"));
@@ -61,15 +62,14 @@ public final class ProfilesScreen extends Screen {
         snapshot = mod.playerSearchRepository().state().rankings();
         phase = mod.playerSearchRepository().state().phase();
         apiName = requested.isEmpty() ? "" : mod.rankingUsername(requested, snapshot, provider);
-        w = Math.min(520, width - 20);
-        h = Math.min(348, height - 16);
-        x = (width - w) / 2; y = (height - h) / 2;
-        contentOffset = TaggerTabs.offset(w) + (w < 440 ? 24 : 0);
-        TaggerTabs.add(this::addRenderableWidget, owner, "Profiles", x, y, w);
+        frame = TaggerFrame.fit(width, height);
+        w = frame.w(); h = frame.h(); x = frame.x(); y = frame.y();
+        contentOffset = frame.offset() + (w < 440 ? 24 : 0);
+        TaggerTabs.add(this::addRenderableWidget, owner, "Profiles", frame);
         var source = TierlistLogo.button(provider, provider.label() + " >", w < 440 ? w - 24 : 94, 20, false,
                 pressed -> minecraft.gui.setScreen(new ProfileProviderScreen(this, provider)));
         source.setTooltip(Tooltip.create(Component.literal("Profile tierlist. This does not change in-game tags.")));
-        source.setPosition(x + 12, y + 42 + TaggerTabs.offset(w)); addRenderableWidget(source);
+        source.setPosition(x + 12, y + 42 + frame.offset()); addRenderableWidget(source);
         searchButton = TaggerWidgets.action("Search", 60, true, pressed -> search());
         searchButton.setPosition(x + w - 148, y + 42 + contentOffset);
         searchField = new TaggerWidgets.Input(w < 440 ? w - 166 : w - 270, 20, Component.literal("Player username"));
@@ -180,14 +180,14 @@ public final class ProfilesScreen extends Screen {
     }
 
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        g.fill(0, 0, width, height, 0x28090A13);
-        TaggerWidgets.panel(g, x, y, w, h);
-        g.text(font, Component.literal("Crit's").withStyle(style -> style.withBold(true)), x + 12, y + 10, TaggerWidgets.TEXT);
-        if (w >= 400) g.text(font, "PROFILES · " + provider.label(), x + 12, y + 22, TaggerWidgets.MUTED);
-        g.fill(x + 12, y + 32 + TaggerTabs.offset(w), x + w - 12, y + 33 + TaggerTabs.offset(w), TaggerWidgets.LINE);
+        frame.draw(g, "Player profiles");
         var state = AfriTiersClient.instance().playerSearchRepository().state();
         var profile = snapshot.profile(apiName);
         int contentX = x + (showSkin() ? 158 : 12), contentWidth = w - (showSkin() ? 182 : 36);
+        if (showSkin()) {
+            g.fill(x + 12, y + 100 + contentOffset, x + 148, y + h - 54, 0xFF181D20);
+            g.outline(x + 12, y + 100 + contentOffset, 136, h - 154 - contentOffset, TaggerWidgets.LINE);
+        }
         if (!requested.isEmpty()) {
             String name = profile.isPresent() && requested.equalsIgnoreCase(profile.get().name()) ? profile.get().name() : requested;
             g.text(font, Component.literal(name).withStyle(style -> style.withBold(true)), contentX, y + 80 + contentOffset, TaggerWidgets.TEXT);

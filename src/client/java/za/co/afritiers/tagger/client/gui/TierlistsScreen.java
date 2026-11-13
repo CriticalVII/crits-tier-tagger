@@ -13,12 +13,13 @@ public final class TierlistsScreen extends Screen {
     private final TaggerSettingsScreen owner;
     private int x, y, w, h, offset;
     private String feedback = "";
+    private TaggerFrame frame;
     TierlistsScreen(TaggerSettingsScreen owner) { super(Component.literal("Tierlists")); this.owner = owner; }
     @Override protected void init() {
         AfriTiersClient.instance().loadSelectedTierlist();
-        w = Math.min(520, width - 20); h = Math.min(348, height - 16);
-        x = (width - w) / 2; y = (height - h) / 2; offset = TaggerTabs.offset(w);
-        TaggerTabs.add(this::addRenderableWidget, owner, "Tierlists", x, y, w);
+        frame = TaggerFrame.fit(width, height);
+        w = frame.w(); h = frame.h(); x = frame.x(); y = frame.y(); offset = frame.offset();
+        TaggerTabs.add(this::addRenderableWidget, owner, "Tierlists", frame);
         var grid = LinearLayout.vertical().spacing(10);
         LinearLayout row = null;
         int index = 0;
@@ -42,9 +43,7 @@ public final class TierlistsScreen extends Screen {
         back.setPosition(x + w - 92, y + h - 30); addRenderableWidget(back);
     }
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        g.fill(0, 0, width, height, 0x28090A13); TaggerWidgets.panel(g, x, y, w, h);
-        g.text(font, "Crit's", x + 12, y + 12, TaggerWidgets.TEXT);
-        g.fill(x + 12, y + 32 + offset, x + w - 12, y + 33 + offset, TaggerWidgets.LINE);
+        frame.draw(g, "Tierlist sources");
         g.text(font, "In-game tierlist", x + 12, y + 44 + offset, TaggerWidgets.GREEN);
         g.text(font, font.plainSubstrByWidth("One source for Tab and nametags. Profiles has its own selector.", w - 24), x + 12, y + 58 + offset, TaggerWidgets.MUTED);
         g.text(font, font.plainSubstrByWidth(feedback.isEmpty() ? "AfriTiers waitlist notifications stay independent." : feedback, w - 24),

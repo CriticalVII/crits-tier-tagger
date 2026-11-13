@@ -65,9 +65,10 @@ public final class ModePickerScreen extends Screen {
     }
 
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        g.fill(0, 0, width, height, 0x35090A13);
+        TaggerWidgets.backdrop(g, width, height);
         TaggerWidgets.panel(g, x, y, w, h);
-        g.text(font, "Choose a mode", x + 12, y + 14, TaggerWidgets.TEXT);
+        g.text(font, TaggerFrame.heading("Choose a mode"), x + 12, y + 12, TaggerWidgets.TEXT, false);
+        g.fill(x + 12, y + 29, x + w - 12, y + 30, TaggerWidgets.LINE);
         g.text(font, "One mode, or everyone's strongest tier.", x + 12, y + 34, TaggerWidgets.MUTED);
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
