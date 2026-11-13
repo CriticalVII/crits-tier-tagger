@@ -19,7 +19,7 @@ public final class ModePickerScreen extends Screen {
     private int x, y, w, h;
 
     ModePickerScreen(TaggerSettingsScreen owner, String selected) {
-        super(Component.literal("Choose a mode"));
+        super(net.minecraft.client.Minecraft.getInstance(), TaggerFonts.body(), Component.literal("Choose a mode"));
         this.owner = owner;
         this.selected = selected;
     }

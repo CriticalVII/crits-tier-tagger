@@ -23,7 +23,7 @@ final class ConnectionDetailsScreen extends Screen {
     private final TaggerSettingsScreen owner;
     private final List<StringWidget> values = new ArrayList<>();
     private int x, y, w, h;
-    ConnectionDetailsScreen(TaggerSettingsScreen owner) { super(Component.literal("Connection details")); this.owner = owner; }
+    ConnectionDetailsScreen(TaggerSettingsScreen owner) { super(net.minecraft.client.Minecraft.getInstance(), TaggerFonts.body(), Component.literal("Connection details")); this.owner = owner; }
 
     @Override protected void init() {
         values.clear();

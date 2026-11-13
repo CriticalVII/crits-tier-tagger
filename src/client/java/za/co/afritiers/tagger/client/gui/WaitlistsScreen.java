@@ -27,7 +27,7 @@ public final class WaitlistsScreen extends Screen {
     private TaggerFrame frame;
 
     WaitlistsScreen(TaggerSettingsScreen owner) {
-        super(Component.literal("Waitlist Notifications")); this.owner = owner;
+        super(net.minecraft.client.Minecraft.getInstance(), TaggerFonts.body(), Component.literal("Waitlist Notifications")); this.owner = owner;
     }
 
     @Override protected void init() {

@@ -23,9 +23,9 @@ final class TaggerTabs {
             });
             boolean rail = frame.rail() > 0;
             int tabWidth = rail ? frame.rail() - 16 : (frame.w() - 42) / 4;
-            tab.setWidth(tabWidth); tab.setHeight(rail ? 26 : 18); tab.setRail(rail);
+            tab.setWidth(tabWidth); tab.setHeight(rail ? 20 : 18); tab.setRail(rail);
             tab.setPosition(rail ? frame.left() + 8 : frame.x() + 12 + index * (tabWidth + 6),
-                    rail ? frame.top() + 90 + index * 32 : frame.top() + 35);
+                    rail ? frame.top() + (index < 2 ? 59 + index * 22 : 137 + (index - 2) * 22) : frame.top() + 35);
             add.accept(tab);
         }
     }
