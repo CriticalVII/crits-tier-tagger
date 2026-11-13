@@ -10,6 +10,7 @@ import za.co.afritiers.tagger.client.ModeIcons;
 import za.co.afritiers.tagger.client.TagFormatter;
 import za.co.afritiers.tagger.config.TaggerConfig;
 import za.co.afritiers.tagger.ranking.Tier;
+import za.co.afritiers.tagger.provider.TierlistProvider;
 
 /** Translucent native settings with immediate persistence and a pinned reference preview. */
 public final class TaggerSettingsScreen extends Screen {
@@ -67,14 +68,13 @@ public final class TaggerSettingsScreen extends Screen {
         field.setTooltip(TaggerFonts.tooltip(Component.literal("Optional six-digit hex colour, for example FFD700. Leave blank for gold, silver, bronze and purple. Icons keep their own colours.")));
         colour.addChild(field);
         appearance.addChild(colour);
-        var source = new TaggerWidgets.Action("Tierlist: " + AfriTiersClient.instance().selectedProvider().label() + " >",
-                columnWidth, 26, false, pressed -> minecraft.gui.setScreen(new TierlistsScreen(this)));
-        source.setTooltip(TaggerFonts.tooltip(Component.literal("Choose the source for Tab and nametag tiers.")));
-        appearance.addChild(source);
         LinearLayout controls = columns ? LinearLayout.horizontal().spacing(12) : LinearLayout.vertical().spacing(12);
         controls.addChild(display);
         controls.addChild(appearance);
-        ScrollableLayout scroll = new ScrollableLayout(minecraft, controls, Math.max(32, panelHeight - (compact ? 128 : 174) - navigationOffset), ScrollableLayout.ReserveStrategy.RIGHT);
+        var settings = LinearLayout.vertical().spacing(10);
+        settings.addChild(tierlistChoices(contentWidth));
+        settings.addChild(controls);
+        ScrollableLayout scroll = new ScrollableLayout(minecraft, settings, Math.max(32, panelHeight - (compact ? 128 : 174) - navigationOffset), ScrollableLayout.ReserveStrategy.RIGHT);
         scroll.setMinWidth(contentWidth);
         scroll.arrangeElements();
         scroll.setX(panelX + 12);
@@ -115,6 +115,29 @@ public final class TaggerSettingsScreen extends Screen {
 
     private void addTabs() {
         TaggerTabs.add(this::addRenderableWidget, this, "Settings", frame);
+    }
+
+    private LinearLayout tierlistChoices(int width) {
+        var choices = LinearLayout.vertical().spacing(4);
+        choices.addChild(new StringWidget(width, 14, Component.literal("In-game tierlist").withColor(TaggerWidgets.TEXT), font));
+        int columns = width >= 320 ? 4 : 2;
+        int cellWidth = (width - (columns - 1) * 6) / columns;
+        LinearLayout row = null;
+        int index = 0;
+        for (var provider : TierlistProvider.values()) {
+            if (index++ % columns == 0) { row = LinearLayout.horizontal().spacing(6); choices.addChild(row); }
+            var button = TierlistLogo.button(provider, provider.label(), cellWidth, compact ? 22 : 28,
+                    provider == AfriTiersClient.instance().selectedProvider(), pressed -> {
+                        try {
+                            AfriTiersClient.instance().selectTierlist(provider);
+                            feedback = "Saved · now showing " + provider.label();
+                            rebuildWidgets();
+                        } catch (java.io.IOException exception) { feedback = "Could not save. Check config permissions."; }
+                    });
+            button.setTooltip(TaggerFonts.tooltip(Component.literal(provider.description() + "\nUsed for Tab and nametags. Profiles has its own selector.")));
+            row.addChild(button);
+        }
+        return choices;
     }
 
     private LinearLayout section(String heading, int sectionWidth) {
