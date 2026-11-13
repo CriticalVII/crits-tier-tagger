@@ -76,6 +76,7 @@ public final class ProfilesScreen extends Screen {
         searchField = new TaggerWidgets.Input(w < 440 ? w - 166 : w - 270, 20, Component.literal("Player username"));
         searchField.setPosition(x + (w < 440 ? 12 : 114), y + 42 + contentOffset);
         searchField.setMaxLength(16);
+        searchField.setCentered(true);
         searchField.setBordered(false);
         searchField.setTextColor(TaggerWidgets.TEXT);
         searchField.setHint(Component.literal("Player username"));
