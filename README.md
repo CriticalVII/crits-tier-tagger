@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/main/resources/assets/afritiers_tagger/icon.png" width="96" alt="Crit's Tier Tagger">
+  <img src="resources/assets/afritiers_tagger/icon.png" width="96" alt="Crit's Tier Tagger">
 </p>
 
 # Crit's Tier Tagger
