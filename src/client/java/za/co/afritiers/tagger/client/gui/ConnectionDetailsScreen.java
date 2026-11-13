@@ -23,7 +23,7 @@ final class ConnectionDetailsScreen extends Screen {
     private final TaggerSettingsScreen owner;
     private final List<StringWidget> values = new ArrayList<>();
     private int x, y, w, h;
-    ConnectionDetailsScreen(TaggerSettingsScreen owner) { super(Component.literal("Connection details")); this.owner = owner; }
+    ConnectionDetailsScreen(TaggerSettingsScreen owner) { super(net.minecraft.client.Minecraft.getInstance(), TaggerFonts.body(), Component.literal("Connection details")); this.owner = owner; }
 
     @Override protected void init() {
         values.clear();
@@ -70,7 +70,7 @@ final class ConnectionDetailsScreen extends Screen {
         for (int i = 0; i < values.size(); i++) {
             String line = lines.get(i);
             values.get(i).setMessage(Component.literal(font.plainSubstrByWidth(line, w - 44)).withColor(TaggerWidgets.MUTED));
-            values.get(i).setTooltip(Tooltip.create(Component.literal(line)));
+            values.get(i).setTooltip(TaggerFonts.tooltip(Component.literal(line)));
         }
     }
 

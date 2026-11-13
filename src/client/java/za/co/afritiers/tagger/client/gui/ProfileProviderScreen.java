@@ -11,17 +11,17 @@ final class ProfileProviderScreen extends Screen {
     private final TierlistProvider selected;
     private int x, y, w, h;
     ProfileProviderScreen(ProfilesScreen owner, TierlistProvider selected) {
-        super(Component.literal("Profile tierlist")); this.owner = owner; this.selected = selected;
+        super(net.minecraft.client.Minecraft.getInstance(), TaggerFonts.body(), Component.literal("Profile tierlist")); this.owner = owner; this.selected = selected;
     }
     @Override protected void init() {
         w = Math.min(420, width - 20); h = Math.min(220, height - 16);
         x = (width - w) / 2; y = (height - h) / 2;
         int index = 0, cell = (w - 36) / 2;
         for (var provider : TierlistProvider.values()) {
-            var button = TierlistLogo.button(provider, provider.label(), cell, 34, provider == selected, pressed -> {
+            var button = TierlistLogo.tile(provider, cell, 52, provider == selected, pressed -> {
                 owner.selectProvider(provider); onClose();
             });
-            button.setPosition(x + 12 + index % 2 * (cell + 12), y + 66 + index / 2 * 44);
+            button.setPosition(x + 12 + index % 2 * (cell + 12), y + 58 + index / 2 * 60);
             addRenderableWidget(button); index++;
         }
         var back = TaggerWidgets.action("Back", 80, false, pressed -> onClose());

@@ -29,9 +29,10 @@ public final class ProfilesScreen extends Screen {
     private int contentOffset;
     private TierlistProvider provider;
     private TaggerFrame frame;
+    private int profileInset() { return showSkin() ? w >= 440 ? 180 : 158 : 12; }
 
     public ProfilesScreen(TaggerSettingsScreen owner) {
-        super(Component.literal("Crit's profiles"));
+        super(net.minecraft.client.Minecraft.getInstance(), TaggerFonts.body(), Component.literal("Crit's profiles"));
         this.owner = owner;
         provider = AfriTiersClient.instance().defaultProfileProvider();
         requested = net.minecraft.client.Minecraft.getInstance().getUser().getName();
@@ -68,7 +69,7 @@ public final class ProfilesScreen extends Screen {
         TaggerTabs.add(this::addRenderableWidget, owner, "Profiles", frame);
         var source = TierlistLogo.button(provider, provider.label() + " >", w < 440 ? w - 24 : 94, 20, false,
                 pressed -> minecraft.gui.setScreen(new ProfileProviderScreen(this, provider)));
-        source.setTooltip(Tooltip.create(Component.literal("Profile tierlist. This does not change in-game tags.")));
+        source.setTooltip(TaggerFonts.tooltip(Component.literal("Profile tierlist. This does not change in-game tags.")));
         source.setPosition(x + 12, y + 42 + frame.offset()); addRenderableWidget(source);
         searchButton = TaggerWidgets.action("Search", 60, true, pressed -> search());
         searchButton.setPosition(x + w - 148, y + 42 + contentOffset);
@@ -80,7 +81,7 @@ public final class ProfilesScreen extends Screen {
         searchField.setHint(Component.literal("Player username"));
         searchField.setValue(input);
         searchField.setResponder(value -> { input = value; searchButton.active = validInput(); });
-        searchField.setTooltip(Tooltip.create(Component.literal(provider == TierlistProvider.AFRITIERS
+        searchField.setTooltip(TaggerFonts.tooltip(Component.literal(provider == TierlistProvider.AFRITIERS
                 ? "Search a username or saved alias. Verified paid-account name changes are resolved automatically."
                 : "Resolve a username to its verified Minecraft UUID, then search " + provider.label() + ".")));
         addRenderableWidget(searchField); addRenderableWidget(searchButton);
@@ -98,7 +99,7 @@ public final class ProfilesScreen extends Screen {
         snapshot.profile(apiName).ifPresent(this::addProfile);
         if (!requested.isEmpty() && showSkin()) addSkin();
         Button refresh = TaggerWidgets.action("Refresh", 64, false, pressed -> feedback = mod.playerSearchRepository().refresh());
-        refresh.setTooltip(Tooltip.create(Component.literal("Refresh player stats. API cooldowns still apply.")));
+        refresh.setTooltip(TaggerFonts.tooltip(Component.literal("Refresh player stats. API cooldowns still apply.")));
         refresh.setPosition(x + 12, y + h - 30); addRenderableWidget(refresh);
         Button back = TaggerWidgets.action("Back", 80, false, pressed -> onClose());
         back.setPosition(x + w - 92, y + h - 30); addRenderableWidget(back);
@@ -116,21 +117,23 @@ public final class ProfilesScreen extends Screen {
 
     private void addProfile(PlayerStats profile) {
         boolean showSkin = showSkin();
-        int contentX = x + (showSkin ? 158 : 12), contentWidth = w - (showSkin ? 182 : 36);
+        int contentX = x + profileInset(), contentWidth = w - profileInset() - 24;
         LinearLayout rows = LinearLayout.vertical().spacing(3);
         if (!requested.equalsIgnoreCase(profile.name())) line(rows, contentWidth, "API name: ", profile.name(), TaggerWidgets.MUTED);
-        line(rows, contentWidth, "Region: ", profile.region(), TaggerWidgets.GREEN);
+        line(rows, contentWidth, "Region: ", profile.region(), TaggerWidgets.TEXT);
         line(rows, contentWidth, "Points: ", profile.points() < 0 ? "Not supplied" : profile.points()
                 + (profile.combatTitle().isBlank() ? "" : " (" + profile.combatTitle() + ")"), 0xFFFFD700);
         line(rows, contentWidth, "Overall rank: ", profile.position() == 0 ? "Not supplied" : "#" + profile.position(), 0xFFD700);
-        rows.addChild(new ProfileLine(contentWidth, Component.literal("RANKINGS").withColor(TaggerWidgets.GREEN)));
+        rows.addChild(new ProfileLine(contentWidth, Component.literal("Rankings").withColor(TaggerWidgets.TEXT)));
         var tiers = snapshot.players().getOrDefault(apiName, java.util.List.of());
-        tiers.stream().sorted(Comparator.comparing(Tier::retired).thenComparingInt(Tier::strength).thenComparing(Tier::mode)).forEach(tier -> {
-            Component text = Component.empty().append(ModeIcons.component(tier.mode()))
-                    .append(Component.literal(" " + provider.modeLabel(tier.mode()) + ": ").withColor(TaggerWidgets.TEXT))
-                    .append(Component.literal(tier.displayLevel()).withColor(new za.co.afritiers.tagger.config.TaggerConfig().colour(tier.level())));
-            rows.addChild(new ProfileLine(contentWidth, text));
-        });
+        var ordered = tiers.stream().sorted(Comparator.comparing(Tier::retired).thenComparingInt(Tier::strength).thenComparing(Tier::mode)).toList();
+        int columns = contentWidth >= 240 ? 3 : 2;
+        LinearLayout rankRow = null;
+        for (int index = 0; index < ordered.size(); index++) {
+            if (index % columns == 0) { rankRow = LinearLayout.horizontal().spacing(6); rows.addChild(rankRow); }
+            int cardWidth = (contentWidth - (columns - 1) * 6) / columns;
+            rankRow.addChild(new RankTile(cardWidth, ordered.get(index)));
+        }
         if (tiers.isEmpty()) rows.addChild(new ProfileLine(contentWidth, Component.literal("No recorded tiers").withColor(TaggerWidgets.MUTED)));
         ScrollableLayout scroll = new ScrollableLayout(minecraft, rows, Math.max(32, h - 148 - contentOffset), ScrollableLayout.ReserveStrategy.RIGHT);
         scroll.setMinWidth(contentWidth);
@@ -148,11 +151,20 @@ public final class ProfilesScreen extends Screen {
             java.util.function.Supplier<net.minecraft.world.entity.player.PlayerSkin> skinSource = online != null
                     ? online::getSkin : self ? minecraft.getSkinManager().createLookup(minecraft.getGameProfile(), true)
                     : DefaultPlayerSkin::getDefaultSkin;
-            int skinHeight = Math.max(50, Math.min(220, h - 174 - contentOffset));
-            var skin = new PlayerSkinWidget(132, skinHeight, minecraft.getEntityModels(), skinSource);
-            skin.setPosition(x + 12, y + 102 + contentOffset); addRenderableWidget(skin);
-            var caption = new ProfileLine(128, Component.literal(self ? "YOUR PROFILE" : online == null ? "Default skin" : "Online skin").withColor(TaggerWidgets.MUTED));
-            caption.setPosition(x + 16, y + 105 + skinHeight + contentOffset); addRenderableWidget(caption);
+            int skinHeight = Math.max(50, Math.min(320, h - 168 - contentOffset));
+            int skinWidth = profileInset() - 24;
+            var skin = new PlayerSkinWidget(skinWidth, skinHeight, minecraft.getEntityModels(), skinSource) {
+                private final long appearedAt = System.nanoTime();
+                @Override protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
+                    super.extractWidgetRenderState(g, mouseX, mouseY, delta);
+                    if (minecraft.options.screenEffectScale().get() == 0) return;
+                    float remaining = Math.max(0, 1 - (System.nanoTime() - appearedAt) / 180_000_000F);
+                    if (remaining > 0) g.fill(getX(), getY(), getRight(), getBottom(), ((int) (remaining * 255) << 24) | 0x0A0A0A);
+                }
+            };
+            skin.setPosition(x + 12, y + 92 + contentOffset); addRenderableWidget(skin);
+            var caption = new ProfileLine(skinWidth, Component.literal(self ? "YOUR PROFILE" : online == null ? "Default skin" : "Online skin").withColor(TaggerWidgets.MUTED));
+            caption.setPosition(x + 12, y + 97 + skinHeight + contentOffset); addRenderableWidget(caption);
     }
 
     private void line(LinearLayout rows, int width, String label, String value, int colour) {
@@ -179,14 +191,10 @@ public final class ProfilesScreen extends Screen {
     }
 
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        frame.draw(g, "Player profiles");
+        frame.draw(g, "Profiles");
         var state = AfriTiersClient.instance().playerSearchRepository().state();
         var profile = snapshot.profile(apiName);
-        int contentX = x + (showSkin() ? 158 : 12), contentWidth = w - (showSkin() ? 182 : 36);
-        if (showSkin()) {
-            g.fill(x + 12, y + 100 + contentOffset, x + 148, y + h - 54, 0xFF181D20);
-            g.outline(x + 12, y + 100 + contentOffset, 136, h - 154 - contentOffset, TaggerWidgets.LINE);
-        }
+        int contentX = x + profileInset(), contentWidth = w - profileInset() - 24;
         if (!requested.isEmpty()) {
             String name = profile.isPresent() && requested.equalsIgnoreCase(profile.get().name()) ? profile.get().name() : requested;
             g.text(font, Component.literal(name).withStyle(style -> style.withBold(true)), contentX, y + 80 + contentOffset, TaggerWidgets.TEXT);
@@ -216,10 +224,10 @@ public final class ProfilesScreen extends Screen {
     private final class ProfileLine extends AbstractWidget {
         ProfileLine(int width, Component text) {
             super(0, 0, width, 18, text);
-            setTooltip(Tooltip.create(text));
+            setTooltip(TaggerFonts.tooltip(text));
         }
         @Override protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-            g.fill(getX(), getY(), getRight(), getBottom(), isHovered() ? 0xFF222B30 : 0xFF191E21);
+            if (isHovered()) TaggerWidgets.rounded(g, getX(), getY(), width, height, 2, 0xFF181818);
             g.enableScissor(getX(), getY() - 2, getRight(), getBottom());
             g.text(font, getMessage(), getX() + 4, getY() + 4, TaggerWidgets.TEXT, false);
             g.disableScissor();
@@ -227,5 +235,24 @@ public final class ProfilesScreen extends Screen {
         @Override protected void updateWidgetNarration(net.minecraft.client.gui.narration.NarrationElementOutput output) {
             defaultButtonNarrationText(output);
         }
+    }
+
+    private final class RankTile extends AbstractWidget {
+        private final Tier tier;
+        RankTile(int width, Tier tier) {
+            super(0, 0, width, 54, Component.literal(provider.modeLabel(tier.mode()) + ": " + tier.displayLevel()));
+            this.tier = tier; setTooltip(TaggerFonts.tooltip(getMessage()));
+        }
+        @Override protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
+            TaggerWidgets.rounded(g, getX(), getY(), width, height, 3, isHovered() ? 0xFF2C2C2C : TaggerWidgets.SURFACE);
+            String name = font.plainSubstrByWidth(provider.modeLabel(tier.mode()), width - 12);
+            g.text(font, name, getX() + (width - font.width(name)) / 2, getY() + 7, TaggerWidgets.TEXT, false);
+            String level = tier.displayLevel(); int group = 24 + 4 + font.width(level);
+            int left = getX() + (width - group) / 2;
+            g.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
+                    ModeIcons.sprite(ModeIcon.forMode(tier.mode())).spriteId(), left, getY() + 23, 24, 24);
+            g.text(font, level, left + 28, getY() + 30, 0xFF000000 | new za.co.afritiers.tagger.config.TaggerConfig().colour(tier.level()), false);
+        }
+        @Override protected void updateWidgetNarration(net.minecraft.client.gui.narration.NarrationElementOutput output) { defaultButtonNarrationText(output); }
     }
 }
