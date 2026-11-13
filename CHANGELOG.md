@@ -2,6 +2,8 @@
 
 ## 2.2.4 — 2026-11-13
 
+- Renamed the GitHub repository to `crits-tier-tagger` and updated the mod's website, source and issue links.
+
 - Shortened source paths to `src/client/crits/` and `src/common/crits/`, with a single top-level `resources/` directory. Removed redundant source-root nesting and empty directories.
 - Updated Java namespaces, Fabric entrypoints, mixin registration, build configuration and documentation to match. Existing mod/config IDs, assets and behaviour remain unchanged.
 
