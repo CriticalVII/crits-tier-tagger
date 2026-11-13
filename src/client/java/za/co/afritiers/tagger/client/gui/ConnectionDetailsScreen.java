@@ -47,19 +47,24 @@ final class ConnectionDetailsScreen extends Screen {
     @Override public void tick() {
         var state = AfriTiersClient.instance().repository().state();
         var rankings = state.rankings();
+        var mod = AfriTiersClient.instance();
+        var provider = mod.selectedProvider();
+        boolean bulk = provider == za.co.afritiers.tagger.provider.TierlistProvider.AFRITIERS;
         List<String> lines = List.of(
-                "Status: " + state.message(),
+                provider.label() + ": " + state.message(),
                 "Ranked usernames: " + rankings.players().size(),
                 "Last attempt: " + time(state.lastAttempt()),
                 "Last success: " + time(state.lastSuccess()),
-                "Source updated: " + (rankings.updatedAt() == null ? "Unknown" : DATE.format(rankings.updatedAt())),
+                (bulk ? "Source updated: " : "Last profile update: ") + (rankings.updatedAt() == null ? "Unknown" : DATE.format(rankings.updatedAt())),
                 "Data age: " + (rankings.updatedAt() == null ? "Unknown" : Math.max(0, java.time.Duration.between(rankings.updatedAt(), Instant.now()).toSeconds()) + "s"),
                 "Next refresh: " + time(state.nextRefresh()),
-                "Source: " + (rankings.updatedAt() == null ? "Not loaded" : rankings.stale() ? "Stale" : "Current"),
-                "Ambiguous names: " + rankings.ambiguousNames() + " | Skipped records: " + rankings.skippedRecords(),
+                bulk ? "Source: " + (rankings.updatedAt() == null ? "Not loaded" : rankings.stale() ? "Stale" : "Current")
+                        : "Profiles are fetched on demand and cached for five minutes.",
+                bulk ? "Ambiguous names: " + rankings.ambiguousNames() + " | Skipped records: " + rankings.skippedRecords()
+                        : "Points and overall ranks come directly from " + provider.label() + ".",
                 "Matches usernames, including offline accounts.",
-                "Paid-name lookup: " + AfriTiersClient.instance().paidNames().status(),
-                "Saved username aliases: " + AfriTiersClient.instance().config().usernameAliases.size(),
+                bulk ? "Paid-name lookup: " + mod.paidNames().status() : "Lookups use usernames; server UUIDs are never matched.",
+                "Saved username aliases: " + mod.config().aliases(provider).size(),
                 "Refresh uses saved settings.",
                 AfriTiersClient.instance().configWarning());
         for (int i = 0; i < values.size(); i++) {
