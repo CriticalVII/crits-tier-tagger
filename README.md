@@ -15,7 +15,7 @@ A client-side Fabric mod for **Minecraft Java 26.2**. Display PvP tiers from **A
 
 ## Install
 
-Download [crits-tier-tagger-2.0.0.jar](releases/crits-tier-tagger-2.0.0.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
+Download [crits-tier-tagger-2.0.1.jar](releases/crits-tier-tagger-2.0.1.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
 
 | Requirement | Version |
 | --- | --- |
@@ -34,6 +34,8 @@ The mod keeps its original internal ID and `config/afritiers_tagger.json` file s
 Press **K**, run `/crittiers config`, or open **Mods → Crit's Tier Tagger → Configure**. Changes save immediately. Close with Done or Escape; invalid colour values are not saved.
 
 Choose your in-game source in **Tierlists**. This supplies both Tab and nametags. Each provider remembers its selected mode; choose a specific mode or Strongest tier from Settings. Providers remain separate: an outage or missing player does not substitute another tierlist's result.
+
+Settings and Profiles work from the main menu through Mod Menu or the **K** shortcut; joining a world is not required. The title-screen shortcut follows your configured keybind and also works without Mod Menu. Opening Settings loads the selected tierlist, and selecting another source starts its update immediately. Profiles can display your account or search any username from the main menu. Background refreshes and API cooldowns still apply. Provider choices show each service's own logo; mode icons use simple flat artwork inspired by the tierlists' visual style.
 
 Retired tiers are included by default. Top 10 rank is off by default and uses the selected provider's **overall** leaderboard position. Tier colours are gold for tier 1, silver for tier 2, bronze for tier 3 and purple for tiers 4–5. A custom colour affects tags; profile stats keep tier colours. The preview starts with Sword HT1 and gold #1. Tags use spaces with no added pipe separator.
 
@@ -77,10 +79,10 @@ Queues are checked about every 30 seconds while watching in game or browsing thi
 
 ## Build
 
-Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.0.0.jar`.
+Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.0.1.jar`.
 
 The repository includes production source, assets, build files, editable mode artwork in `artwork/modes/`, and the latest packaged JAR. Local verification tools, fixtures and debug files are excluded.
 
 ## License
 
-All rights reserved. See [LICENSE](LICENSE). This project is independent of the listed tierlist services.
+All rights reserved. See [LICENSE](LICENSE). Provider names and logos belong to their respective owners; original asset links are in [artwork/PROVIDERS.md](artwork/PROVIDERS.md). This project is independent of the listed tierlist services.

@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.0.1 — 2026-11-13
+
+### Changed
+
+- Remade all 22 mode icons with simpler flat silhouettes, restrained colours and objects matching the supplied tierlist references, including the Netherite Pot helmet, SMP pearl, Diamond SMP apple and Debuff carrot.
+- Added official AfriTiers, MCTiers, PvPTiers and SubTiers logos beside their names in the tierlist cards, profile source picker and selected profile-source button.
+- Preserved the accepted nametag and Tab icon metrics, nine-pixel Tab rows, tier colours and existing mod logo.
+
+### Fixed
+
+- Opening Settings starts the selected tierlist's data session from the main menu. Switching tierlists loads the new source without joining a server or world.
+- The configured settings shortcut (K by default) now opens the GUI on the title screen, including without Mod Menu.
+- The selected provider can load your own profile outside a world. Profiles also searches other usernames and refreshes without a world, including when tags are disabled.
+- Removed misleading join-a-world requirements from connection and refresh messages. Unselected provider cards now say Select to load.
+- Main-menu loading retains the existing request spacing, cache limits, Retry-After handling and refresh cooldowns.
+
 ## 2.0.0 — 2026-11-13
 
 ### Added
