@@ -1,6 +1,7 @@
 package dev.crits.tiertagger.client.gui;
 
 import dev.crits.tiertagger.client.CritsTierTaggerClient;
+import dev.crits.tiertagger.provider.TierlistProvider;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -47,7 +48,7 @@ final class ConnectionDetailsScreen extends Screen {
         var rankings = state.rankings();
         var mod = CritsTierTaggerClient.instance();
         var provider = mod.selectedProvider();
-        boolean bulk = provider == dev.crits.tiertagger.provider.TierlistProvider.AFRITIERS;
+        boolean bulk = provider == TierlistProvider.AFRITIERS;
         List<String> lines = List.of(
                 provider.label() + ": " + state.message(),
                 (bulk ? "Ranked usernames: " : "Cached UUID profiles: ") + rankings.players().size(),

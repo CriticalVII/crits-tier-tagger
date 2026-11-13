@@ -1,5 +1,8 @@
 package dev.crits.tiertagger.ranking;
 
+
+
+
 /** Public profile fields and the overall position in one normalized API snapshot. */
 public record PlayerStats(String name, String region, int points, int position, String combatTitle) {
     public PlayerStats(String name, String region, int points, int position) {

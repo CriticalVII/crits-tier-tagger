@@ -1,5 +1,6 @@
 package dev.crits.tiertagger.provider;
 
+import dev.crits.tiertagger.ranking.Tier;
 import java.util.*;
 
 /** Stable configuration IDs are separate from each service's public branding and API mode IDs. */
@@ -36,7 +37,7 @@ public enum TierlistProvider {
             case "dia_crystal" -> "Diamond Crystal";
             case "neth_pot" -> "Netherite Pot";
             case "nethop" -> this == MCTIERS ? "NethPot" : "NethOP";
-            default -> dev.crits.tiertagger.ranking.Tier.modeLabel(mode);
+            default -> Tier.modeLabel(mode);
         };
     }
 }

@@ -1,6 +1,7 @@
 package dev.crits.tiertagger.repository;
 
 import dev.crits.tiertagger.network.source.RankingSource;
+import dev.crits.tiertagger.provider.TierlistProvider;
 import dev.crits.tiertagger.ranking.Rankings;
 import java.time.*;
 import java.util.concurrent.*;
@@ -38,8 +39,8 @@ public final class RankingRepository implements TierRepository {
     }
 
     public State state() { return state; }
-    @Override public dev.crits.tiertagger.provider.TierlistProvider provider() {
-        return dev.crits.tiertagger.provider.TierlistProvider.AFRITIERS;
+    @Override public TierlistProvider provider() {
+        return TierlistProvider.AFRITIERS;
     }
 
     public synchronized void connect() {

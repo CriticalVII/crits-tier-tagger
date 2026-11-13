@@ -2,11 +2,9 @@ package dev.crits.tiertagger.repository;
 
 import dev.crits.tiertagger.network.source.PlayerProfileSource;
 import dev.crits.tiertagger.network.source.RankingSource;
-import dev.crits.tiertagger.provider.*;
 import dev.crits.tiertagger.provider.PlayerIdentity;
 import dev.crits.tiertagger.provider.PlayerProfileParser;
 import dev.crits.tiertagger.provider.TierlistProvider;
-import dev.crits.tiertagger.ranking.*;
 import dev.crits.tiertagger.ranking.PlayerStats;
 import dev.crits.tiertagger.ranking.Rankings;
 import dev.crits.tiertagger.ranking.Tier;

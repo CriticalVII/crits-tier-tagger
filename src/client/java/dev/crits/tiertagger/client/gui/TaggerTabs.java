@@ -20,7 +20,7 @@ final class TaggerTabs {
                     default -> owner;
                 });
             });
-            tab.setWidth(frame.rail() - 16); tab.setHeight(22); tab.setRail(true);
+            tab.setWidth(frame.rail() - 16); tab.setHeight(22);
             tab.setPosition(frame.left() + 8, frame.top() + 46 + index * 26);
             add.accept(tab);
         }

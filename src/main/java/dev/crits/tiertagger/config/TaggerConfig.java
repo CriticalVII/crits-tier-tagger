@@ -1,5 +1,7 @@
 package dev.crits.tiertagger.config;
 
+import dev.crits.tiertagger.provider.TierlistProvider;
+import dev.crits.tiertagger.waitlist.Waitlists;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -45,12 +47,12 @@ public final class TaggerConfig {
     }
 
     public void validate() {
-        tierlist = dev.crits.tiertagger.provider.TierlistProvider.from(tierlist).id();
-        if (profileTierlist == null || dev.crits.tiertagger.provider.TierlistProvider.find(profileTierlist).isEmpty()) profileTierlist = "";
+        tierlist = TierlistProvider.from(tierlist).id();
+        if (profileTierlist == null || TierlistProvider.find(profileTierlist).isEmpty()) profileTierlist = "";
         if (tierlistModes == null) tierlistModes = new java.util.LinkedHashMap<>();
         if (tierlistModes.size() > 4) throw new IllegalArgumentException("Too many provider mode preferences");
         for (var entry : tierlistModes.entrySet()) {
-            if (dev.crits.tiertagger.provider.TierlistProvider.find(entry.getKey()).isEmpty()
+            if (TierlistProvider.find(entry.getKey()).isEmpty()
                     || entry.getValue() == null || !entry.getValue().matches("[a-z0-9_-]{1,32}"))
                 throw new IllegalArgumentException("Invalid provider mode preference");
         }
@@ -58,7 +60,7 @@ public final class TaggerConfig {
         if (tierlistAliases.size() > 3) throw new IllegalArgumentException("Too many provider alias groups");
         var normalizedGroups = new java.util.LinkedHashMap<String, java.util.Map<String, String>>();
         for (var entry : tierlistAliases.entrySet()) {
-            if (dev.crits.tiertagger.provider.TierlistProvider.find(entry.getKey()).isEmpty() || entry.getKey().equals("afritiers"))
+            if (TierlistProvider.find(entry.getKey()).isEmpty() || entry.getKey().equals("afritiers"))
                 throw new IllegalArgumentException("Invalid alias provider");
             var group = new TaggerConfig();
             group.usernameAliases = entry.getValue();
@@ -69,7 +71,7 @@ public final class TaggerConfig {
         if (waitlistModes == null) waitlistModes = new java.util.LinkedHashSet<>();
         if (waitlistModes.size() > 128) throw new IllegalArgumentException("At most 128 waitlist subscriptions are supported");
         var normalizedModes = new java.util.LinkedHashSet<String>();
-        for (String mode : waitlistModes) normalizedModes.add(dev.crits.tiertagger.waitlist.Waitlists.modeKey(mode));
+        for (String mode : waitlistModes) normalizedModes.add(Waitlists.modeKey(mode));
         waitlistModes = normalizedModes;
         normalizeUsernameAliases();
         if (mode == null || !Pattern.matches("[a-z0-9_-]{1,32}", mode)) mode = "strongest";
@@ -95,12 +97,12 @@ public final class TaggerConfig {
         usernameAliases = normalizedAliases;
     }
 
-    public java.util.Map<String, String> aliases(dev.crits.tiertagger.provider.TierlistProvider provider) {
-        return provider == dev.crits.tiertagger.provider.TierlistProvider.AFRITIERS ? usernameAliases
+    public java.util.Map<String, String> aliases(TierlistProvider provider) {
+        return provider == TierlistProvider.AFRITIERS ? usernameAliases
                 : tierlistAliases.getOrDefault(provider.id(), java.util.Map.of());
     }
-    public java.util.Map<String, String> editAliases(dev.crits.tiertagger.provider.TierlistProvider provider) {
-        return provider == dev.crits.tiertagger.provider.TierlistProvider.AFRITIERS ? usernameAliases
+    public java.util.Map<String, String> editAliases(TierlistProvider provider) {
+        return provider == TierlistProvider.AFRITIERS ? usernameAliases
                 : tierlistAliases.computeIfAbsent(provider.id(), ignored -> new java.util.LinkedHashMap<>());
     }
 
