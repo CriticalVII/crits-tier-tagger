@@ -28,11 +28,6 @@ public record Rankings(Map<String, List<Tier>> players, List<String> modes,
         return Optional.ofNullable(stats.get(Tier.normalizeUsername(username)));
     }
 
-    public int topTenPosition(String username) {
-        PlayerStats profile = stats.get(Tier.normalizeUsername(username));
-        return profile != null && profile.position() >= 1 && profile.position() <= 10 ? profile.position() : 0;
-    }
-
     public Optional<Tier> select(String username, String mode, boolean includeRetired) {
         ModeIcon selected = ModeIcon.find(mode).orElse(null);
         return players.getOrDefault(Tier.normalizeUsername(username), List.of()).stream()

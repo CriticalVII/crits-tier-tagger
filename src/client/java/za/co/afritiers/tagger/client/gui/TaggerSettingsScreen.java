@@ -49,7 +49,6 @@ public final class TaggerSettingsScreen extends Screen {
         display.addChild(new TaggerWidgets.Toggle("Enabled", "Show tier tags", columnWidth, compact, () -> draft.enabled, value -> { draft.enabled = value; persist(); }));
         display.addChild(new TaggerWidgets.Toggle("Nameplates", "Above players", columnWidth, compact, () -> draft.nameplates, value -> { draft.nameplates = value; persist(); }));
         display.addChild(new TaggerWidgets.Toggle("Tab list", "In the player list", columnWidth, compact, () -> draft.tabList, value -> { draft.tabList = value; persist(); }));
-        display.addChild(new TaggerWidgets.Toggle("Top 10 rank", "Gold labels #1–#10", columnWidth, compact, () -> draft.showTopTen, value -> { draft.showTopTen = value; persist(); }));
         LinearLayout appearance = section("Rankings & colour", columnWidth);
         appearance.addChild(new TaggerWidgets.Mode(columnWidth, compact, this::modeText,
                 pressed -> minecraft.gui.setScreen(new ModePickerScreen(this, draft.mode))));
@@ -168,7 +167,7 @@ public final class TaggerSettingsScreen extends Screen {
         validationError = "";
         try { sample.validate(); }
         catch (IllegalArgumentException exception) { validationError = exception.getMessage(); sample.customColour = ""; }
-        preview = Component.empty().append(TagFormatter.placement(1)).append(TagFormatter.tag(new Tier("sword",
+        preview = Component.empty().append(TagFormatter.tag(new Tier("sword",
                 Tier.ORDER.get(previewTier), false), sample)).append(minecraft.getUser().getName());
         if (colourField != null) {
             colourField.setTextColor(validationError.isEmpty() ? TaggerWidgets.TEXT : 0xFFE0BE83);
@@ -182,7 +181,6 @@ public final class TaggerSettingsScreen extends Screen {
         edited.enabled = draft.enabled;
         edited.nameplates = draft.nameplates;
         edited.tabList = draft.tabList;
-        edited.showTopTen = draft.showTopTen;
         edited.includeRetired = draft.includeRetired;
         edited.mode = draft.mode;
         edited.tierlistModes.put(edited.tierlist, draft.mode);
