@@ -57,6 +57,10 @@ public final class AfriTiersClient implements ClientModInitializer {
     public TaggerConfig config() { return config.copy(); }
     TaggerConfig activeConfig() { return config; }
     public TierRepository repository() { return repository; }
+    /** API sessions belong to the menu as well as worlds; opening settings must be enough to sync. */
+    public void loadSelectedTierlist() {
+        if (config.enabled && repository.state().phase() == RankingRepository.Phase.DISCONNECTED) repository.connect();
+    }
     public TierlistProvider selectedProvider() { return selectedProvider; }
     public TierlistProvider defaultProfileProvider() {
         return config.profileTierlist.isEmpty() ? selectedProvider : TierlistProvider.from(config.profileTierlist);
@@ -137,9 +141,10 @@ public final class AfriTiersClient implements ClientModInitializer {
             repository = gameRepositories.computeIfAbsent(next, AfriTiersClient::createRepository);
             selectedProvider = next;
             repository.setEnabled(validated.enabled);
-            if (Minecraft.getInstance().player != null) repository.connect();
+            if (validated.enabled) repository.connect();
         }
         repository.setEnabled(validated.enabled);
+        loadSelectedTierlist();
         if (!validated.enabled) paidNames.setActive(false);
     }
 
@@ -171,7 +176,7 @@ public final class AfriTiersClient implements ClientModInitializer {
     }
 
     public TierRepository playerSearchRepository() {
-        if (profileProvider == selectedProvider && Minecraft.getInstance().player != null && config.enabled) return repository;
+        if (profileProvider == selectedProvider && config.enabled) return repository;
         return profileProvider == TierlistProvider.AFRITIERS ? browser
                 : profileRepositories.computeIfAbsent(profileProvider, AfriTiersClient::createRepository);
     }
@@ -183,7 +188,7 @@ public final class AfriTiersClient implements ClientModInitializer {
         profileProvider = provider;
         browsingPlayers = true;
         var service = playerSearchRepository();
-        if (service != repository && service.state().phase() == RankingRepository.Phase.DISCONNECTED) service.connect();
+        if (service.state().phase() == RankingRepository.Phase.DISCONNECTED) service.connect();
     }
 
     public void endPlayerSearch() {
@@ -217,11 +222,11 @@ public final class AfriTiersClient implements ClientModInitializer {
     }
 
     private void updateVisibleProfiles(Minecraft client) {
-        if (!config.enabled || selectedProvider == TierlistProvider.AFRITIERS || client.player == null || client.level == null || client.getConnection() == null) return;
+        if (!config.enabled || selectedProvider == TierlistProvider.AFRITIERS) return;
         LinkedHashSet<String> names = new LinkedHashSet<>();
-        names.add(client.player.getGameProfile().name());
-        client.level.players().stream().limit(512).forEach(player -> names.add(player.getGameProfile().name()));
-        client.getConnection().getListedOnlinePlayers().stream().limit(512).forEach(info -> names.add(info.getProfile().name()));
+        names.add(client.getUser().getName());
+        if (client.level != null) client.level.players().stream().limit(512).forEach(player -> names.add(player.getGameProfile().name()));
+        if (client.getConnection() != null) client.getConnection().getListedOnlinePlayers().stream().limit(512).forEach(info -> names.add(info.getProfile().name()));
         names.stream().limit(512).forEach(name -> repository.requestPlayer(config.aliases(selectedProvider)
                 .getOrDefault(Tier.normalizeUsername(name), name), false));
     }

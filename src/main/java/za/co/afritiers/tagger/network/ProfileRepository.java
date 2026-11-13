@@ -31,7 +31,7 @@ public final class ProfileRepository implements TierRepository {
     public ProfileRepository(PlayerProfileSource source, ExecutorService worker, Clock clock) {
         this.source = source; this.worker = worker; this.clock = clock;
         modes = source.provider().modes();
-        state = new State(Phase.DISCONNECTED, empty(), null, null, null, "Join a world to load " + provider().label());
+        state = new State(Phase.DISCONNECTED, empty(), null, null, null, "Select to load " + provider().label());
     }
     @Override public TierlistProvider provider() { return source.provider(); }
     @Override public State state() { return state; }
@@ -54,7 +54,7 @@ public final class ProfileRepository implements TierRepository {
         enabled = value; resetPending();
         if (connected && enabled) { publish(Phase.READY, "Ready for player lookups"); tick(); }
         else state = new State(enabled ? Phase.DISCONNECTED : Phase.DISABLED, empty(), state.lastAttempt(), state.lastSuccess(), null,
-                enabled ? "Join a world to load tiers" : "Tier tags are disabled");
+                enabled ? "Open settings to load tiers" : "Tier tags are disabled");
     }
 
     @Override public synchronized void requestPlayer(String username, boolean priority) {
@@ -85,7 +85,7 @@ public final class ProfileRepository implements TierRepository {
         if (refreshAt == null || next.isBefore(refreshAt)) refreshAt = next;
     }
     @Override public synchronized String refresh() {
-        if (closed || !connected) return "Open this tierlist in a world or Profiles before refreshing";
+        if (closed || !connected) return "Open this tierlist in Settings or Profiles before refreshing";
         if (!enabled) return "Enable tier tags first";
         Instant next = later(manualAt, retryAt);
         if (clock.instant().isBefore(next)) return "Refresh available in " + Math.max(1, Duration.between(clock.instant(), next).toSeconds()) + "s";
