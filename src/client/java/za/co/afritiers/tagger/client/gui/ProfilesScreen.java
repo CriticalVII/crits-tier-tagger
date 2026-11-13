@@ -197,7 +197,7 @@ public final class ProfilesScreen extends Screen {
         int contentX = x + profileInset(), contentWidth = w - profileInset() - 24;
         if (!requested.isEmpty()) {
             String name = profile.isPresent() && requested.equalsIgnoreCase(profile.get().name()) ? profile.get().name() : requested;
-            g.text(font, Component.literal(name).withStyle(style -> style.withBold(true)), contentX, y + 80 + contentOffset, TaggerWidgets.TEXT);
+            g.text(font, Component.literal(name).withStyle(style -> style.withBold(true)), contentX, y + 80 + contentOffset, TaggerWidgets.TEXT, false);
             g.fill(contentX, y + 94 + contentOffset, x + w - 18, y + 95 + contentOffset, TaggerWidgets.LINE);
         }
         if (profile.isEmpty()) {
@@ -206,14 +206,14 @@ public final class ProfilesScreen extends Screen {
             var lookup = mod.playerLookupStatus(requested, provider, mod.playerSearchRepository());
             if (lookup == TierRepository.LookupStatus.LOADING) message = "Loading player stats...";
             if (lookup == TierRepository.LookupStatus.ERROR) message = "Stats unavailable — retrying automatically";
-            g.text(font, font.plainSubstrByWidth(message, contentWidth), contentX, y + 110 + contentOffset, TaggerWidgets.MUTED);
+            g.text(font, font.plainSubstrByWidth(message, contentWidth), contentX, y + 110 + contentOffset, TaggerWidgets.MUTED, false);
         }
         String note = !feedback.isEmpty() ? feedback : state.phase() == RankingRepository.Phase.ERROR ? state.message()
                 : snapshot.stale() ? "Source out of date · placements may change"
                 : profile.isPresent() ? provider == TierlistProvider.AFRITIERS ? "Points count active tiers; retired tiers earn 0."
                         : provider.label() + " supplies the displayed points and overall rank."
                 : "Searching " + provider.label() + (provider == TierlistProvider.AFRITIERS ? " by username." : " by verified account UUID.");
-        g.text(font, font.plainSubstrByWidth(note, w - 24), x + 12, y + h - 45, TaggerWidgets.MUTED);
+        g.text(font, font.plainSubstrByWidth(note, w - 24), x + 12, y + h - 45, TaggerWidgets.MUTED, false);
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
 

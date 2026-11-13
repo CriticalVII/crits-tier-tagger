@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import za.co.afritiers.tagger.client.EnlargedIconSource;
 import za.co.afritiers.tagger.client.ModeIcons;
 import za.co.afritiers.tagger.client.ModeIconBounds;
+import za.co.afritiers.tagger.client.SmoothTextSource;
 
 @Mixin(Font.class)
 public abstract class ModeIconFontMixin {
@@ -21,6 +22,16 @@ public abstract class ModeIconFontMixin {
     @Unique private final java.util.Map<FontDescription, GlyphSource[]> afritiers$icons = new java.util.HashMap<>();
     @Inject(method = "getGlyphSource", at = @At("RETURN"), cancellable = true)
     private void afritiers$sizeOwnIcon(FontDescription font, CallbackInfoReturnable<GlyphSource> callback) {
+        if (SmoothTextSource.isUiFont(font)) {
+            GlyphSource original = callback.getReturnValue();
+            GlyphSource[] cached = afritiers$icons.get(font);
+            if (cached == null || cached[0] != original) {
+                cached = new GlyphSource[] {original, new SmoothTextSource(original)};
+                afritiers$icons.put(font, cached);
+            }
+            callback.setReturnValue(cached[1]);
+            return;
+        }
         var icon = ModeIcons.iconForFont(font);
         if (icon == null) return;
         boolean tab = font instanceof FontDescription.Resource;
