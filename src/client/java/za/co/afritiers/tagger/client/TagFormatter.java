@@ -7,7 +7,7 @@ import za.co.afritiers.tagger.config.TaggerConfig;
 import za.co.afritiers.tagger.ranking.Tier;
 
 public final class TagFormatter {
-    private static final HoverEvent.ShowText OVERALL_HOVER = new HoverEvent.ShowText(Component.literal("AfriTiers overall ranking"));
+    private static final HoverEvent.ShowText OVERALL_HOVER = new HoverEvent.ShowText(Component.literal("Overall ranking"));
     private TagFormatter() { }
 
     public static Component decorate(String username, Component original, boolean tabList) {
