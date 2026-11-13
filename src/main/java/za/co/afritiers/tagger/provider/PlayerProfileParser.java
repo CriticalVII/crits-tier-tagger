@@ -11,11 +11,12 @@ public final class PlayerProfileParser {
         public Profile { tiers = List.copyOf(tiers); }
     }
     public static Profile parse(JsonElement json, String requested) {
-        if (!requested.matches("[A-Za-z0-9_]{1,16}") || json == null || !json.isJsonObject()) throw new IllegalArgumentException("Invalid player profile");
+        String key = PlayerIdentity.uuid(requested);
+        if (key == null || json == null || !json.isJsonObject()) throw new IllegalArgumentException("Invalid UUID player profile");
         JsonObject root = json.getAsJsonObject();
         String name = text(root, "name");
-        if (!name.matches("[A-Za-z0-9_]{1,16}") || !name.equalsIgnoreCase(requested))
-            throw new IllegalArgumentException("The API returned a different username");
+        if (!name.matches("[A-Za-z0-9_]{1,16}")) name = "Unknown";
+        if (!key.equals(PlayerIdentity.uuid(text(root, "uuid")))) throw new IllegalArgumentException("The API returned a different UUID");
         if (!root.has("rankings") || !root.get("rankings").isJsonObject()) throw new IllegalArgumentException("Profile rankings are missing");
         JsonObject rankings = root.getAsJsonObject("rankings");
         if (rankings.size() > 128) throw new IllegalArgumentException("Too many rankings");
@@ -36,7 +37,7 @@ public final class PlayerProfileParser {
         if (!region.matches("[A-Z]{2,3}|\\?\\?")) region = "Unknown";
         int points = integer(root, "points", 0, Integer.MAX_VALUE, -1);
         int position = integer(root, "overall", 1, Integer.MAX_VALUE, 0);
-        return new Profile(Tier.normalizeUsername(name), tiers, new PlayerStats(name, region, points, position, ""));
+        return new Profile(key, tiers, new PlayerStats(name, region, points, position, ""));
     }
     private static String text(JsonObject root, String key) {
         var value = root.get(key);

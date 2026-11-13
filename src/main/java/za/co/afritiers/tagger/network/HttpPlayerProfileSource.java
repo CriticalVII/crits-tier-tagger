@@ -11,7 +11,7 @@ import java.time.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-/** Username-only public endpoints; no server UUID, authentication token or third-party proxy is used. */
+/** UUID-only tierlist endpoints; IDs are obtained from the official Minecraft account resolver. */
 public final class HttpPlayerProfileSource implements PlayerProfileSource {
     public static final int MAX_BYTES = 256 * 1024;
     private final TierlistProvider provider;
@@ -41,11 +41,12 @@ public final class HttpPlayerProfileSource implements PlayerProfileSource {
         if (modes.isEmpty()) throw new IllegalArgumentException("Mode catalogue is empty");
         return modes;
     }
-    @Override public Optional<PlayerProfileParser.Profile> fetchPlayer(String username) throws Exception {
-        if (username == null || !username.matches("[A-Za-z0-9_]{1,16}")) throw new IllegalArgumentException("Invalid username");
-        String route = provider == TierlistProvider.PVPTIERS ? "/api/search_profile/" + username.toLowerCase(Locale.ROOT)
-                : "/api/v2/profile/by-name/" + username;
-        return get(route, true).map(json -> PlayerProfileParser.parse(json, username));
+    @Override public Optional<PlayerProfileParser.Profile> fetchPlayer(String uuid) throws Exception {
+        String key = PlayerIdentity.uuid(uuid);
+        if (key == null) throw new IllegalArgumentException("A verified Minecraft account UUID is required");
+        String route = provider == TierlistProvider.PVPTIERS ? "/api/profile/" + key
+                : "/api/v2/profile/" + PlayerIdentity.dashed(key);
+        return get(route, true).map(json -> PlayerProfileParser.parse(json, key));
     }
     private Optional<JsonElement> get(String route, boolean missingAllowed) throws Exception {
         var request = HttpRequest.newBuilder(base.resolve(route)).timeout(timeout).header("Accept", "application/json")

@@ -52,7 +52,7 @@ final class ConnectionDetailsScreen extends Screen {
         boolean bulk = provider == za.co.afritiers.tagger.provider.TierlistProvider.AFRITIERS;
         List<String> lines = List.of(
                 provider.label() + ": " + state.message(),
-                "Ranked usernames: " + rankings.players().size(),
+                (bulk ? "Ranked usernames: " : "Cached UUID profiles: ") + rankings.players().size(),
                 "Last attempt: " + time(state.lastAttempt()),
                 "Last success: " + time(state.lastSuccess()),
                 (bulk ? "Source updated: " : "Last profile update: ") + (rankings.updatedAt() == null ? "Unknown" : DATE.format(rankings.updatedAt())),
@@ -62,9 +62,9 @@ final class ConnectionDetailsScreen extends Screen {
                         : "Profiles are fetched on demand and cached for five minutes.",
                 bulk ? "Ambiguous names: " + rankings.ambiguousNames() + " | Skipped records: " + rankings.skippedRecords()
                         : "Points and overall ranks come directly from " + provider.label() + ".",
-                "Matches usernames, including offline accounts.",
-                bulk ? "Paid-name lookup: " + mod.paidNames().status() : "Lookups use usernames; server UUIDs are never matched.",
-                "Saved username aliases: " + mod.config().aliases(provider).size(),
+                bulk ? "Matches usernames, including offline accounts." : "Tier profiles are matched only by verified account UUID.",
+                bulk ? "Paid-name lookup: " + mod.paidNames().status() : "Names resolve through Minecraft; server UUIDs are ignored.",
+                bulk ? "Saved username aliases: " + mod.config().usernameAliases.size() : "Username aliases are not used for this tierlist.",
                 "Refresh uses saved settings.",
                 AfriTiersClient.instance().configWarning());
         for (int i = 0; i < values.size(); i++) {

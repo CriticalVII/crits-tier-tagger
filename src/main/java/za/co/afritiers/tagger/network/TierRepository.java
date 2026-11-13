@@ -14,7 +14,7 @@ public interface TierRepository extends AutoCloseable {
     void tick();
     void worldChanged();
     String refresh();
-    /** Bulk services already fetch every username; per-player services enqueue this request. */
+    /** Bulk services fetch all usernames; per-player services accept only verified account UUIDs. */
     default void requestPlayer(String username, boolean priority) { }
     default LookupStatus lookupStatus(String username) {
         var state = state();

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.1.1 — 2026-11-13
+
+### UUID matching
+
+- MCTiers, PvPTiers and SubTiers now use UUID profile endpoints exclusively. Usernames first resolve to verified account UUIDs through the official Minecraft account service, supporting offline-mode servers without trusting server-generated UUIDs.
+- External profile caches and ranking keys are UUID-based. Responses must contain the requested UUID; old or missing display names cannot change identity matching. Tierlist username lookup fallbacks and external username aliases are disabled.
+- Added a shared bounded identity cache, request spacing, priority searches, negative caching and Retry-After handling. Profile searches and status commands finish their UUID resolution asynchronously.
+- AfriTiers username matching, verified paid rename recovery, aliases and bulk API behavior remain unchanged.
+
+### Tier labels
+
+- Retired tiers now display as `RHT1`, `RLT2`, etc. in Tab, nametags, profiles, hover labels and command output, replacing the `(retired)` suffix.
+- Tier colours, tier ordering, retired-tier filtering and points rules are preserved.
+
 ## 2.1.0 — 2026-11-13
 
 ### GUI redesign

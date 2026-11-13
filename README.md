@@ -11,11 +11,11 @@ A client-side Fabric mod for **Minecraft Java 26.2**. Display PvP tiers from **A
 - Profiles with a separate tierlist selector, region, points, overall rank and per-mode tiers.
 - Optional gold `#1`–`#10` overall labels; Tab alignment applies only to top-ten players.
 - AfriTiers waitlist alerts in chat, optional sound and available Discord join links.
-- Username matching for offline accounts, AfriTiers paid-name recovery and provider-specific aliases.
+- AfriTiers username matching and paid-name recovery; verified UUID matching for the other tierlists.
 
 ## Install
 
-Download [crits-tier-tagger-2.1.0.jar](releases/crits-tier-tagger-2.1.0.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
+Download [crits-tier-tagger-2.1.1.jar](releases/crits-tier-tagger-2.1.1.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
 
 | Requirement | Version |
 | --- | --- |
@@ -44,11 +44,11 @@ Retired tiers are included by default. Top 10 rank is off by default and uses th
 | Tierlist | Data source | Points and ranking |
 | --- | --- | --- |
 | [AfriTiers](https://afritiers.co.za) | Public players API | Overall placement calculated from active-tier points; retired tiers earn zero |
-| [MCTiers](https://mctiers.net) | Public v2 username profile and mode APIs | Provider-supplied points and overall placement |
-| [PvPTiers](https://pvptiers.com) | Public username profile API; eight bundled mode choices | Provider-supplied points and overall placement |
-| [SubTiers](https://subtiers.net) | Public v2 username profile and mode APIs | Provider-supplied points and overall placement |
+| [MCTiers](https://mctiers.net) | Public v2 UUID profile and mode APIs | Provider-supplied points and overall placement |
+| [PvPTiers](https://pvptiers.com) | Public UUID profile API; eight bundled mode choices | Provider-supplied points and overall placement |
+| [SubTiers](https://subtiers.net) | Public v2 UUID profile and mode APIs | Provider-supplied points and overall placement |
 
-For MCTiers, PvPTiers and SubTiers, visible players are looked up gradually and cached for five minutes. Missing profiles are cached briefly; failures and rate limits retry with a cooldown. A busy server can take longer to populate. Requests run in the background. No API key is required.
+For MCTiers, PvPTiers and SubTiers, player names first resolve through the official Minecraft account service. Tierlist requests and matching then use only that verified account UUID. Account resolution is shared across all three sources and cached for five minutes; tier profiles have separate per-provider UUID caches. Missing accounts/profiles are cached briefly; failures and rate limits retry with a cooldown. A busy server can take longer to populate. Requests run in the background. No API key is required.
 
 Joining a server, changing worlds, respawning or transferring between hubs and practice servers schedules a refresh. Rapid transfers share pending work and respect API cooldowns. Cached tiers stay visible while a transfer refresh waits to run.
 
@@ -56,9 +56,11 @@ Joining a server, changing worlds, respawning or transferring between hubs and p
 
 **Profiles** initially displays your own account and leaves the search box empty. Select a tierlist, then search a username with Search or Enter. My profile returns to your account and clears the box. Choosing a source here does not change in-game tags. `/tiers <player> [tierlist]` opens a search directly.
 
-External providers supply their own points and overall ranks; missing stats display as not supplied. AfriTiers combat titles are specific to AfriTiers. Profiles label retired tiers. Your account uses its skin; other players use an available online skin or a labelled default skin.
+External providers supply their own points and overall ranks; missing stats display as not supplied. AfriTiers combat titles are specific to AfriTiers. Retired tiers use an `R` prefix everywhere, for example `RHT1` or `RLT2`, with the same colour as the underlying tier. Your account uses its skin; other players use an available online skin or a labelled default skin.
 
-Offline/cracked accounts match by username. AfriTiers can recover paid-account name changes using verified paid IDs in its records and Mojang's current-name service. The other tierlists are queried by username. **Server/offline UUIDs are never used for tier matching.** If a provider still has an old name, save a known alias while that provider is selected. Aliases belong to that provider and do not affect the others.
+AfriTiers retains username matching for offline/cracked accounts, verified paid-account rename recovery and saved username aliases. Its matching behavior is unchanged.
+
+MCTiers, PvPTiers and SubTiers use verified Minecraft-account UUIDs for Tab, nametags and Profiles. This also works on offline-mode servers because **server-generated UUIDs are ignored**. Accounts without a verified official UUID receive no external-provider tier. A tierlist's old display name does not prevent a match when its UUID is correct; a mismatched or missing UUID is rejected. There is no tierlist username fallback. Username aliases apply only to AfriTiers; legacy external-provider alias entries are ignored.
 
 | Command | Action |
 | --- | --- |
@@ -67,9 +69,9 @@ Offline/cracked accounts match by username. AfriTiers can recover paid-account n
 | `/crittiers config` | Open settings |
 | `/crittiers refresh` | Refresh the selected in-game tierlist, subject to its cooldown |
 | `/crittiers status [username]` | Show selected-provider connection or player details |
-| `/crittiers alias set <current> <apiName>` | Save an alias for the selected in-game provider |
-| `/crittiers alias remove <current>` | Remove that provider's alias |
-| `/crittiers alias list` | List that provider's aliases |
+| `/crittiers alias set <current> <apiName>` | Save an AfriTiers alias while AfriTiers is selected |
+| `/crittiers alias remove <current>` | Remove an AfriTiers alias |
+| `/crittiers alias list` | List AfriTiers aliases |
 
 `/ctiers` and the original `/afritiers` support the same settings, status, refresh and alias subcommands.
 
@@ -81,7 +83,7 @@ Queues are checked about every 30 seconds while watching in game or browsing thi
 
 ## Build
 
-Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.1.0.jar`.
+Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.1.1.jar`.
 
 The repository includes production source, assets, build files, editable mode artwork in `artwork/modes/`, and the latest packaged JAR. Local verification tools, fixtures and debug files are excluded.
 

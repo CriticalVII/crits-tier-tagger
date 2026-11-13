@@ -8,7 +8,7 @@ public enum TierlistProvider {
             "axe", "bed", "cart", "creeper", "diavanilla", "diapot", "diasmp", "mace", "nethop", "ogv", "smp", "spear", "speed", "sword", "uhc", "vanilla"),
     MCTIERS("mctiers", "MCTiers", "https://mctiers.net", "Official points and overall leaderboard",
             "axe", "pot", "mace", "uhc", "smp", "sword", "vanilla", "nethop"),
-    PVPTIERS("pvptiers", "PvPTiers", "https://pvptiers.com", "Username profiles · eight combat modes",
+    PVPTIERS("pvptiers", "PvPTiers", "https://pvptiers.com", "UUID profiles · eight combat modes",
             "crystal", "sword", "uhc", "pot", "neth_pot", "smp", "axe", "mace"),
     SUBTIERS("subtiers", "SubTiers", "https://subtiers.net", "Specialist modes · official overall rank",
             "trident", "bed", "minecart", "creeper", "dia_smp", "dia_crystal", "elytra", "manhunt", "og_vanilla", "speed", "bow", "debuff");

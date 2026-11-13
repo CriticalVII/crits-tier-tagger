@@ -21,9 +21,9 @@ public record Tier(String mode, String level, boolean retired) {
         };
     }
 
-    public String label() {
-        return modeLabel(mode) + " " + level + (retired ? " (retired)" : "");
-    }
+    public String displayLevel() { return (retired ? "R" : "") + level; }
+
+    public String label() { return modeLabel(mode) + " " + displayLevel(); }
 
     public static String modeLabel(String mode) {
         return ModeIcon.find(mode).map(ModeIcon::displayName)

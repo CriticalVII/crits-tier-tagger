@@ -52,7 +52,7 @@ public final class AfriTiersCommands {
                                 var names = new java.util.TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
                                 var connection = context.getSource().getClient().getConnection();
                                 if (connection != null) connection.getListedOnlinePlayers().forEach(info -> names.add(info.getProfile().name()));
-                                names.addAll(mod.repository().state().rankings().players().keySet());
+                                mod.repository().state().rankings().stats().values().forEach(profile -> names.add(profile.name()));
                                 names.stream().filter(name -> name.toLowerCase(Locale.ROOT).startsWith(builder.getRemainingLowerCase()))
                                         .limit(100).forEach(builder::suggest);
                                 return builder.buildFuture();
@@ -93,7 +93,7 @@ public final class AfriTiersCommands {
         var state = mod.repository().state();
         var config = mod.config();
         source.sendFeedback(Component.literal("Crit's tiers · " + mod.selectedProvider().label() + ": " + state.message()
-                + " | " + state.rankings().players().size() + " usernames"
+                + " | " + state.rankings().players().size() + (mod.selectedProvider() == TierlistProvider.AFRITIERS ? " usernames" : " UUID profiles")
                 + " | ambiguous: " + state.rankings().ambiguousNames()
                 + " | Nameplates: " + (config.nameplates ? "ON" : "OFF")
                 + " | Tab: " + (config.tabList ? "ON" : "OFF")
@@ -105,15 +105,14 @@ public final class AfriTiersCommands {
         var rankings = mod.repository().state().rankings();
         var config = mod.config();
         String apiName = mod.rankingUsername(username);
-        String query = config.aliases(mod.selectedProvider()).getOrDefault(za.co.afritiers.tagger.ranking.Tier.normalizeUsername(username), username);
-        mod.repository().requestPlayer(query, true);
+        mod.requestPlayerStatus(username);
         String result = rankings.select(apiName, config.mode, config.includeRetired)
                 .map(tier -> tier.label())
                 .orElseGet(() -> rankings.players().containsKey(apiName)
                         ? "No tier matches the selected mode/retired settings"
-                        : "No matching ranking yet; " + mod.repository().lookupStatus(query));
+                        : "No matching ranking yet; " + mod.playerLookupStatus(username, mod.selectedProvider(), mod.repository()));
         source.sendFeedback(Component.literal(mod.selectedProvider().label() + ": " + username + " | " + result
-                + (apiName.isEmpty() || apiName.equalsIgnoreCase(username) ? "" : " | API name: " + apiName)
+                + (apiName.isEmpty() || apiName.equalsIgnoreCase(username) ? "" : (mod.selectedProvider() == TierlistProvider.AFRITIERS ? " | API name: " : " | UUID: ") + apiName)
                 + " | Nameplates: " + (config.nameplates ? "ON" : "OFF")));
         return 1;
     }
@@ -124,8 +123,8 @@ public final class AfriTiersCommands {
                         .then(argument("current", StringArgumentType.word())
                                 .then(argument("apiName", StringArgumentType.word())
                                         .suggests((context, builder) -> {
-                                            mod.repository().state().rankings().players().keySet().stream().sorted()
-                                                    .filter(name -> name.startsWith(builder.getRemainingLowerCase()))
+                                            mod.repository().state().rankings().stats().values().stream().map(profile -> profile.name()).sorted()
+                                                    .filter(name -> name.toLowerCase(Locale.ROOT).startsWith(builder.getRemainingLowerCase()))
                                                     .forEach(builder::suggest);
                                             return builder.buildFuture();
                                         })
@@ -136,12 +135,14 @@ public final class AfriTiersCommands {
                         .then(argument("current", StringArgumentType.word()).executes(context ->
                                 removeAlias(context.getSource(), StringArgumentType.getString(context, "current")))))
                 .then(literal("list").executes(context -> {
+                    if (mod.selectedProvider() != TierlistProvider.AFRITIERS) return uuidOnly(context.getSource());
                     context.getSource().sendFeedback(Component.literal(mod.selectedProvider().label() + " username aliases: " + new TreeMap<>(mod.config().aliases(mod.selectedProvider()))));
                     return 1;
                 }));
     }
 
     private int setAlias(FabricClientCommandSource source, String current, String apiName) {
+        if (mod.selectedProvider() != TierlistProvider.AFRITIERS) return uuidOnly(source);
         var edited = mod.config();
         edited.editAliases(mod.selectedProvider()).put(current.toLowerCase(Locale.ROOT), apiName);
         try {
@@ -155,6 +156,7 @@ public final class AfriTiersCommands {
     }
 
     private int removeAlias(FabricClientCommandSource source, String current) {
+        if (mod.selectedProvider() != TierlistProvider.AFRITIERS) return uuidOnly(source);
         var edited = mod.config();
         edited.editAliases(mod.selectedProvider()).remove(current.toLowerCase(Locale.ROOT));
         try {
@@ -165,5 +167,10 @@ public final class AfriTiersCommands {
             source.sendError(Component.literal("Could not save aliases: " + exception.getMessage()));
             return 0;
         }
+    }
+
+    private int uuidOnly(FabricClientCommandSource source) {
+        source.sendError(Component.literal(mod.selectedProvider().label() + " uses verified Minecraft UUIDs. Username aliases apply only to AfriTiers."));
+        return 0;
     }
 }
