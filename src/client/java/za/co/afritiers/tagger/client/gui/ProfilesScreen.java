@@ -269,17 +269,24 @@ public final class ProfilesScreen extends Screen {
             this.columns = columnsFor(width);
         }
         private static int columnsFor(int width) { return Math.max(1, Math.min(8, (width - 12) / 36)); }
+        private int badgeX(int index) {
+            int count = Math.min(columns, tiers.size() - (index / columns) * columns);
+            float cell = (width - 12F) / columns;
+            return getX() + Math.round((width - count * cell) / 2 + (index % columns) * cell + (cell - 34) / 2);
+        }
         @Override protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             TaggerWidgets.surface(g, getX(), getY(), width, height, 4, 0xFF121212, isFocused() ? TaggerWidgets.BLUE : TaggerWidgets.LINE);
-            int column = (mouseX - getX() - 6) / 36;
-            int hovered = isHovered() ? ((mouseY - getY()) / 48) * columns + column : -1;
-            if (mouseX < getX() + 6 || column >= columns || hovered >= tiers.size()) hovered = -1;
+            int hovered = -1;
+            if (isHovered()) for (int index = 0; index < tiers.size(); index++) {
+                int left = badgeX(index), top = getY() + (index / columns) * 48;
+                if (mouseX >= left && mouseX < left + 34 && mouseY >= top && mouseY < top + 48) { hovered = index; break; }
+            }
             if (tooltipIndex != hovered) {
                 tooltipIndex = hovered;
                 setTooltip(hovered < 0 ? null : TaggerFonts.tooltip(Component.literal(provider.modeLabel(tiers.get(hovered).mode()) + ": " + tiers.get(hovered).displayLevel())));
             }
             for (int index = 0; index < tiers.size(); index++) {
-                Tier tier = tiers.get(index); int left = getX() + 6 + (index % columns) * 36;
+                Tier tier = tiers.get(index); int left = badgeX(index);
                 int top = getY() + (index / columns) * 48;
                 int colour = 0xFF000000 | TIER_COLOURS.colour(tier.level());
                 TaggerWidgets.surface(g, left + 4, top + 5, 26, 26, 13, 0xFF090C0E, hovered == index ? colour : TaggerWidgets.LINE);
