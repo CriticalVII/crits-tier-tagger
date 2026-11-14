@@ -2,7 +2,6 @@ package crits.gui;
 
 import crits.CritsTierTaggerClient;
 import crits.render.ModeIcons;
-import crits.config.TaggerConfig;
 import crits.provider.TierlistProvider;
 import crits.ranking.ModeIcon;
 import crits.ranking.PlayerStats;
@@ -20,7 +19,7 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 /** A centred searchable profile, overall position and compact mode badges. */
-public final class ProfilesScreen extends Screen {
+public final class ProfilesScreen extends TaggerScreen {
     private final TaggerSettingsScreen owner;
     private String input = "", requested = "", apiName = "", feedback = "";
     private Rankings snapshot = Rankings.EMPTY;
@@ -286,10 +285,11 @@ public final class ProfilesScreen extends Screen {
                 tooltipIndex = hovered;
                 setTooltip(hovered < 0 ? null : TaggerFonts.tooltip(Component.literal(provider.modeLabel(tiers.get(hovered).mode()) + ": " + tiers.get(hovered).displayLevel())));
             }
+            var palette = CritsTierTaggerClient.instance().config();
             for (int index = 0; index < tiers.size(); index++) {
                 Tier tier = tiers.get(index); int left = badgeX(index);
                 int top = getY() + (index / columns) * 48;
-                int colour = 0xFF000000 | CritsTierTaggerClient.instance().config().tierColour(tier.level());
+                int colour = 0xFF000000 | palette.tierColour(tier.level());
                 TaggerWidgets.surface(g, left + 4, top + 5, 26, 26, 13, GuiTheme.background, hovered == index ? colour : GuiTheme.border);
                 g.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
                         ModeIcons.sprite(ModeIcon.forMode(tier.mode())).spriteId(), left + 9, top + 10, 16, 16);

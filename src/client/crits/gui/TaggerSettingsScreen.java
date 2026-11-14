@@ -13,7 +13,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 /** Native dark settings with immediate persistence and a pinned reference preview. */
-public final class TaggerSettingsScreen extends Screen {
+public final class TaggerSettingsScreen extends TaggerScreen {
     private final Screen parent;
     private TaggerConfig draft;
     private Component preview = Component.empty();
@@ -149,6 +149,10 @@ public final class TaggerSettingsScreen extends Screen {
         updatePreview();
     }
 
+    void synchronizeAppearance() {
+        draft.customColour = CritsTierTaggerClient.instance().config().customColour;
+    }
+
     private Component modeText() {
         return Component.empty().append(ModeIcons.component(draft.mode))
                 .append(" " + CritsTierTaggerClient.instance().selectedProvider().modeLabel(draft.mode));
@@ -169,6 +173,7 @@ public final class TaggerSettingsScreen extends Screen {
         preview = Component.empty().append(TagFormatter.tag(new Tier("sword",
                 Tier.ORDER.get(previewTier), false), sample)).append(minecraft.getUser().getName());
         if (colourField != null) {
+            if (colourField instanceof TaggerWidgets.Input input) input.setInvalid(!validationError.isEmpty());
             colourField.setTextColor(validationError.isEmpty() ? GuiTheme.text : 0xFFE0BE83);
             if (!previousError.equals(validationError)) colourField.setTooltip(TaggerFonts.tooltip(Component.literal(validationError.isEmpty()
                     ? "Leave blank for tier colours, or enter a six-digit hex colour." : validationError)));

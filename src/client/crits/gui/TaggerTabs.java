@@ -8,7 +8,7 @@ import net.minecraft.client.gui.components.Button;
 final class TaggerTabs {
     private TaggerTabs() { }
     static void add(Consumer<Button> add, TaggerSettingsScreen owner, String active, TaggerFrame frame) {
-        String[] labels = {"Settings", "Profiles", "Waitlists"};
+        String[] labels = {"Tier Tags", "Profiles", "Waitlists", "Settings"};
         for (int index = 0; index < labels.length; index++) {
             String label = labels[index];
             var tab = new TaggerWidgets.Tab(label, label.equals(active), pressed -> {
@@ -17,6 +17,7 @@ final class TaggerTabs {
                 client.gui.setScreen(switch (label) {
                     case "Profiles" -> new ProfilesScreen(owner);
                     case "Waitlists" -> new WaitlistsScreen(owner);
+                    case "Settings" -> new AppearanceScreen(owner);
                     default -> owner;
                 });
             });

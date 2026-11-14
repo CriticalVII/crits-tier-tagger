@@ -16,7 +16,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 /** Read-only connection diagnostics alongside the automatically saved settings. */
-final class ConnectionDetailsScreen extends Screen {
+final class ConnectionDetailsScreen extends TaggerScreen {
     private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm:ss").withZone(ZoneId.systemDefault());
     private final TaggerSettingsScreen owner;
@@ -74,7 +74,6 @@ final class ConnectionDetailsScreen extends Screen {
     }
 
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        TaggerWidgets.backdrop(g, width, height);
         TaggerWidgets.panel(g, x, y, w, h);
         g.text(font, TaggerFrame.heading(title.getString()), x + 14, y + 12, GuiTheme.text, false);
         g.fill(x + 14, y + 31, x + w - 14, y + 32, GuiTheme.border);
