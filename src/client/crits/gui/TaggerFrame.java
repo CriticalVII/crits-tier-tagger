@@ -25,8 +25,8 @@ record TaggerFrame(int left, int top, int width, int height, int rail, long appe
     void draw(GuiGraphicsExtractor g, String page) {
         var client = Minecraft.getInstance(); var font = TaggerFonts.body();
         TaggerWidgets.surface(g, left, top, width, height, 10, GuiTheme.translucent(GuiTheme.background), GuiTheme.border);
-        g.enableScissor(left + 1, top + 1, left + width - 1, top + height - 1);
-        TaggerWidgets.rounded(g, left + 1, top + 1, rail - 1, height - 2, 9, GuiTheme.translucent(GuiTheme.sidebar));
+        g.enableScissor(left + 1, top + 1, x(), top + height - 1);
+        TaggerWidgets.rounded(g, left + 1, top + 1, rail + 10, height - 2, 9, GuiTheme.translucent(GuiTheme.sidebar));
         g.disableScissor();
         g.fill(x() - 1, top, x(), top + height, GuiTheme.border);
         if (font.width("Crit's Tier Tagger") <= rail - 20) {
