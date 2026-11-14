@@ -232,7 +232,6 @@ public final class AppearanceScreen extends TaggerScreen {
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
     @Override public void onClose() { minecraft.gui.setScreen(owner); }
-    @Override public void removed() { owner.synchronizeAppearance(); }
     @Override public boolean isPauseScreen() { return false; }
 
     private static final class ThemeCard extends TaggerWidgets.Action {
