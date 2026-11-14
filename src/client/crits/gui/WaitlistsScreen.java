@@ -15,7 +15,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 /** Per-mode subscriptions save immediately and work independently of tier-tag visibility. */
-public final class WaitlistsScreen extends Screen {
+public final class WaitlistsScreen extends TaggerScreen {
     private final TaggerSettingsScreen owner;
     private TaggerConfig config;
     private Set<String> knownModes = Set.of();
@@ -116,12 +116,12 @@ public final class WaitlistsScreen extends Screen {
 
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         frame.draw(g, "Waitlists");
-        g.text(font, font.plainSubstrByWidth("AfriTiers alerts · independent of your selected tierlist.", w - 24), x + 12, y + 43, TaggerWidgets.MUTED, false);
+        g.text(font, font.plainSubstrByWidth("AfriTiers alerts · independent of your selected tierlist.", w - 24), x + 12, y + 43, GuiTheme.muted, false);
         String summary = config.waitlistModes.size() + " watched · " + (config.waitlistNotifications ? "one alert per opening" : "notifications paused");
-        g.text(font, font.plainSubstrByWidth(summary, w - 24), x + 12, y + 94, TaggerWidgets.GREEN, false);
+        g.text(font, font.plainSubstrByWidth(summary, w - 24), x + 12, y + 94, GuiTheme.accent, false);
         var state = CritsTierTaggerClient.instance().waitlists().state();
         String note = System.nanoTime() < feedbackUntil ? feedback : state.message();
-        g.text(font, font.plainSubstrByWidth(note, w - 24), x + 12, y + h - 43, TaggerWidgets.MUTED, false);
+        g.text(font, font.plainSubstrByWidth(note, w - 24), x + 12, y + h - 43, GuiTheme.muted, false);
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
     @Override public void removed() { CritsTierTaggerClient.instance().browseWaitlists(false); }

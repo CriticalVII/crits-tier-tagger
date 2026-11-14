@@ -7,14 +7,14 @@
 A client-side Fabric mod for **Minecraft Java 26.2**. Display PvP tiers from **AfriTiers, MCTiers, PvPTiers or SubTiers**, search player profiles, and watch AfriTiers waitlists.
 
 - One selected tierlist for player nametags and Tab, with smooth mode icons and tier colours.
-- A Pandora-inspired black workspace with simple side tabs, image galleries, automatic saving and a provider-specific mode picker.
+- A themed workspace with 14 presets, custom palettes, tier-colour controls, automatic saving and a provider-specific mode picker.
 - Profiles with a separate tierlist selector, region, points, overall rank and per-mode tiers.
 - AfriTiers waitlist alerts in chat, optional sound and available Discord join links.
 - AfriTiers username matching and paid-name recovery; verified UUID matching for the other tierlists.
 
 ## Install
 
-Download [crits-tier-tagger-2.2.4.jar](releases/crits-tier-tagger-2.2.4.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
+Download [crits-tier-tagger-2.3.0.jar](releases/crits-tier-tagger-2.3.0.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
 
 | Requirement | Version |
 | --- | --- |
@@ -32,11 +32,17 @@ The mod keeps its original internal ID and `config/afritiers_tagger.json` file s
 
 Press **K**, run `/crittiers config`, or open **Mods → Crit's Tier Tagger → Configure**. Changes save immediately. Close with Done or Escape; invalid colour values are not saved.
 
-The GUI takes inspiration from Pandora's launcher: an edge-to-edge black workspace, three simple side tabs, compact green/cyan actions, switches and blue-outlined selections. Outfit text is oversampled and linearly filtered in this mod's menus, including labels, text fields and tooltips; Minecraft's HUD and in-game tag fonts retain their original rendering. Smaller GUI sizes keep the sidebar and scroll their content. Profiles uses a centred player identity, a position-and-points panel and compact circular mode icons with coloured tier pills. Hover a badge for its full mode and tier; extra modes wrap onto further rows within one continuous panel. Tile motion and heading reveals respect Minecraft's Screen Effects setting; set it to 0 to remove animation.
+The GUI uses an inset workspace with rounded, translucent panels and four side tabs: **Tier Tags**, **Profiles**, **Waitlists** and **Settings**. Smaller GUI sizes keep the sidebar and scroll the content. Profiles retains its centred identity, overall position and continuous panel of mode icons with coloured tier pills.
 
-Choose the in-game tierlist directly in **Settings**, using the four provider buttons. This source supplies both Tab and nametags. Each provider remembers its selected mode; choose a specific mode or Strongest tier below the selector. Providers remain separate: an outage or missing player does not substitute another tierlist's result. Profiles has its own independent source selector.
+In **Settings → Themes**, choose from 14 palettes: Frosted, Glass, Obsidian, Minecraft, Mauve, Rose, Latte, Nordic, Snow, Ember, Forest, Abyss, Linen and Cherry. Search the gallery, pick an accent swatch or enter a hex value, adjust panel opacity and corner radius, and toggle blur, motion or smooth Outfit text. The Minecraft preset keeps square corners and pixel text. Blur follows Minecraft's Menu Background Blur setting; animations also respect its Screen Effects preference. GUI font and palette preferences never replace Minecraft's HUD font.
 
-Settings and Profiles work from the main menu through Mod Menu or the **K** shortcut; joining a world is not required. The title-screen shortcut follows your configured keybind and works without Mod Menu. Opening Settings loads the selected tierlist, and selecting another source starts its update immediately. Background refreshes and API cooldowns still apply. Mode and provider artwork uses the original assets, with no redrawing or recolouring.
+**Settings → Tier colours** edits the five tier colours, with live previews and four colour sets. High, low and retired tiers share their tier number's colour. An optional all-tags override applies to Tab and nametags; Profiles keeps the individual tier colours. Blank fields restore defaults; unfinished hex values keep the last saved colour.
+
+**Settings → Custom** lets you override background, sidebar, surface, text, muted text and borders on top of a preset. Enable Custom palette to use these overrides. Copy theme and Paste theme share only appearance preferences, without usernames, aliases or account data. Appearance and tier palettes have separate resets. Selecting a preset restores its accent and opacity, and turns off custom palette overrides while keeping them available for later.
+
+Choose the in-game tierlist directly in **Tier Tags**, using the four provider buttons. This source supplies both Tab and nametags. Each provider remembers its selected mode; choose a specific mode or Strongest tier below the selector. Providers remain separate: an outage or missing player does not substitute another tierlist's result. Profiles has its own independent source selector.
+
+Settings and Profiles work from the main menu through Mod Menu or the **K** shortcut; joining a world is not required. The title-screen shortcut follows your configured keybind and works without Mod Menu. Opening Tier Tags loads the selected tierlist, and selecting another source starts its update immediately. Background refreshes and API cooldowns still apply. Mode and provider artwork uses the original assets, with no redrawing or recolouring.
 
 Retired tiers are included by default. Tier colours are gold for tier 1, silver for tier 2, bronze for tier 3 and purple for tiers 4–5. A custom colour affects tags; profile stats keep tier colours. The preview starts with Sword HT1. Tab and nametags show the mode icon and tier without ranking labels or rank indentation. Tags use spaces with no added pipe separator.
 
@@ -82,7 +88,7 @@ Queues are checked about every 30 seconds while watching in game or browsing thi
 
 ## Build
 
-Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.2.4.jar`.
+Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.3.0.jar`.
 
 The repository includes production source, canonical runtime assets, build files, provenance documentation and the latest packaged JAR. See [Codebase layout](docs/CODEBASE.md) for the source map. Local verification tools, fixtures and debug files are excluded.
 

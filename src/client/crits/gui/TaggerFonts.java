@@ -14,7 +14,8 @@ final class TaggerFonts {
     private static Font base, body;
     private TaggerFonts() { }
     static net.minecraft.client.gui.components.Tooltip tooltip(net.minecraft.network.chat.Component text) {
-        return net.minecraft.client.gui.components.Tooltip.create(text.copy().withStyle(style -> style.withFont(BODY)));
+        return net.minecraft.client.gui.components.Tooltip.create(text.copy().withStyle(style -> style.withFont(
+                GuiTheme.smoothFont() ? BODY : FontDescription.DEFAULT)));
     }
     static Font body() {
         Font original = Minecraft.getInstance().font;
@@ -23,7 +24,8 @@ final class TaggerFonts {
             var delegate = ((FontProviderAccessor) (Object) original).crits$getProvider();
             body = new Font(new Font.Provider() {
                 @Override public GlyphSource glyphs(FontDescription font) {
-                    if (FontDescription.DEFAULT.equals(font)) return ((FontProviderAccessor) (Object) original).crits$getGlyphSource(BODY);
+                    if (FontDescription.DEFAULT.equals(font) || BODY.equals(font)) return ((FontProviderAccessor) (Object) original).crits$getGlyphSource(
+                            GuiTheme.smoothFont() ? BODY : FontDescription.DEFAULT);
                     return delegate.glyphs(font);
                 }
                 @Override public EffectGlyph effect() { return delegate.effect(); }
