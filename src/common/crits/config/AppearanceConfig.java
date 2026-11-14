@@ -12,6 +12,7 @@ public final class AppearanceConfig {
     public String accent = "";
     public int opacity = 94;
     public int cornerRadius = 8;
+    public boolean transparentGui = true;
     public boolean blur = true;
     public boolean animations = true;
     public boolean smoothFont = true;
@@ -22,6 +23,7 @@ public final class AppearanceConfig {
     public AppearanceConfig copy() {
         var copy = new AppearanceConfig();
         copy.theme = theme; copy.accent = accent; copy.opacity = opacity; copy.cornerRadius = cornerRadius;
+        copy.transparentGui = transparentGui;
         copy.blur = blur; copy.animations = animations; copy.smoothFont = smoothFont; copy.customPalette = customPalette;
         copy.palette = palette == null ? new LinkedHashMap<>() : new LinkedHashMap<>(palette);
         return copy;
