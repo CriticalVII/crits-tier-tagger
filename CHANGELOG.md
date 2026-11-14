@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.3.1 — 2026-11-14
+
+- Removed theme-card subtitles and shortened hover text. Each card now uses its own preset background, border, text colours and corner style.
+- Added an Interface tab for easy access to accent, font, blur, animation and corner settings. Compact screens wrap the settings tabs into two rows.
+- Added an explicit Transparent GUI switch. Opacity is retained when switching to opaque panels, and selecting Glass enables transparency.
+- Exposed the smooth/pixel font choice for every preset, including Minecraft.
+- Removed colour controls from Tier Tags. Tier colours and the all-tags override remain in Settings → Tier colours; resetting tag controls leaves the palette intact.
+
 ## 2.3.0 — 2026-11-14
 
 - Redesigned every mod screen around a shared, inset themed workspace with rounded surfaces, transparent backgrounds and consistent focus/hover states.

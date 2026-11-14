@@ -35,26 +35,28 @@ public final class AppearanceScreen extends TaggerScreen {
     @Override protected void init() {
         frame = TaggerFrame.fit(width, height); x = frame.x(); y = frame.y(); w = frame.w(); h = frame.h();
         TaggerTabs.add(this::addRenderableWidget, owner, "Settings", frame);
-        String[] pages = {"Themes", "Tier colours", "Custom"};
-        int cell = (w - 32) / 3;
+        String[] pages = {"Themes", "Interface", "Tier colours", "Custom"};
+        int columns = w < 330 ? 2 : 4;
+        int cell = (w - 24 - (columns - 1) * 4) / columns;
         for (int i = 0; i < pages.length; i++) {
             String label = pages[i];
             var tab = new TaggerWidgets.Action(label, cell, 22, page.equals(label), pressed -> {
                 rememberScroll(); page = label; feedback = ""; rebuildWidgets();
             });
-            tab.setPosition(x + 12 + i * (cell + 4), y + 42); addRenderableWidget(tab);
+            tab.setPosition(x + 12 + i % columns * (cell + 4), y + 42 + i / columns * 26); addRenderableWidget(tab);
         }
         int contentWidth = w - 34;
         var rows = LinearLayout.vertical().spacing(8);
-        int scrollTop = 74;
+        int scrollTop = columns == 2 ? 100 : 74;
         if (page.equals("Themes")) {
             search = new TaggerWidgets.Input(w - 32, 18, Component.literal("Search themes"));
             search.setMaxLength(40); search.setValue(filter); search.setHint(Component.literal("Search themes..."));
             search.setResponder(value -> { filter = value; refilter = true; });
-            search.setPosition(x + 16, y + 76); addRenderableWidget(search);
-            scrollTop = 102;
+            search.setPosition(x + 16, y + scrollTop + 2); addRenderableWidget(search);
+            scrollTop += 28;
             themes(rows, contentWidth);
-        } else if (page.equals("Tier colours")) tiers(rows, contentWidth);
+        } else if (page.equals("Interface")) interfaceOptions(rows, contentWidth);
+        else if (page.equals("Tier colours")) tiers(rows, contentWidth);
         else custom(rows, contentWidth);
         var scroll = new ScrollableLayout(minecraft, rows, Math.max(32, h - scrollTop - 40), ScrollableLayout.ReserveStrategy.RIGHT);
         scroll.setMinWidth(contentWidth); scroll.arrangeElements(); scroll.setX(x + 12); scroll.setY(y + scrollTop);
@@ -80,12 +82,28 @@ public final class AppearanceScreen extends TaggerScreen {
                 if (save(c -> {
                     c.appearance.theme = preset.id; c.appearance.accent = ""; c.appearance.customPalette = false;
                     c.appearance.opacity = preset == ThemePreset.GLASS ? 72 : 94;
+                    c.appearance.smoothFont = preset != ThemePreset.BLOCK;
+                    if (preset == ThemePreset.GLASS) c.appearance.transparentGui = true;
                 })) rebuildKeepingScroll();
             }));
         }
         if (index == 0) label(rows, width, "No matching themes. Try another name.");
-        if (!filter.isEmpty()) return;
-        label(rows, width, "Make it yours");
+    }
+
+    private void interfaceOptions(LinearLayout rows, int width) {
+        var prefs = config().appearance;
+        rows.addChild(new TaggerWidgets.Toggle("Transparent GUI", "See the game or panorama through panels", width, false,
+                () -> config().appearance.transparentGui, value -> {
+                    if (save(c -> c.appearance.transparentGui = value)) rebuildKeepingScroll();
+                }));
+        var opacity = new PreferenceSlider("Panel opacity", width, prefs.opacity, 60, 100, "%", value -> save(c -> c.appearance.opacity = value));
+        opacity.active = prefs.transparentGui;
+        rows.addChild(opacity);
+        rows.addChild(new TaggerWidgets.Toggle("Smooth font", "Outfit when on; Minecraft pixel text when off", width, false,
+                () -> config().appearance.smoothFont, value -> {
+                    if (save(c -> c.appearance.smoothFont = value)) rebuildKeepingScroll();
+                }));
+        label(rows, width, "Accent colour");
         colourRow(rows, width, "Accent", prefs.accent, hex(ThemePreset.from(prefs.theme).accent), (c, value) -> c.appearance.accent = value);
         var swatches = LinearLayout.horizontal().spacing(3);
         int swatchWidth = Math.min(22, (width - (ACCENTS.length - 1) * 3) / ACCENTS.length);
@@ -93,16 +111,11 @@ public final class AppearanceScreen extends TaggerScreen {
             if (save(c -> c.appearance.accent = accent)) rebuildKeepingScroll();
         }));
         rows.addChild(swatches);
-        rows.addChild(new PreferenceSlider("Panel opacity", width, prefs.opacity, 60, 100, "%", value -> save(c -> c.appearance.opacity = value)));
         rows.addChild(new PreferenceSlider("Corner radius", width, prefs.cornerRadius, 0, 12, "", value -> save(c -> c.appearance.cornerRadius = value)));
         rows.addChild(new TaggerWidgets.Toggle("Background blur", "Uses Minecraft's menu blur setting", width, false,
                 () -> config().appearance.blur, value -> save(c -> c.appearance.blur = value)));
         rows.addChild(new TaggerWidgets.Toggle("Animations", "Subtle hover and heading movement", width, false,
                 () -> config().appearance.animations, value -> save(c -> c.appearance.animations = value)));
-        rows.addChild(new TaggerWidgets.Toggle("Smooth font", "Minecraft theme always uses pixel text", width, false,
-                () -> config().appearance.smoothFont, value -> {
-                    if (save(c -> c.appearance.smoothFont = value)) rebuildKeepingScroll();
-                }));
         rows.addChild(TaggerWidgets.action("Reset appearance", width, false, pressed -> {
             if (save(c -> c.appearance = new AppearanceConfig())) rebuildKeepingScroll();
         }));
@@ -219,20 +232,21 @@ public final class AppearanceScreen extends TaggerScreen {
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
     @Override public void onClose() { minecraft.gui.setScreen(owner); }
-    @Override public void removed() { owner.synchronizeAppearance(); }
     @Override public boolean isPauseScreen() { return false; }
 
     private static final class ThemeCard extends TaggerWidgets.Action {
         private final ThemePreset preset;
         private final boolean selected;
         ThemeCard(ThemePreset preset, int width, boolean selected, OnPress action) {
-            super(preset.label, width, 90, false, action); this.preset = preset; this.selected = selected;
+            super(preset.label, width, width >= 175 ? 62 : 76, false, action); this.preset = preset; this.selected = selected;
             setMessage(Component.literal(preset.label + (selected ? " · Selected" : "")));
-            setTooltip(TaggerFonts.tooltip(Component.literal(preset.description + "\nApply theme and its default accent and opacity. Custom colours are kept for later.")));
+            setTooltip(TaggerFonts.tooltip(Component.literal("Apply " + preset.label)));
         }
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-            TaggerWidgets.surface(g, getX(), getY(), width, height, 9, selected ? GuiTheme.selection : GuiTheme.blend(GuiTheme.surface, GuiTheme.hover, hoverAmount()),
-                    selected || isFocused() ? GuiTheme.accent : GuiTheme.border);
+            int fill = GuiTheme.blend(GuiTheme.rgb(preset.surface), GuiTheme.rgb(preset.text), hoverAmount() * 0.06F);
+            if (selected) fill = GuiTheme.blend(fill, GuiTheme.rgb(preset.accent), 0.10F);
+            TaggerWidgets.surfaceExact(g, getX(), getY(), width, height, preset == ThemePreset.BLOCK ? 0 : 8, fill,
+                    GuiTheme.rgb(selected || isFocused() ? preset.accent : preset.border));
             int px = getX() + 8, py = getY() + 8;
             // Draw the actual preset colours rather than a static screenshot of another theme.
             TaggerWidgets.rounded(g, px, py, 70, 45, 3, GuiTheme.rgb(preset.background));
@@ -247,13 +261,11 @@ public final class AppearanceScreen extends TaggerScreen {
             var font = TaggerFonts.body();
             int textX = width >= 175 ? px + 78 : px;
             int textY = width >= 175 ? py + 3 : py + 49;
-            g.text(font, font.plainSubstrByWidth(preset.label, getRight() - textX - 7), textX, textY, GuiTheme.text, false);
+            g.text(font, font.plainSubstrByWidth(preset.label, getRight() - textX - 7), textX, textY, GuiTheme.rgb(preset.text), false);
             if (width >= 175) {
                 TaggerWidgets.rounded(g, textX, py + 21, 12, 12, 6, GuiTheme.rgb(preset.accent));
-                g.text(font, selected ? "Selected" : preset == ThemePreset.LATTE || preset == ThemePreset.SNOW || preset == ThemePreset.SAND ? "Light" : "Dark", textX + 17, py + 23, GuiTheme.muted, false);
+                g.text(font, selected ? "Selected" : preset == ThemePreset.GLASS ? "Transparent" : preset == ThemePreset.LATTE || preset == ThemePreset.SNOW || preset == ThemePreset.SAND ? "Light" : "Dark", textX + 17, py + 23, GuiTheme.rgb(preset.muted), false);
             }
-            String detail = font.plainSubstrByWidth(preset.description, width - 16);
-            g.text(font, detail, px, getBottom() - 17, GuiTheme.muted, false);
         }
     }
     private static final class Swatch extends TaggerWidgets.Action {
@@ -279,7 +291,7 @@ public final class AppearanceScreen extends TaggerScreen {
         @Override protected void applyValue() { changed.accept(setting()); }
         @Override public void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             TaggerWidgets.surface(g, getX(), getY(), width, height, 6, GuiTheme.surface, isFocused() ? GuiTheme.accent : GuiTheme.border);
-            g.text(TaggerFonts.body(), getMessage(), getX() + 8, getY() + 5, GuiTheme.text, false);
+            g.text(TaggerFonts.body(), getMessage(), getX() + 8, getY() + 5, active ? GuiTheme.text : GuiTheme.muted, false);
             int track = width - 20, position = (int) (track * value);
             TaggerWidgets.rounded(g, getX() + 10, getY() + 24, track, 3, 1, GuiTheme.border);
             TaggerWidgets.rounded(g, getX() + 10, getY() + 24, position, 3, 1, GuiTheme.accent);
