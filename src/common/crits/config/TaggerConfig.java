@@ -6,6 +6,9 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 public final class TaggerConfig {
+    public AppearanceConfig appearance = new AppearanceConfig();
+    /** Tier number (1–5) -> RGB, shared by profiles, previews and in-game tags. */
+    public java.util.Map<String, String> tierColours = new java.util.LinkedHashMap<>();
     public boolean enabled = true;
     public boolean nameplates = true;
     public boolean tabList = true;
@@ -27,6 +30,8 @@ public final class TaggerConfig {
 
     public TaggerConfig copy() {
         TaggerConfig copy = new TaggerConfig();
+        copy.appearance = appearance == null ? new AppearanceConfig() : appearance.copy();
+        copy.tierColours = tierColours == null ? new java.util.LinkedHashMap<>() : new java.util.LinkedHashMap<>(tierColours);
         copy.enabled = enabled;
         copy.nameplates = nameplates;
         copy.tabList = tabList;
@@ -47,6 +52,17 @@ public final class TaggerConfig {
     }
 
     public void validate() {
+        if (appearance == null) appearance = new AppearanceConfig();
+        appearance.validate();
+        if (tierColours == null) tierColours = new java.util.LinkedHashMap<>();
+        if (tierColours.size() > 5) throw new IllegalArgumentException("Only five tier colours are supported");
+        var cleanColours = new java.util.LinkedHashMap<String, String>();
+        tierColours.forEach((key, value) -> {
+            if (key == null || !key.matches("[1-5]")) throw new IllegalArgumentException("Invalid tier colour number");
+            String clean = AppearanceConfig.hex(value, true);
+            if (!clean.isEmpty()) cleanColours.put(key, clean);
+        });
+        tierColours = cleanColours;
         tierlist = TierlistProvider.from(tierlist).id();
         if (profileTierlist == null || TierlistProvider.find(profileTierlist).isEmpty()) profileTierlist = "";
         if (tierlistModes == null) tierlistModes = new java.util.LinkedHashMap<>();
@@ -108,7 +124,14 @@ public final class TaggerConfig {
 
     public int colour(String level) {
         if (!customColour.isEmpty()) return Integer.parseInt(customColour, 16);
-        return switch (level.charAt(2)) {
+        return tierColour(level);
+    }
+
+    /** Individual tier palette; independent of the optional all-tags override. */
+    public int tierColour(String level) {
+        String number = level.substring(level.length() - 1);
+        if (tierColours.containsKey(number)) return Integer.parseInt(tierColours.get(number), 16);
+        return switch (number.charAt(0)) {
             case '1' -> 0xFFD700;
             case '2' -> 0xC0C0C0;
             case '3' -> 0xCD7F32;
