@@ -23,7 +23,8 @@ final class TaggerFonts {
             var delegate = ((FontProviderAccessor) (Object) original).crits$getProvider();
             body = new Font(new Font.Provider() {
                 @Override public GlyphSource glyphs(FontDescription font) {
-                    if (FontDescription.DEFAULT.equals(font)) return ((FontProviderAccessor) (Object) original).crits$getGlyphSource(BODY);
+                    if (FontDescription.DEFAULT.equals(font) || BODY.equals(font)) return ((FontProviderAccessor) (Object) original).crits$getGlyphSource(
+                            GuiTheme.smoothFont() ? BODY : FontDescription.DEFAULT);
                     return delegate.glyphs(font);
                 }
                 @Override public EffectGlyph effect() { return delegate.effect(); }

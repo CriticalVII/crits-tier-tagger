@@ -80,6 +80,7 @@ public final class CritsTierTaggerClient implements ClientModInitializer {
         instance = this;
         store = new ConfigStore(FabricLoader.getInstance().getConfigDir().resolve("afritiers_tagger.json"));
         config = store.load();
+        crits.gui.GuiTheme.apply(config.appearance);
         selectedProvider = TierlistProvider.from(config.tierlist);
         repository = createRepository(selectedProvider);
         browser = new RankingRepository(new HttpRankingSource());
@@ -148,6 +149,7 @@ public final class CritsTierTaggerClient implements ClientModInitializer {
         validated.validate();
         store.save(validated);
         config = validated;
+        crits.gui.GuiTheme.apply(config.appearance);
         TierlistProvider next = TierlistProvider.from(validated.tierlist);
         if (selectedProvider != next) {
             repository.disconnect();

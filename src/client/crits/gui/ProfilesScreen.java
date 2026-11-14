@@ -21,7 +21,6 @@ import org.lwjgl.glfw.GLFW;
 
 /** A centred searchable profile, overall position and compact mode badges. */
 public final class ProfilesScreen extends Screen {
-    private static final TaggerConfig TIER_COLOURS = new TaggerConfig();
     private final TaggerSettingsScreen owner;
     private String input = "", requested = "", apiName = "", feedback = "";
     private Rankings snapshot = Rankings.EMPTY;
@@ -80,7 +79,7 @@ public final class ProfilesScreen extends Screen {
         searchField.setMaxLength(16);
         searchField.setCentered(true);
         searchField.setBordered(false);
-        searchField.setTextColor(TaggerWidgets.TEXT);
+        searchField.setTextColor(GuiTheme.text);
         searchField.setHint(Component.literal("Player username"));
         searchField.setValue(input);
         searchField.setResponder(value -> { input = value; searchButton.active = validInput(); });
@@ -122,15 +121,15 @@ public final class ProfilesScreen extends Screen {
         LinearLayout rows = LinearLayout.vertical().spacing(4);
         rows.addChild(new IdentityHeader(contentWidth, profile));
         if (profile == null) {
-            rows.addChild(new ProfileLine(contentWidth, Component.literal(lookupMessage()).withColor(TaggerWidgets.MUTED)));
+            rows.addChild(new ProfileLine(contentWidth, Component.literal(lookupMessage()).withColor(GuiTheme.muted)));
         } else {
-            rows.addChild(new TaggerWidgets.Label(contentWidth, 12, Component.literal("POSITION").withColor(TaggerWidgets.MUTED), font));
+            rows.addChild(new TaggerWidgets.Label(contentWidth, 12, Component.literal("POSITION").withColor(GuiTheme.muted), font));
             rows.addChild(new PositionBar(contentWidth, profile));
-            rows.addChild(new TaggerWidgets.Label(contentWidth, 12, Component.literal("TIERS").withColor(TaggerWidgets.MUTED), font));
+            rows.addChild(new TaggerWidgets.Label(contentWidth, 12, Component.literal("TIERS").withColor(GuiTheme.muted), font));
             var tiers = snapshot.players().getOrDefault(apiName, java.util.List.of()).stream()
                     .sorted(Comparator.comparing(Tier::retired).thenComparingInt(Tier::strength).thenComparing(Tier::mode)).toList();
             if (!tiers.isEmpty()) rows.addChild(new TierStrip(contentWidth, tiers));
-            if (tiers.isEmpty()) rows.addChild(new ProfileLine(contentWidth, Component.literal("No recorded tiers").withColor(TaggerWidgets.MUTED)));
+            if (tiers.isEmpty()) rows.addChild(new ProfileLine(contentWidth, Component.literal("No recorded tiers").withColor(GuiTheme.muted)));
         }
         var scroll = new ScrollableLayout(minecraft, rows, Math.max(32, h - 128 - contentOffset), ScrollableLayout.ReserveStrategy.RIGHT);
         scroll.setMinWidth(contentWidth);
@@ -181,7 +180,7 @@ public final class ProfilesScreen extends Screen {
                 : profile.isPresent() ? provider == TierlistProvider.AFRITIERS ? "Points count active tiers; retired tiers earn 0."
                         : provider.label() + " supplies the displayed points and overall rank."
                 : "Searching " + provider.label() + (provider == TierlistProvider.AFRITIERS ? " by username." : " by verified account UUID.");
-        g.text(font, font.plainSubstrByWidth(note, w - 24), x + 12, y + h - 45, TaggerWidgets.MUTED, false);
+        g.text(font, font.plainSubstrByWidth(note, w - 24), x + 12, y + h - 45, GuiTheme.muted, false);
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
 
@@ -195,9 +194,9 @@ public final class ProfilesScreen extends Screen {
             setTooltip(TaggerFonts.tooltip(text));
         }
         @Override protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-            if (isHovered()) TaggerWidgets.rounded(g, getX(), getY(), width, height, 2, 0xFF181818);
+            if (isHovered()) TaggerWidgets.rounded(g, getX(), getY(), width, height, 2, GuiTheme.hover);
             g.enableScissor(getX(), getY() - 2, getRight(), getBottom());
-            g.text(font, getMessage(), getX() + 4, getY() + 4, TaggerWidgets.TEXT, false);
+            g.text(font, getMessage(), getX() + 4, getY() + 4, GuiTheme.text, false);
             g.disableScissor();
         }
         @Override protected void updateWidgetNarration(net.minecraft.client.gui.narration.NarrationElementOutput output) {
@@ -219,18 +218,18 @@ public final class ProfilesScreen extends Screen {
         }
         @Override protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             int centre = getX() + width / 2;
-            TaggerWidgets.surface(g, centre - 22, getY(), 44, 44, 22, 0xFF171717, 0xFF937A2B);
+            TaggerWidgets.surface(g, centre - 22, getY(), 44, 44, 22, GuiTheme.surface, GuiTheme.accent);
             PlayerFaceExtractor.extractRenderState(g, skin.get(), centre - 14, getY() + 8, 28);
             String displayName = profile != null && requested.equalsIgnoreCase(profile.name()) ? profile.name() : requested;
             g.text(font, TaggerFrame.heading(displayName), centre - font.width(TaggerFrame.heading(displayName)) / 2,
-                    getY() + 49, TaggerWidgets.TEXT, false);
+                    getY() + 49, GuiTheme.text, false);
             String title = profile != null && !profile.combatTitle().isBlank() ? profile.combatTitle() : provider.label() + " profile";
             int pillWidth = Math.min(width - 12, font.width(title) + 20);
-            TaggerWidgets.rounded(g, centre - pillWidth / 2, getY() + 65, pillWidth, 17, 8, 0xFF292718);
+            TaggerWidgets.rounded(g, centre - pillWidth / 2, getY() + 65, pillWidth, 17, 8, GuiTheme.selection);
             g.text(font, font.plainSubstrByWidth(title, pillWidth - 12), centre - font.width(font.plainSubstrByWidth(title, pillWidth - 12)) / 2,
-                    getY() + 69, 0xFFFFD700, false);
+                    getY() + 69, GuiTheme.accent, false);
             String region = profile == null ? "" : profile.region();
-            g.text(font, region, centre - font.width(region) / 2, getY() + 91, TaggerWidgets.MUTED, false);
+            g.text(font, region, centre - font.width(region) / 2, getY() + 91, GuiTheme.muted, false);
         }
         @Override protected void updateWidgetNarration(net.minecraft.client.gui.narration.NarrationElementOutput output) {
             output.add(net.minecraft.client.gui.narration.NarratedElementType.TITLE, getMessage());
@@ -246,13 +245,13 @@ public final class ProfilesScreen extends Screen {
             this.profile = profile; setTooltip(TaggerFonts.tooltip(getMessage()));
         }
         @Override protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-            TaggerWidgets.surface(g, getX(), getY(), width, height, 4, 0xFF171717, isFocused() ? TaggerWidgets.BLUE : TaggerWidgets.LINE);
+            TaggerWidgets.surface(g, getX(), getY(), width, height, 4, GuiTheme.surface, isFocused() ? GuiTheme.accent : GuiTheme.border);
             String rank = profile.position() == 0 ? "—" : "#" + profile.position();
             int rankWidth = Math.min(width / 2, Math.max(43, font.width(rank) + 16));
-            TaggerWidgets.rounded(g, getX() + 1, getY() + 1, rankWidth, height - 2, 3, 0xFF302A16);
-            g.text(font, rank, getX() + (rankWidth - font.width(rank)) / 2, getY() + 9, 0xFFFFD700, false);
+            TaggerWidgets.rounded(g, getX() + 1, getY() + 1, rankWidth, height - 2, 3, GuiTheme.selection);
+            g.text(font, rank, getX() + (rankWidth - font.width(rank)) / 2, getY() + 9, GuiTheme.accent, false);
             String text = "Overall  ·  " + (profile.points() < 0 ? "Points unavailable" : profile.points() + " points");
-            g.text(font, font.plainSubstrByWidth(text, width - rankWidth - 18), getX() + rankWidth + 10, getY() + 9, TaggerWidgets.TEXT, false);
+            g.text(font, font.plainSubstrByWidth(text, width - rankWidth - 18), getX() + rankWidth + 10, getY() + 9, GuiTheme.text, false);
         }
         @Override protected void updateWidgetNarration(net.minecraft.client.gui.narration.NarrationElementOutput output) {
             output.add(net.minecraft.client.gui.narration.NarratedElementType.TITLE, getMessage());
@@ -277,7 +276,7 @@ public final class ProfilesScreen extends Screen {
             return getX() + Math.round((width - count * cell) / 2 + (index % columns) * cell + (cell - 34) / 2);
         }
         @Override protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-            TaggerWidgets.surface(g, getX(), getY(), width, height, 4, 0xFF121212, isFocused() ? TaggerWidgets.BLUE : TaggerWidgets.LINE);
+            TaggerWidgets.surface(g, getX(), getY(), width, height, 4, GuiTheme.surface, isFocused() ? GuiTheme.accent : GuiTheme.border);
             int hovered = -1;
             if (isHovered()) for (int index = 0; index < tiers.size(); index++) {
                 int left = badgeX(index), top = getY() + (index / columns) * 48;
@@ -290,11 +289,11 @@ public final class ProfilesScreen extends Screen {
             for (int index = 0; index < tiers.size(); index++) {
                 Tier tier = tiers.get(index); int left = badgeX(index);
                 int top = getY() + (index / columns) * 48;
-                int colour = 0xFF000000 | TIER_COLOURS.colour(tier.level());
-                TaggerWidgets.surface(g, left + 4, top + 5, 26, 26, 13, 0xFF090C0E, hovered == index ? colour : TaggerWidgets.LINE);
+                int colour = 0xFF000000 | CritsTierTaggerClient.instance().config().tierColour(tier.level());
+                TaggerWidgets.surface(g, left + 4, top + 5, 26, 26, 13, GuiTheme.background, hovered == index ? colour : GuiTheme.border);
                 g.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
                         ModeIcons.sprite(ModeIcon.forMode(tier.mode())).spriteId(), left + 9, top + 10, 16, 16);
-                TaggerWidgets.rounded(g, left + 1, top + 32, 32, 13, 6, 0xFF252525);
+                TaggerWidgets.rounded(g, left + 1, top + 32, 32, 13, 6, GuiTheme.hover);
                 String level = tier.displayLevel();
                 g.text(font, level, left + (34 - font.width(level)) / 2, top + 35, colour, false);
             }

@@ -11,21 +11,22 @@ import net.minecraft.network.chat.Component;
 
 /** Pixel-aligned native widgets retain vanilla input, focus, narration and click sounds. */
 final class TaggerWidgets {
-    static final int TEXT = 0xFFF2F2F2, MUTED = 0xFFA0A0A0, FAINT = 0xFF727272,
-            GREEN = 0xFF38EA83, CYAN = 0xFF03C9E2, BLUE = 0xFF356DFF,
-            LINE = 0xFF282828, INK = 0xFF101010, SURFACE = 0xFF232323;
     private TaggerWidgets() { }
 
     static void panel(GuiGraphicsExtractor g, int x, int y, int w, int h) {
-        surface(g, x, y, w, h, 4, 0xFF0E0E0E, LINE);
+        surface(g, x, y, w, h, 8, GuiTheme.translucent(GuiTheme.background), GuiTheme.border);
     }
 
     static void backdrop(GuiGraphicsExtractor g, int width, int height) {
-        g.fill(0, 0, width, height, 0xFF0A0A0A);
+        var client = Minecraft.getInstance();
+        if (client.level == null) client.gameRenderer.panorama().extractRenderState(g, width, height);
+        if (GuiTheme.blur() && client.options.getMenuBackgroundBlurriness() >= 1) g.blurBeforeThisStratum();
+        g.fill(0, 0, width, height, 0x50000000);
     }
 
     static void rounded(GuiGraphicsExtractor g, int x, int y, int w, int h, int radius, int colour) {
-        int r = Math.max(0, Math.min(radius, Math.min(w, h) / 2));
+        if (w <= 0 || h <= 0) return;
+        int r = Math.max(0, Math.min(GuiTheme.radius(radius), Math.min(w, h) / 2));
         g.fill(x, y + r, x + w, y + h - r, colour);
         for (int row = 0; row < r; row++) {
             int inset = (int) Math.ceil(r - Math.sqrt(r * r - Math.pow(r - row - 0.5, 2)));
@@ -52,7 +53,7 @@ final class TaggerWidgets {
             var font = TaggerFonts.body();
             var text = font.width(getMessage()) > getWidth()
                     ? net.minecraft.client.gui.components.ComponentRenderUtils.clipText(getMessage(), font, getWidth()) : getMessage().getVisualOrderText();
-            g.text(font, text, getX(), getY() + (getHeight() - 9) / 2, TEXT, false);
+            g.text(font, text, getX(), getY() + (getHeight() - 9) / 2, GuiTheme.text, false);
         }
     }
 
@@ -67,7 +68,7 @@ final class TaggerWidgets {
         final float hoverAmount() {
             long now = System.nanoTime();
             float target = isHoveredOrFocused() && active ? 1 : 0;
-            if (Minecraft.getInstance().options.screenEffectScale().get() == 0 || lastFrame == 0) hover = target;
+            if (!GuiTheme.animations() || lastFrame == 0) hover = target;
             else hover += (target - hover) * Math.min(1, (now - lastFrame) / 100_000_000F);
             lastFrame = now;
             return hover;
@@ -75,13 +76,13 @@ final class TaggerWidgets {
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             extractBackground(g);
             var font = TaggerFonts.body();
-            g.text(font, getMessage(), getX() + (width - font.width(getMessage())) / 2, getY() + (height - 8) / 2, active ? primary ? GREEN : TEXT : FAINT, false);
+            g.text(font, getMessage(), getX() + (width - font.width(getMessage())) / 2, getY() + (height - 8) / 2, active ? primary ? GuiTheme.accent : GuiTheme.text : GuiTheme.muted, false);
         }
         protected void extractBackground(GuiGraphicsExtractor g) {
             float over = hoverAmount();
-            int fill = primary ? mix(0xFF112A1C, 0xFF173C27, over) : mix(0xFF151515, 0xFF272727, over);
-            if (!active) fill = 0xFF101010;
-            surface(g, getX(), getY(), width, height, 3, fill, isFocused() ? CYAN : primary && active ? 0xFF1C422B : LINE);
+            int fill = primary ? mix(GuiTheme.selection, GuiTheme.blend(GuiTheme.selection, GuiTheme.accent, 0.10F), over) : mix(GuiTheme.surface, GuiTheme.hover, over);
+            if (!active) fill = GuiTheme.background;
+            surface(g, getX(), getY(), width, height, 6, fill, isFocused() ? GuiTheme.accent : primary && active ? GuiTheme.accent : GuiTheme.border);
         }
     }
 
@@ -95,17 +96,17 @@ final class TaggerWidgets {
         }
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             float hover = hoverAmount();
-            int lift = Minecraft.getInstance().options.screenEffectScale().get() == 0 ? 0 : Math.round(hover);
+            int lift = !GuiTheme.animations() ? 0 : Math.round(hover);
             surface(g, getX(), getY() + 1 - lift, width, height - 1, 3,
-                    selected ? 0xFF10152D : mix(0xFF242424, 0xFF2D2D2D, hover),
-                    selected || isFocused() ? BLUE : 0xFF242424);
+                    selected ? GuiTheme.selection : mix(GuiTheme.surface, GuiTheme.hover, hover),
+                    selected || isFocused() ? GuiTheme.accent : GuiTheme.surface);
             var font = TaggerFonts.body();
             String text = font.plainSubstrByWidth(title, width - 12);
-            g.text(font, text, getX() + (width - font.width(text)) / 2, getY() + 7 - lift, TEXT, false);
+            g.text(font, text, getX() + (width - font.width(text)) / 2, getY() + 7 - lift, GuiTheme.text, false);
             int size = Math.min(36, height - 25);
             g.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, sprite,
                     getX() + (width - size) / 2, getY() + 21 - lift, size, size);
-            if (selected) g.outline(getRight() - 11, getBottom() - 10 - lift, 5, 5, TEXT);
+            if (selected) g.outline(getRight() - 11, getBottom() - 10 - lift, 5, 5, GuiTheme.text);
         }
         @Override public void updateWidgetNarration(net.minecraft.client.gui.narration.NarrationElementOutput output) {
             super.updateWidgetNarration(output);
@@ -121,10 +122,10 @@ final class TaggerWidgets {
         }
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             float hover = hoverAmount();
-            if (selected || hover > 0) rounded(g, getX(), getY(), width, height, 3, selected ? 0xFF252525 : mix(0xFF0B0B0B, 0xFF1C1C1C, hover));
-            if (isFocused()) g.outline(getX(), getY(), width, height, CYAN);
+            if (selected || hover > 0) rounded(g, getX(), getY(), width, height, 6, selected ? GuiTheme.selection : mix(GuiTheme.sidebar, GuiTheme.hover, hover));
+            if (isFocused()) g.outline(getX(), getY(), width, height, GuiTheme.accent);
             var font = TaggerFonts.body();
-            g.text(font, getMessage(), getX() + 10, getY() + (height - 8) / 2, selected ? TEXT : MUTED, false);
+            g.text(font, getMessage(), getX() + 10, getY() + (height - 8) / 2, selected ? GuiTheme.text : GuiTheme.muted, false);
         }
     }
 
@@ -134,20 +135,21 @@ final class TaggerWidgets {
         Input(int width, int height, Component label) {
             super(TaggerFonts.body(), width, height, label);
             setBordered(false);
-            setTextColor(TEXT);
+            setTextColor(GuiTheme.text);
             setTextShadow(false);
         }
         @Override public int menuTextY() { return getY() + Math.max(0, (height - 10) / 2); }
         @Override public void setCentered(boolean centred) { this.centred = centred; super.setCentered(centred); }
         @Override public void setHint(Component hint) { this.hint = hint; }
         @Override public void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-            surface(g, getX() - 4, getY() - 3, width + 6, height + 4, 3, 0xFF111111, isFocused() ? CYAN : LINE);
+            surface(g, getX() - 4, getY() - 3, width + 6, height + 4, 3, GuiTheme.background, isFocused() ? GuiTheme.accent : GuiTheme.border);
+            setTextColor(GuiTheme.text);
             super.extractWidgetRenderState(g, mouseX, mouseY, delta);
             if (visible && hint != null && getValue().isEmpty() && !isFocused()) {
                 var font = TaggerFonts.body();
                 String text = font.plainSubstrByWidth(hint.getString(), width - 8);
-                g.text(font, Component.literal(text).withStyle(hint.getStyle()).withColor(FAINT),
-                        centred ? getX() + (width - font.width(text)) / 2 : getX(), menuTextY(), FAINT, false);
+                g.text(font, Component.literal(text).withStyle(hint.getStyle()).withColor(GuiTheme.muted),
+                        centred ? getX() + (width - font.width(text)) / 2 : getX(), menuTextY(), GuiTheme.muted, false);
             }
         }
     }
@@ -169,14 +171,14 @@ final class TaggerWidgets {
             row(g, this, hoverAmount());
             var font = TaggerFonts.body();
             int labelY = getY() + (height < 34 ? 9 : 6);
-            if (icon != null) g.text(font, icon, getX() + 7, labelY, TEXT, false);
-            g.text(font, font.plainSubstrByWidth(label, width - (icon == null ? 48 : 64)), getX() + (icon == null ? 8 : 24), labelY, TEXT, false);
-            if (height >= 34) g.text(font, font.plainSubstrByWidth(description, width - 16), getX() + 8, getY() + 21, MUTED, false);
+            if (icon != null) g.text(font, icon, getX() + 7, labelY, GuiTheme.text, false);
+            g.text(font, font.plainSubstrByWidth(label, width - (icon == null ? 48 : 64)), getX() + (icon == null ? 8 : 24), labelY, GuiTheme.text, false);
+            if (height >= 34) g.text(font, font.plainSubstrByWidth(description, width - 16), getX() + 8, getY() + 21, GuiTheme.muted, false);
             int right = getRight() - 7;
             boolean on = value.getAsBoolean();
             int chipY = getY() + (height < 34 ? 7 : 5);
-            rounded(g, right - 22, chipY + 1, 22, 11, 5, on ? 0xFF17572E : 0xFF414141);
-            rounded(g, on ? right - 10 : right - 20, chipY + 3, 7, 7, 3, on ? GREEN : 0xFFBBBBBB);
+            rounded(g, right - 22, chipY + 1, 22, 11, 5, on ? GuiTheme.selection : GuiTheme.border);
+            rounded(g, on ? right - 10 : right - 20, chipY + 3, 7, 7, 3, on ? GuiTheme.accent : GuiTheme.muted);
         }
     }
 
@@ -194,18 +196,18 @@ final class TaggerWidgets {
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             row(g, this, hoverAmount());
             var font = TaggerFonts.body();
-            if (height >= 34) g.text(font, "Ranking mode", getX() + 8, getY() + 5, MUTED, false);
+            if (height >= 34) g.text(font, "Ranking mode", getX() + 8, getY() + 5, GuiTheme.muted, false);
             int textY = getY() + (height < 34 ? 9 : 21);
             g.enableScissor(getX() + 7, textY - 2, getRight() - 19, getBottom());
-            g.text(font, value.get(), getX() + 8, textY, TEXT, false);
+            g.text(font, value.get(), getX() + 8, textY, GuiTheme.text, false);
             g.disableScissor();
-            g.text(font, ">", getRight() - 13, textY, MUTED, false);
+            g.text(font, ">", getRight() - 13, textY, GuiTheme.muted, false);
         }
     }
 
     private static void row(GuiGraphicsExtractor g, Button widget, float hover) {
-        surface(g, widget.getX(), widget.getY(), widget.getWidth(), widget.getHeight(), 3,
-                mix(0xFF151515, 0xFF202020, hover), widget.isFocused() ? CYAN : LINE);
+        surface(g, widget.getX(), widget.getY(), widget.getWidth(), widget.getHeight(), 6,
+                mix(GuiTheme.surface, GuiTheme.hover, hover), widget.isFocused() ? GuiTheme.accent : GuiTheme.border);
     }
     private static int mix(int from, int to, float amount) {
         int r = (int) (((from >> 16) & 255) * (1 - amount) + ((to >> 16) & 255) * amount);
