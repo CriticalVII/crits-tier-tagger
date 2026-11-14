@@ -71,6 +71,14 @@ final class TaggerWidgets {
         return (int) Math.ceil(radius - Math.sqrt(radius * radius - Math.pow(radius - row - 0.5, 2)));
     }
 
+    static void tierText(GuiGraphicsExtractor g, net.minecraft.client.gui.Font font, String text, int x, int y, int colour) {
+        g.text(font, text, x-1, y, 0xFF10151C, false);
+        g.text(font, text, x+1, y, 0xFF10151C, false);
+        g.text(font, text, x, y-1, 0xFF10151C, false);
+        g.text(font, text, x, y+1, 0xFF10151C, false);
+        g.text(font, text, x, y, colour, false);
+    }
+
     static Action action(String text, int width, boolean primary, Button.OnPress action) {
         return new Action(text, width, 20, primary, action);
     }

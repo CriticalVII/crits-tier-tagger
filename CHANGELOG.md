@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.3.4 — 2026-11-14
+
+- Fixed the signed-distance border mask at radius 1 so its centre no longer alters panel opacity. Added marked radius steps and one-step keyboard snapping.
+- Added a shared swatch-and-hex colour picker for every colour control, and separate HT1–HT5, LT1–LT5 and Retired overrides with legacy colour fallbacks.
+- Draw tier labels directly on the shared panel with contrast outlines instead of individual backing pills.
+- Removed automatic hover popups from controls. Tier badges retain cursor-positioned mode, tier and points details; external providers without per-tier points display not supplied.
+
 ## 2.3.3 — 2026-11-14
 
 - Replaced per-frame corner scanlines with reusable coverage textures and nine-slice drawing, capped at 18 quads per bordered panel. Masks are bounded by supported corner radii.
