@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.3.5 — 2026-11-14
+
+- Reduced the gallery to six themes, mapping retired preset IDs to a nearby retained theme. Grouped HT/LT colour choices under Tier 1–Tier 5.
+- Added theme-coloured tier hover cards with at least 94% opacity, and 256px GUI-only exports from original artwork for clearer provider/mode selectors. In-world sprite dimensions remain unchanged.
+- Removed the Retired colour selector and legacy override; retired tiers inherit the underlying HT/LT colour without resetting other preferences.
+- Added the live Sword/tier/username preview to colour pickers, using the selected colour and tier being edited.
+- Removed dark outlines from GUI tier labels.
+- Kept panel and navigation colours stable on hover while preserving selected states and keyboard focus outlines.
+- Capped corner radius at 8 in both the slider and saved config validation, preserving marked snapping steps.
+
 ## 2.3.4 — 2026-11-14
 
 - Fixed the signed-distance border mask at radius 1 so its centre no longer alters panel opacity. Added marked radius steps and one-step keyboard snapping.

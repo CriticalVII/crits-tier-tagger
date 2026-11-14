@@ -62,6 +62,7 @@ public final class TaggerConfig {
             String clean = AppearanceConfig.hex(value, true);
             if (!clean.isEmpty()) cleanColours.put(key, clean);
         });
+        cleanColours.remove("retired"); // Retired tiers inherit their underlying HT/LT colour.
         tierColours = cleanColours;
         tierlist = TierlistProvider.from(tierlist).id();
         if (profileTierlist == null || TierlistProvider.find(profileTierlist).isEmpty()) profileTierlist = "";
@@ -129,7 +130,6 @@ public final class TaggerConfig {
 
     /** Individual tier palette; independent of the optional all-tags override. */
     public int tierColour(String level) {
-        if (level.startsWith("R") && tierColours.containsKey("retired")) return Integer.parseInt(tierColours.get("retired"), 16);
         String active = level.startsWith("R") ? level.substring(1) : level;
         if (tierColours.containsKey(active)) return Integer.parseInt(tierColours.get(active), 16);
         String number = level.substring(level.length() - 1);

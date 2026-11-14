@@ -1,6 +1,6 @@
 # Original mode icons
 
-These are the original assets requested by the user, copied from MCTiers and SubTiers. The canonical runtime files are in `resources/assets/afritiers_tagger/textures/gui/sprites/mode/`. They are PNG exports with transparent padding, sized proportionally to the established nameplate and Tab dimensions. Unused duplicate source artwork is not stored in this repository; the upstream source links below are retained. No icons are redrawn or recoloured.
+These are the original assets requested by the user, copied from MCTiers and SubTiers. The canonical runtime files are in `resources/assets/afritiers_tagger/textures/gui/sprites/mode/`. They are PNG exports with transparent padding, sized proportionally to the established nameplate and Tab dimensions. Unused duplicate source artwork is not stored in this repository; the upstream source links below are retained. No icons are redrawn or recoloured. The GUI also uses 256px exports under `textures/gui/icons/mode/`, rendered from the same upstream SVG/original PNG files for clearer scaling. The original 32px sprites remain for in-world tags.
 
 Rights to these third-party assets remain with their respective owners. The project license does not grant rights to them.
 
