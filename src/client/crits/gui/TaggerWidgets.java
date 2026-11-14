@@ -36,8 +36,29 @@ final class TaggerWidgets {
     }
 
     static void surface(GuiGraphicsExtractor g, int x, int y, int w, int h, int r, int fill, int border) {
-        rounded(g, x, y, w, h, r, border);
-        rounded(g, x + 1, y + 1, w - 2, h - 2, Math.max(0, r - 1), fill);
+        if (w <= 0 || h <= 0) return;
+        r = Math.max(0, Math.min(GuiTheme.radius(r), Math.min(w, h) / 2));
+        rounded(g, x, y, w, h, r, fill);
+        if (r == 0) { g.outline(x, y, w, h, border); return; }
+        // Draw only the border ring: an opaque undercoat would hide glass transparency.
+        g.fill(x, y + r, x + 1, y + h - r, border);
+        g.fill(x + w - 1, y + r, x + w, y + h - r, border);
+        for (int row = 0; row < r; row++) {
+            int outer = cornerInset(r, row);
+            int inner = row == 0 ? w / 2 : 1 + cornerInset(r - 1, row - 1);
+            if (row == 0) {
+                g.fill(x + outer, y, x + w - outer, y + 1, border);
+                g.fill(x + outer, y + h - 1, x + w - outer, y + h, border);
+            } else {
+                g.fill(x + outer, y + row, x + inner, y + row + 1, border);
+                g.fill(x + w - inner, y + row, x + w - outer, y + row + 1, border);
+                g.fill(x + outer, y + h - row - 1, x + inner, y + h - row, border);
+                g.fill(x + w - inner, y + h - row - 1, x + w - outer, y + h - row, border);
+            }
+        }
+    }
+    private static int cornerInset(int radius, int row) {
+        return (int) Math.ceil(radius - Math.sqrt(radius * radius - Math.pow(radius - row - 0.5, 2)));
     }
 
     static Action action(String text, int width, boolean primary, Button.OnPress action) {
@@ -132,6 +153,8 @@ final class TaggerWidgets {
     static final class Input extends EditBox implements MenuTextInput {
         private Component hint;
         private boolean centred;
+        private boolean invalid;
+        void setInvalid(boolean value) { invalid = value; }
         Input(int width, int height, Component label) {
             super(TaggerFonts.body(), width, height, label);
             setBordered(false);
@@ -143,7 +166,7 @@ final class TaggerWidgets {
         @Override public void setHint(Component hint) { this.hint = hint; }
         @Override public void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             surface(g, getX() - 4, getY() - 3, width + 6, height + 4, 3, GuiTheme.background, isFocused() ? GuiTheme.accent : GuiTheme.border);
-            setTextColor(GuiTheme.text);
+            setTextColor(invalid ? 0xFFE08A85 : GuiTheme.text);
             super.extractWidgetRenderState(g, mouseX, mouseY, delta);
             if (visible && hint != null && getValue().isEmpty() && !isFocused()) {
                 var font = TaggerFonts.body();

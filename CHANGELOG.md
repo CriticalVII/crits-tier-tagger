@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.3.0 — 2026-11-14
+
+- Redesigned every mod screen around a shared, inset themed workspace with rounded surfaces, transparent backgrounds and consistent focus/hover states.
+- Added a Settings tab with a searchable gallery of 14 dark, pastel, light and Minecraft-style palettes. Renamed the existing tag configuration tab to Tier Tags.
+- Added accent swatches and hex input, opacity and corner sliders, blur and animation controls, and a smooth/pixel font option. Minecraft screen-effect preferences remain respected.
+- Added independent T1–T5 colour controls, live tier previews, four colour sets and resets. Profiles, previews and in-game tags use the saved tier palette; the existing all-tags override stays available.
+- Added custom surface/text palettes and bounded clipboard theme import/export containing appearance preferences only. All valid changes save immediately; unfinished hex colours leave the saved value intact.
+- Kept existing matching, provider selection, waitlist subscriptions, icon sizes, world-transfer refreshes and network protections. Older configuration files migrate without resetting these settings.
+
 ## 2.2.4 — 2026-11-13
 
 - Renamed the GitHub repository to `crits-tier-tagger` and updated the mod's website, source and issue links.

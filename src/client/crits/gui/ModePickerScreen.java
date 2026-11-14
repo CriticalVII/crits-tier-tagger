@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 /** Provider-supported modes remain selectable before rankings have downloaded. */
-public final class ModePickerScreen extends Screen {
+public final class ModePickerScreen extends TaggerScreen {
     private final TaggerSettingsScreen owner;
     private final String selected;
     private int x, y, w, h;
@@ -65,7 +65,6 @@ public final class ModePickerScreen extends Screen {
     }
 
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-        TaggerWidgets.backdrop(g, width, height);
         TaggerWidgets.panel(g, x, y, w, h);
         g.text(font, TaggerFrame.heading("Choose a mode"), x + 12, y + 12, GuiTheme.text, false);
         g.fill(x + 12, y + 29, x + w - 12, y + 30, GuiTheme.border);

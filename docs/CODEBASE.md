@@ -5,7 +5,7 @@ The Java namespace is `crits`. This single short namespace keeps classes unique 
 ```text
 src/
   common/crits/
-    config/             Validation and atomic config persistence
+    config/             Validation, theme presets and atomic config persistence
     identity/           Verified account and AfriTiers rename resolution
     network/
       http/             HTTP clients, limits, timeouts and response handling
@@ -42,6 +42,10 @@ releases/                 Latest production JAR and SHA-256 checksum
 `src/common` contains code that can run independently of Minecraft's client classes. `src/client` contains native GUI and game integration. Fabric Loom combines both into the production JAR.
 
 The internal mod ID, resource namespace, config filename, translation keys and keybind IDs remain `afritiers_tagger` for compatibility. Renaming Java classes does not reset existing settings or change username/UUID matching.
+
+## GUI themes
+
+`ThemePreset` and `AppearanceConfig` hold client-independent palettes and validated preferences. `GuiTheme` caches rendering tokens after a config load/save. `TaggerScreen` owns the single panorama/blur background pass; `TaggerFrame` and `TaggerWidgets` share those tokens. `AppearanceScreen` provides the gallery, custom palette editor and tier-colour controls. Theme thumbnails are drawn from each palette and need no additional artwork.
 
 ## Assets
 

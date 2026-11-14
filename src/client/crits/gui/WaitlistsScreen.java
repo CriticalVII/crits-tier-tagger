@@ -15,7 +15,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 /** Per-mode subscriptions save immediately and work independently of tier-tag visibility. */
-public final class WaitlistsScreen extends Screen {
+public final class WaitlistsScreen extends TaggerScreen {
     private final TaggerSettingsScreen owner;
     private TaggerConfig config;
     private Set<String> knownModes = Set.of();

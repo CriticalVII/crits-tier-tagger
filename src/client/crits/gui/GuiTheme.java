@@ -25,7 +25,10 @@ public final class GuiTheme {
     }
     static int rgb(int value) { return 0xFF000000 | value; }
     static int translucent(int value) { return ((int) (255 * preferences.opacity / 100F) << 24) | (value & 0xFFFFFF); }
-    static int radius(int requested) { return preferences.theme.equals("block") ? 0 : Math.min(requested, preferences.cornerRadius); }
+    static int radius(int requested) {
+        if (requested > 12) return requested; // Avatars and mode circles retain their shape.
+        return preferences.theme.equals("block") ? 0 : Math.min(requested, preferences.cornerRadius);
+    }
     static boolean animations() { return preferences.animations && net.minecraft.client.Minecraft.getInstance().options.screenEffectScale().get() > 0; }
     static boolean smoothFont() { return preferences.smoothFont && !preferences.theme.equals("block"); }
     static boolean blur() { return preferences.blur; }
