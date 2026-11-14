@@ -11,7 +11,7 @@ final class TierlistLogo {
     private TierlistLogo() { }
 
     static void draw(GuiGraphicsExtractor g, TierlistProvider provider, int x, int y, int size) {
-        g.blitSprite(RenderPipelines.GUI_TEXTURED,
+        GuiIcons.draw(g,
                 Identifier.fromNamespaceAndPath("afritiers_tagger", "provider/" + provider.id()), x, y, size, size);
     }
 

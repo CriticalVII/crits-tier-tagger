@@ -1,6 +1,6 @@
 # Tierlist logos
 
-The provider selectors use the services' own public site icons, prepared as transparent PNG sprites for Minecraft's GUI atlas. Their proportions and colours are preserved.
+The provider selectors use the services' own public site icons, prepared as transparent PNG sprites for Minecraft's GUI atlas. Their proportions and colours are preserved. GUI selectors use 256px exports from the full-resolution originals under `textures/gui/icons/provider/`, with filtered sampling. Obsolete 32px provider exports have been removed.
 
 | Provider | Original asset |
 | --- | --- |

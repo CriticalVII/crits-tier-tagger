@@ -22,6 +22,7 @@ public final class AppearanceScreen extends TaggerScreen {
     private final TaggerSettingsScreen owner;
     private TaggerFrame frame;
     private String page = "Themes", filter = "", feedback = "";
+    private int tierGroup = 1;
     private boolean refilter;
     private TaggerWidgets.Input search;
     private AbstractScrollArea scrollArea;
@@ -113,7 +114,7 @@ public final class AppearanceScreen extends TaggerScreen {
             if (save(c -> c.appearance.accent = accent)) rebuildKeepingScroll();
         }));
         rows.addChild(swatches);
-        rows.addChild(new PreferenceSlider("Corner radius", width, prefs.cornerRadius, 0, 12, "", value -> save(c -> c.appearance.cornerRadius = value)));
+        rows.addChild(new PreferenceSlider("Corner radius", width, prefs.cornerRadius, 0, 8, "", value -> save(c -> c.appearance.cornerRadius = value)));
         rows.addChild(new TaggerWidgets.Toggle("Background blur", "Uses Minecraft's menu blur setting", width, false,
                 () -> config().appearance.blur, value -> save(c -> c.appearance.blur = value)));
         rows.addChild(new TaggerWidgets.Toggle("Animations", "Subtle hover and heading movement", width, false,
@@ -126,15 +127,19 @@ public final class AppearanceScreen extends TaggerScreen {
     private void tiers(LinearLayout rows, int width) {
         label(rows, width, "Your tier palette");
         label(rows, width, "Used in profiles, previews, Tab and nametags.");
-        for (int number = 1; number <= 5; number++) for (String prefix : new String[]{"HT", "LT"}) {
-            String key = prefix + number;
-            colourRow(rows, width, key, config().tierColours.getOrDefault(key, ""), hex(config().tierColour(key)), (c, value) -> {
-                if (value.isEmpty()) c.tierColours.remove(key); else c.tierColours.put(key, value);
-            });
+        for (int number = 1; number <= 5; number++) {
+            int group = number;
+            rows.addChild(TaggerWidgets.action("Tier " + number, width, tierGroup == number, pressed -> {
+                tierGroup = tierGroup == group ? 0 : group; rebuildKeepingScroll();
+            }));
+            if (tierGroup != number) continue;
+            for (String prefix : new String[]{"HT", "LT"}) {
+                String key = prefix + number;
+                colourRow(rows, width, key, config().tierColours.getOrDefault(key, ""), hex(config().tierColour(key)), (c, value) -> {
+                    if (value.isEmpty()) c.tierColours.remove(key); else c.tierColours.put(key, value);
+                });
+            }
         }
-        colourRow(rows, width, "Retired", config().tierColours.getOrDefault("retired", ""), hex(config().tierColour("RHT1")), (c, value) -> {
-            if (value.isEmpty()) c.tierColours.remove("retired"); else c.tierColours.put("retired", value);
-        });
         rows.addChild(new TierPreview(width));
         label(rows, width, "Colour sets");
         String[][] palettes = {
@@ -268,7 +273,7 @@ public final class AppearanceScreen extends TaggerScreen {
             g.text(font, font.plainSubstrByWidth(preset.label, getRight() - textX - 7), textX, textY, GuiTheme.rgb(preset.text), false);
             if (width >= 175) {
                 TaggerWidgets.rounded(g, textX, py + 21, 12, 12, 6, GuiTheme.rgb(preset.accent));
-                g.text(font, selected ? "Selected" : preset == ThemePreset.GLASS ? "Transparent" : preset == ThemePreset.LATTE || preset == ThemePreset.SNOW || preset == ThemePreset.SAND ? "Light" : "Dark", textX + 17, py + 23, GuiTheme.rgb(preset.muted), false);
+                g.text(font, selected ? "Selected" : preset == ThemePreset.GLASS ? "Transparent" : preset == ThemePreset.LATTE ? "Light" : "Dark", textX + 17, py + 23, GuiTheme.rgb(preset.muted), false);
             }
         }
     }
@@ -324,7 +329,7 @@ public final class AppearanceScreen extends TaggerScreen {
             for (int number = 1; number <= 5; number++) {
                 int left = getX() + (number - 1) * width / 5 + width / 10;
                 if (isHovered() && mouseX >= getX() + (number-1)*width/5 && mouseX < getX() + number*width/5)
-                    g.setTooltipForNextFrame(TaggerFonts.body(), Component.literal("Sword: HT" + number + " · Points: "
+                    TierHover.show(Component.literal("Sword: HT" + number + " · Points: "
                         + (CritsTierTaggerClient.instance().selectedProvider() == crits.provider.TierlistProvider.AFRITIERS
                         ? new crits.ranking.Tier("sword", "HT"+number, false).points() : "not supplied")), mouseX, mouseY);
                 g.centeredText(TaggerFonts.body(), ModeIcons.component("sword"), left, getY() + 5, GuiTheme.text);
