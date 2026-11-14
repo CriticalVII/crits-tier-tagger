@@ -47,6 +47,9 @@ public final class ProfileRepository implements TierRepository {
         if (closed) return;
         if (connected) { worldChanged(); return; }
         connected = true;
+        entries.forEach((key, entry) -> {
+            if (entry.status == LookupStatus.ERROR && queue.size() < 128) queue.add(key);
+        });
         publish(!enabled ? Phase.DISABLED : clock.instant().isBefore(retryAt) ? Phase.ERROR : Phase.READY,
                 clock.instant().isBefore(retryAt) ? provider().label() + " is cooling down; retrying automatically"
                         : "Ready for " + provider().label() + " player lookups");
@@ -91,7 +94,7 @@ public final class ProfileRepository implements TierRepository {
         String key = PlayerIdentity.uuid(username);
         if (key == null) return LookupStatus.NOT_FOUND;
         Entry entry = entries.get(key);
-        if (entry != null) return entry.status;
+        if (entry != null) return entry.profile != null ? LookupStatus.FOUND : entry.status;
         return state.phase() == Phase.ERROR ? LookupStatus.ERROR : LookupStatus.LOADING;
     }
 
@@ -118,7 +121,7 @@ public final class ProfileRepository implements TierRepository {
             catalogueAt = Instant.MIN; refreshAt = null; worldAllowedAt = now.plusSeconds(30);
         }
         if (!now.isBefore(pruneAt)) {
-            boolean removed = entries.entrySet().removeIf(entry -> entry.getValue().status != LookupStatus.LOADING
+            boolean removed = entries.entrySet().removeIf(entry -> entry.getValue().profile == null && entry.getValue().status != LookupStatus.LOADING
                     && entry.getValue().updated.isBefore(now.minusSeconds(600)));
             if (removed) publish(state.phase(), state.message());
             pruneAt = now.plusSeconds(1);
@@ -160,7 +163,13 @@ public final class ProfileRepository implements TierRepository {
                     running = false; failures = Math.min(6, failures + 1);
                     retryAt = clock.instant().plusSeconds(Math.min(900, 30L << (failures - 1)));
                     if (exception instanceof RankingSource.ApiException api && api.retryAfter() != null) retryAt = later(retryAt, api.retryAfter());
-                    if (username != null) entries.put(username, new Entry(null, LookupStatus.ERROR, retryAt, clock.instant()));
+                    if (username != null) {
+                        Entry previous = entries.get(username);
+                        entries.put(username, new Entry(previous == null ? null : previous.profile, LookupStatus.ERROR, retryAt,
+                                previous == null ? clock.instant() : previous.updated));
+                        // Retry the failed UUID after cooldown even if the profile screen has closed.
+                        if (queue.size() < 128) queue.addFirst(username);
+                    }
                     publish(Phase.ERROR, exception instanceof RankingSource.ApiException ? exception.getMessage()
                             : provider().label() + " data unavailable; retrying automatically");
                 }
@@ -174,7 +183,7 @@ public final class ProfileRepository implements TierRepository {
         Map<String, List<Tier>> players = new HashMap<>();
         Map<String, PlayerStats> stats = new HashMap<>();
         entries.forEach((key, entry) -> {
-            if (entry.profile != null && entry.status != LookupStatus.ERROR) {
+            if (entry.profile != null) {
                 players.put(key, entry.profile.tiers()); stats.put(key, entry.profile.stats());
             }
         });

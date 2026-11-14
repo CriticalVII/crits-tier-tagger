@@ -14,7 +14,7 @@ A client-side Fabric mod for **Minecraft Java 26.2**. Display PvP tiers from **A
 
 ## Install
 
-Download [crits-tier-tagger-2.3.6.jar](releases/crits-tier-tagger-2.3.6.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
+Download [crits-tier-tagger-2.3.7.jar](releases/crits-tier-tagger-2.3.7.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
 
 | Requirement | Version |
 | --- | --- |
@@ -53,7 +53,7 @@ Retired tiers are included by default. Tier colours are gold for tier 1, silver 
 | [PvPTiers](https://pvptiers.com) | Public UUID profile API; eight bundled mode choices | Provider-supplied points and overall placement |
 | [SubTiers](https://subtiers.net) | Public v2 UUID profile and mode APIs | Provider-supplied points and overall placement |
 
-For MCTiers, PvPTiers and SubTiers, player names first resolve through the official Minecraft account service. Tierlist requests and matching then use only that verified account UUID. Account resolution is shared across all three sources and cached for five minutes; tier profiles have separate per-provider UUID caches. Missing accounts/profiles are cached briefly; failures and rate limits retry with a cooldown. A busy server can take longer to populate. Requests run in the background. No API key is required.
+For MCTiers, PvPTiers and SubTiers, player names first resolve through the official Minecraft account service. Tierlist requests and matching then use only that verified account UUID. Account resolution is shared across all three sources and cached for five minutes; tier profiles have separate per-provider UUID caches. Missing accounts/profiles are cached briefly; failures and rate limits retry with a cooldown. A busy server can take longer to populate. Last successful tiers remain visible during refreshes and API cooldowns. This cache lasts for the current Minecraft session; fresh successful responses replace it. Requests run in the background. No API key is required.
 
 Joining a server, changing worlds, respawning or transferring between hubs and practice servers schedules a refresh. Rapid transfers share pending work and respect API cooldowns. Cached tiers stay visible while a transfer refresh waits to run.
 
@@ -88,7 +88,7 @@ Queues are checked about every 30 seconds while watching in game or browsing thi
 
 ## Build
 
-Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.3.6.jar`.
+Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.3.7.jar`.
 
 The repository includes production source, canonical runtime assets, build files, provenance documentation and the latest packaged JAR. See [Codebase layout](docs/CODEBASE.md) for the source map. Local verification tools, fixtures and debug files are excluded.
 
