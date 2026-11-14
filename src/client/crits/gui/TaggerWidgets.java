@@ -44,9 +44,14 @@ final class TaggerWidgets {
     }
     /** Gallery cards preview their own corners, independent of the active workspace. */
     static void surfaceExact(GuiGraphicsExtractor g, int x, int y, int w, int h, int r, int fill, int border) {
+        drawSurface(g, x, y, w, h, r, GuiTheme.translucent(fill), border);
+    }
+    static void opaqueSurface(GuiGraphicsExtractor g, int x, int y, int w, int h, int r, int fill, int border) {
+        drawSurface(g, x, y, w, h, r, fill, border);
+    }
+    private static void drawSurface(GuiGraphicsExtractor g, int x, int y, int w, int h, int r, int fill, int border) {
         if (w <= 0 || h <= 0) return;
         r = Math.max(0, Math.min(r, Math.min(w, h) / 2));
-        fill = GuiTheme.translucent(fill);
         if (GuiTheme.smoothFont() && r > 0) { SmoothSurfaces.draw(g, x, y, w, h, r, fill, border); return; }
         roundedExact(g, x, y, w, h, r, fill);
         if (r == 0) { g.outline(x, y, w, h, border); return; }
@@ -72,10 +77,6 @@ final class TaggerWidgets {
     }
 
     static void tierText(GuiGraphicsExtractor g, net.minecraft.client.gui.Font font, String text, int x, int y, int colour) {
-        g.text(font, text, x-1, y, 0xFF10151C, false);
-        g.text(font, text, x+1, y, 0xFF10151C, false);
-        g.text(font, text, x, y-1, 0xFF10151C, false);
-        g.text(font, text, x, y+1, 0xFF10151C, false);
         g.text(font, text, x, y, colour, false);
     }
 
@@ -98,20 +99,11 @@ final class TaggerWidgets {
 
     static class Action extends Button {
         private final boolean primary;
-        private float hover;
-        private long lastFrame;
         Action(String text, int width, int height, boolean primary, OnPress action) {
             super(0, 0, width, height, Component.literal(text), action, DEFAULT_NARRATION);
             this.primary = primary;
         }
-        final float hoverAmount() {
-            long now = System.nanoTime();
-            float target = isHoveredOrFocused() && active ? 1 : 0;
-            if (!GuiTheme.animations() || lastFrame == 0) hover = target;
-            else hover += (target - hover) * Math.min(1, (now - lastFrame) / 100_000_000F);
-            lastFrame = now;
-            return hover;
-        }
+        final float hoverAmount() { return 0; }
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             extractBackground(g);
             var font = TaggerFonts.body();
@@ -143,7 +135,7 @@ final class TaggerWidgets {
             String text = font.plainSubstrByWidth(title, width - 12);
             g.text(font, text, getX() + (width - font.width(text)) / 2, getY() + 7 - lift, GuiTheme.text, false);
             int size = Math.min(36, height - 25);
-            g.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, sprite,
+            GuiIcons.draw(g, sprite,
                     getX() + (width - size) / 2, getY() + 21 - lift, size, size);
             if (selected) g.outline(getRight() - 11, getBottom() - 10 - lift, 5, 5, GuiTheme.text);
         }

@@ -25,6 +25,7 @@ public final class GuiTheme {
     }
     static int rgb(int value) { return 0xFF000000 | value; }
     static int translucent(int value) { return ((preferences.transparentGui ? (int) (255 * preferences.opacity / 100F) : 255) << 24) | (value & 0xFFFFFF); }
+    static int tooltipFill() { return ((preferences.transparentGui ? Math.max(94, preferences.opacity) * 255 / 100 : 255) << 24) | (surface & 0xFFFFFF); }
     static int radius(int requested) {
         if (requested > 12) return requested; // Avatars and mode circles retain their shape.
         return preferences.theme.equals("block") ? 0 : Math.min(requested, preferences.cornerRadius);

@@ -280,7 +280,7 @@ public final class ProfilesScreen extends TaggerScreen {
                 int left = badgeX(index), top = getY() + (index / columns) * 48;
                 if (mouseX >= left && mouseX < left + 34 && mouseY >= top && mouseY < top + 48) { hovered = index; break; }
             }
-            if (hovered >= 0) g.setTooltipForNextFrame(font,
+            if (hovered >= 0) TierHover.show(
                     Component.literal(provider.modeLabel(tiers.get(hovered).mode()) + ": " + tiers.get(hovered).displayLevel() + " · Points: " + (provider == TierlistProvider.AFRITIERS ? tiers.get(hovered).points() : "not supplied")), mouseX, mouseY);
             var palette = CritsTierTaggerClient.instance().config();
             for (int index = 0; index < tiers.size(); index++) {
@@ -288,8 +288,7 @@ public final class ProfilesScreen extends TaggerScreen {
                 int top = getY() + (index / columns) * 48;
                 int colour = 0xFF000000 | palette.tierColour(tier.displayLevel());
                 TaggerWidgets.surface(g, left + 4, top + 5, 26, 26, 13, GuiTheme.background, hovered == index ? colour : GuiTheme.border);
-                g.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
-                        ModeIcons.sprite(ModeIcon.forMode(tier.mode())).spriteId(), left + 9, top + 10, 16, 16);
+                GuiIcons.draw(g, ModeIcons.sprite(ModeIcon.forMode(tier.mode())).spriteId(), left + 9, top + 10, 16);
                 String level = tier.displayLevel();
                 TaggerWidgets.tierText(g, font, level, left + (34 - font.width(level)) / 2, top + 35, colour);
             }

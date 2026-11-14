@@ -32,7 +32,7 @@ public final class AppearanceConfig {
         theme = ThemePreset.from(theme).id;
         accent = hex(accent, true);
         opacity = Math.max(60, Math.min(100, opacity));
-        cornerRadius = Math.max(0, Math.min(12, cornerRadius));
+        cornerRadius = Math.max(0, Math.min(8, cornerRadius));
         if (palette == null) palette = new LinkedHashMap<>();
         if (palette.size() > PALETTE_KEYS.size()) throw new IllegalArgumentException("Too many custom theme colours");
         var clean = new LinkedHashMap<String, String>();
