@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.3.3 — 2026-11-14
+
+- Replaced per-frame corner scanlines with reusable coverage textures and nine-slice drawing, capped at 18 quads per bordered panel. Masks are bounded by supported corner radii.
+- Coalesced rapid GUI config writes after 350 ms of inactivity, while applying changes immediately. Pending settings flush on normal shutdown and failed writes retry. Commands retain synchronous persistence.
+- Avoided redundant selected-tab/theme rebuilds and ranking reloads for appearance-only edits.
+- Corrected shared widget hover tooltips to follow the cursor in this mod’s screens, preserving keyboard-focused placement and vanilla menus.
+- Renamed Smooth font to Pixel Style and inverted the toggle: off uses smooth text and corners; on uses pixel rendering. Theme selection no longer overrides this independent preference.
+
 ## 2.3.2 — 2026-11-14
 
 - Improved tier-label contrast on light and translucent themes with dark backing and text shadows.

@@ -158,7 +158,7 @@ public final class TaggerSettingsScreen extends TaggerScreen {
         edited.includeRetired = draft.includeRetired;
         edited.mode = draft.mode;
         edited.tierlistModes.put(edited.tierlist, draft.mode);
-        try { CritsTierTaggerClient.instance().saveConfig(edited); feedback = "Saved automatically"; }
+        try { CritsTierTaggerClient.instance().saveGuiConfig(edited); feedback = "Saved automatically"; }
         catch (java.io.IOException | IllegalArgumentException exception) {
             feedback = exception instanceof IllegalArgumentException ? exception.getMessage() : "Could not save. Check config folder permissions.";
         }
