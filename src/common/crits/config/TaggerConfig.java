@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public final class TaggerConfig {
     public AppearanceConfig appearance = new AppearanceConfig();
-    /** Tier number (1–5) -> RGB, shared by profiles, previews and in-game tags. */
+    /** HT/LT tier IDs and retired -> RGB; legacy tier numbers remain fallbacks. */
     public java.util.Map<String, String> tierColours = new java.util.LinkedHashMap<>();
     public boolean enabled = true;
     public boolean nameplates = true;
@@ -55,10 +55,10 @@ public final class TaggerConfig {
         if (appearance == null) appearance = new AppearanceConfig();
         appearance.validate();
         if (tierColours == null) tierColours = new java.util.LinkedHashMap<>();
-        if (tierColours.size() > 5) throw new IllegalArgumentException("Only five tier colours are supported");
+        if (tierColours.size() > 16) throw new IllegalArgumentException("Too many tier colour entries");
         var cleanColours = new java.util.LinkedHashMap<String, String>();
         tierColours.forEach((key, value) -> {
-            if (key == null || !key.matches("[1-5]")) throw new IllegalArgumentException("Invalid tier colour number");
+            if (key == null || !key.matches("[1-5]|[HL]T[1-5]|retired")) throw new IllegalArgumentException("Invalid tier colour number");
             String clean = AppearanceConfig.hex(value, true);
             if (!clean.isEmpty()) cleanColours.put(key, clean);
         });
@@ -129,6 +129,9 @@ public final class TaggerConfig {
 
     /** Individual tier palette; independent of the optional all-tags override. */
     public int tierColour(String level) {
+        if (level.startsWith("R") && tierColours.containsKey("retired")) return Integer.parseInt(tierColours.get("retired"), 16);
+        String active = level.startsWith("R") ? level.substring(1) : level;
+        if (tierColours.containsKey(active)) return Integer.parseInt(tierColours.get(active), 16);
         String number = level.substring(level.length() - 1);
         if (tierColours.containsKey(number)) return Integer.parseInt(tierColours.get(number), 16);
         return switch (number.charAt(0)) {

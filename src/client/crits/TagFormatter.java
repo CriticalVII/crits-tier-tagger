@@ -37,7 +37,7 @@ public final class TagFormatter {
                 .append(ModeIcons.component(tier.mode(), tabList))
                 .append(" ")
                 .append(Component.literal(tier.displayLevel())
-                        .withStyle(style -> style.withFont(FontDescription.DEFAULT).withColor(config.colour(tier.level()))))
+                        .withStyle(style -> style.withFont(FontDescription.DEFAULT).withColor(config.colour(tier.displayLevel()))))
                 .append(" ")
                 .withStyle(style -> style.withHoverEvent(new HoverEvent.ShowText(Component.literal(tier.label()))));
     }

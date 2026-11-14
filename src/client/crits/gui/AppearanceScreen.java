@@ -126,13 +126,15 @@ public final class AppearanceScreen extends TaggerScreen {
     private void tiers(LinearLayout rows, int width) {
         label(rows, width, "Your tier palette");
         label(rows, width, "Used in profiles, previews, Tab and nametags.");
-        for (int number = 1; number <= 5; number++) {
-            String key = Integer.toString(number);
-            colourRow(rows, width, "Tier " + number + " · HT / LT / R", config().tierColours.getOrDefault(key, ""),
-                    hex(new TaggerConfig().tierColour("HT" + key)), (c, value) -> {
-                        if (value.isEmpty()) c.tierColours.remove(key); else c.tierColours.put(key, value);
-                    });
+        for (int number = 1; number <= 5; number++) for (String prefix : new String[]{"HT", "LT"}) {
+            String key = prefix + number;
+            colourRow(rows, width, key, config().tierColours.getOrDefault(key, ""), hex(config().tierColour(key)), (c, value) -> {
+                if (value.isEmpty()) c.tierColours.remove(key); else c.tierColours.put(key, value);
+            });
         }
+        colourRow(rows, width, "Retired", config().tierColours.getOrDefault("retired", ""), hex(config().tierColour("RHT1")), (c, value) -> {
+            if (value.isEmpty()) c.tierColours.remove("retired"); else c.tierColours.put("retired", value);
+        });
         rows.addChild(new TierPreview(width));
         label(rows, width, "Colour sets");
         String[][] palettes = {
@@ -142,7 +144,7 @@ public final class AppearanceScreen extends TaggerScreen {
                 {"Ember", "FFD17A", "D7C7B4", "E59B73", "C78DAB", "AC99D2"}
         };
         for (var palette : palettes) rows.addChild(TaggerWidgets.action(palette[0] + " colours", width, false, pressed -> {
-            if (save(c -> { for (int n = 1; n <= 5; n++) c.tierColours.put("" + n, palette[n]); })) rebuildKeepingScroll();
+            if (save(c -> { c.tierColours.clear(); for (int n = 1; n <= 5; n++) c.tierColours.put("" + n, palette[n]); })) rebuildKeepingScroll();
         }));
         colourRow(rows, width, "All tags override", config().customColour, "Tier colours", (c, value) -> c.customColour = value);
         label(rows, width, "Blank uses each tier's colour. Icons stay original.");
@@ -188,22 +190,22 @@ public final class AppearanceScreen extends TaggerScreen {
     private interface ColourChange { void accept(TaggerConfig config, String value); }
     private void colourRow(LinearLayout rows, int width, String title, String value, String fallback, ColourChange change) {
         var row = LinearLayout.horizontal().spacing(6);
-        row.addChild(new TaggerWidgets.Label(width - 119, 27, Component.literal(title), font));
-        var field = new TaggerWidgets.Input(83, 20, Component.literal(title + " hex colour"));
-        field.setMaxLength(7); field.setValue(value.isEmpty() ? "" : "#" + value.replace("#", ""));
-        field.setHint(Component.literal(fallback.startsWith("Tier") ? "Automatic" : "#" + fallback));
-        field.setTooltip(TaggerFonts.tooltip(Component.literal(title + ": enter #RRGGBB or clear for the default.")));
-        field.setResponder(input -> {
-            try {
-                String clean = AppearanceConfig.hex(input, true);
-                field.setInvalid(false);
-                save(c -> change.accept(c, clean));
-            } catch (IllegalArgumentException exception) { field.setInvalid(true); feedback = "Finish the hex colour · last saved colour is kept"; }
-        });
-        row.addChild(field);
-        var reset = TaggerWidgets.action("x", 24, false, pressed -> field.setValue(""));
-        reset.setTooltip(TaggerFonts.tooltip(Component.literal("Reset " + title.toLowerCase(Locale.ROOT))));
-        row.addChild(reset); rows.addChild(row);
+        row.addChild(new TaggerWidgets.Label(width - 110, 26, Component.literal(title), font));
+        String initial = value.isEmpty() ? fallback : value;
+        int colour;
+        try { colour = Integer.parseInt(initial.replace("#", ""), 16); } catch (NumberFormatException ignored) { colour = 0xFFD700; }
+        final int selected = colour;
+        var picker = new TaggerWidgets.Action("Choose " + title + " colour", 104, 24, false, pressed -> {
+            rememberScroll();
+            minecraft.gui.setScreen(new ColourPickerScreen(this, title, selected, chosen -> save(c -> change.accept(c, chosen))));
+        }) {
+            @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
+                extractBackground(g);
+                g.text(TaggerFonts.body(), "Choose colour", getX() + 20, getY() + 8, GuiTheme.text, false);
+                TaggerWidgets.rounded(g, getX() + 5, getY() + 7, 10, 10, 2, GuiTheme.rgb(selected));
+            }
+        };
+        row.addChild(picker); rows.addChild(row);
     }
     private void label(LinearLayout rows, int width, String text) {
         var label = new TaggerWidgets.Label(width, 16, Component.literal(text), font);
@@ -289,12 +291,23 @@ public final class AppearanceScreen extends TaggerScreen {
             this.label = label; this.suffix = suffix; this.min = min; this.max = max; this.changed = changed; updateMessage();
         }
         private int setting() { return (int) Math.round(min + value * (max - min)); }
+        @Override public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+            if (active && (event.isLeft() || event.isRight())) {
+                value = (Math.clamp(setting() + (event.isRight() ? 1 : -1), min, max) - min) / (double)(max - min);
+                applyValue(); updateMessage(); return true;
+            }
+            return super.keyPressed(event);
+        }
         @Override protected void updateMessage() { setMessage(Component.literal(label + ": " + setting() + suffix)); }
-        @Override protected void applyValue() { changed.accept(setting()); }
+        @Override protected void applyValue() { value = (setting() - min) / (double)(max - min); changed.accept(setting()); }
         @Override public void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
             TaggerWidgets.surface(g, getX(), getY(), width, height, 6, GuiTheme.surface, isFocused() ? GuiTheme.accent : GuiTheme.border);
             g.text(TaggerFonts.body(), getMessage(), getX() + 8, getY() + 5, active ? GuiTheme.text : GuiTheme.muted, false);
             int track = width - 20, position = (int) (track * value);
+            if (max - min <= 12) for (int tick = min; tick <= max; tick++) {
+                int tx = getX() + 10 + (int)Math.round(track * (tick - min) / (double)(max - min));
+                g.fill(tx, getY() + 21, tx + 1, getY() + 29, GuiTheme.muted);
+            }
             TaggerWidgets.rounded(g, getX() + 10, getY() + 24, track, 3, 1, GuiTheme.border);
             TaggerWidgets.rounded(g, getX() + 10, getY() + 24, position, 3, 1, GuiTheme.accent);
             TaggerWidgets.rounded(g, getX() + 7 + position, getY() + 22, 7, 7, 3, GuiTheme.accent);
@@ -310,9 +323,12 @@ public final class AppearanceScreen extends TaggerScreen {
             var config = config();
             for (int number = 1; number <= 5; number++) {
                 int left = getX() + (number - 1) * width / 5 + width / 10;
+                if (isHovered() && mouseX >= getX() + (number-1)*width/5 && mouseX < getX() + number*width/5)
+                    g.setTooltipForNextFrame(TaggerFonts.body(), Component.literal("Sword: HT" + number + " · Points: "
+                        + (CritsTierTaggerClient.instance().selectedProvider() == crits.provider.TierlistProvider.AFRITIERS
+                        ? new crits.ranking.Tier("sword", "HT"+number, false).points() : "not supplied")), mouseX, mouseY);
                 g.centeredText(TaggerFonts.body(), ModeIcons.component("sword"), left, getY() + 5, GuiTheme.text);
-                TaggerWidgets.rounded(g, left - 16, getY() + 20, 32, 15, 5, 0xFF172029);
-                g.text(TaggerFonts.body(), "HT" + number, left - 10, getY() + 23, GuiTheme.rgb(config.tierColour("HT" + number)), true);
+                TaggerWidgets.tierText(g, TaggerFonts.body(), "HT" + number, left - 10, getY() + 23, GuiTheme.rgb(config.tierColour("HT" + number)));
             }
         }
     }
