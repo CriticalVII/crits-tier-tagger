@@ -30,6 +30,7 @@ final class TaggerWidgets {
     private static void roundedExact(GuiGraphicsExtractor g, int x, int y, int w, int h, int radius, int colour) {
         if (w <= 0 || h <= 0) return;
         int r = Math.max(0, Math.min(radius, Math.min(w, h) / 2));
+        if (GuiTheme.smoothFont() && r > 0) { SmoothSurfaces.draw(g, x, y, w, h, r, colour, null); return; }
         g.fill(x, y + r, x + w, y + h - r, colour);
         for (int row = 0; row < r; row++) {
             int inset = (int) Math.ceil(r - Math.sqrt(r * r - Math.pow(r - row - 0.5, 2)));
@@ -45,6 +46,8 @@ final class TaggerWidgets {
     static void surfaceExact(GuiGraphicsExtractor g, int x, int y, int w, int h, int r, int fill, int border) {
         if (w <= 0 || h <= 0) return;
         r = Math.max(0, Math.min(r, Math.min(w, h) / 2));
+        fill = GuiTheme.translucent(fill);
+        if (GuiTheme.smoothFont() && r > 0) { SmoothSurfaces.draw(g, x, y, w, h, r, fill, border); return; }
         roundedExact(g, x, y, w, h, r, fill);
         if (r == 0) { g.outline(x, y, w, h, border); return; }
         // Draw only the border ring: an opaque undercoat would hide glass transparency.

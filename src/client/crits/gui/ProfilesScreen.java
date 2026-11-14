@@ -260,7 +260,6 @@ public final class ProfilesScreen extends TaggerScreen {
     private final class TierStrip extends AbstractWidget {
         private final java.util.List<Tier> tiers;
         private final int columns;
-        private int tooltipIndex = -2;
         TierStrip(int width, java.util.List<Tier> tiers) {
             super(0, 0, width, 48 * ((tiers.size() + columnsFor(width) - 1) / columnsFor(width)) + 2,
                     Component.literal(tiers.stream().map(tier -> provider.modeLabel(tier.mode()) + ": " + tier.displayLevel())
@@ -281,10 +280,8 @@ public final class ProfilesScreen extends TaggerScreen {
                 int left = badgeX(index), top = getY() + (index / columns) * 48;
                 if (mouseX >= left && mouseX < left + 34 && mouseY >= top && mouseY < top + 48) { hovered = index; break; }
             }
-            if (tooltipIndex != hovered) {
-                tooltipIndex = hovered;
-                setTooltip(hovered < 0 ? null : TaggerFonts.tooltip(Component.literal(provider.modeLabel(tiers.get(hovered).mode()) + ": " + tiers.get(hovered).displayLevel())));
-            }
+            if (hovered >= 0) g.setTooltipForNextFrame(font,
+                    Component.literal(provider.modeLabel(tiers.get(hovered).mode()) + ": " + tiers.get(hovered).displayLevel()), mouseX, mouseY);
             var palette = CritsTierTaggerClient.instance().config();
             for (int index = 0; index < tiers.size(); index++) {
                 Tier tier = tiers.get(index); int left = badgeX(index);
@@ -293,9 +290,9 @@ public final class ProfilesScreen extends TaggerScreen {
                 TaggerWidgets.surface(g, left + 4, top + 5, 26, 26, 13, GuiTheme.background, hovered == index ? colour : GuiTheme.border);
                 g.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED,
                         ModeIcons.sprite(ModeIcon.forMode(tier.mode())).spriteId(), left + 9, top + 10, 16, 16);
-                TaggerWidgets.rounded(g, left + 1, top + 32, 32, 13, 6, GuiTheme.hover);
+                TaggerWidgets.rounded(g, left + 1, top + 32, 32, 13, 6, 0xFF172029);
                 String level = tier.displayLevel();
-                g.text(font, level, left + (34 - font.width(level)) / 2, top + 35, colour, false);
+                g.text(font, level, left + (34 - font.width(level)) / 2, top + 35, colour, true);
             }
         }
         @Override protected void updateWidgetNarration(net.minecraft.client.gui.narration.NarrationElementOutput output) {

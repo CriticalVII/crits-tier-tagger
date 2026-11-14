@@ -81,7 +81,7 @@ public final class AppearanceScreen extends TaggerScreen {
             row.addChild(new ThemeCard(preset, cell, preset.id.equals(prefs.theme) && !prefs.customPalette, pressed -> {
                 if (save(c -> {
                     c.appearance.theme = preset.id; c.appearance.accent = ""; c.appearance.customPalette = false;
-                    c.appearance.opacity = preset == ThemePreset.GLASS ? 72 : 94;
+                    c.appearance.opacity = 60;
                     c.appearance.smoothFont = preset != ThemePreset.BLOCK;
                     if (preset == ThemePreset.GLASS) c.appearance.transparentGui = true;
                 })) rebuildKeepingScroll();
@@ -99,7 +99,7 @@ public final class AppearanceScreen extends TaggerScreen {
         var opacity = new PreferenceSlider("Panel opacity", width, prefs.opacity, 60, 100, "%", value -> save(c -> c.appearance.opacity = value));
         opacity.active = prefs.transparentGui;
         rows.addChild(opacity);
-        rows.addChild(new TaggerWidgets.Toggle("Smooth font", "Outfit when on; Minecraft pixel text when off", width, false,
+        rows.addChild(new TaggerWidgets.Toggle("Smooth font", "Smooth text and rounded edges; pixel style when off", width, false,
                 () -> config().appearance.smoothFont, value -> {
                     if (save(c -> c.appearance.smoothFont = value)) rebuildKeepingScroll();
                 }));
@@ -309,7 +309,8 @@ public final class AppearanceScreen extends TaggerScreen {
             for (int number = 1; number <= 5; number++) {
                 int left = getX() + (number - 1) * width / 5 + width / 10;
                 g.centeredText(TaggerFonts.body(), ModeIcons.component("sword"), left, getY() + 5, GuiTheme.text);
-                g.text(TaggerFonts.body(), "HT" + number, left - 10, getY() + 23, GuiTheme.rgb(config.tierColour("HT" + number)), false);
+                TaggerWidgets.rounded(g, left - 16, getY() + 20, 32, 15, 5, 0xFF172029);
+                g.text(TaggerFonts.body(), "HT" + number, left - 10, getY() + 23, GuiTheme.rgb(config.tierColour("HT" + number)), true);
             }
         }
     }

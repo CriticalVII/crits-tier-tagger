@@ -10,7 +10,7 @@ public final class AppearanceConfig {
     public static final Set<String> PALETTE_KEYS = Set.of("background", "sidebar", "surface", "text", "muted", "border");
     public String theme = "frost";
     public String accent = "";
-    public int opacity = 94;
+    public int opacity = 60;
     public int cornerRadius = 8;
     public boolean transparentGui = true;
     public boolean blur = true;
