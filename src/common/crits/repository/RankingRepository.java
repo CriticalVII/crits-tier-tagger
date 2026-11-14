@@ -17,6 +17,7 @@ public final class RankingRepository implements TierRepository {
     private final Clock clock;
     private final IntSupplier jitter;
     private volatile State state = new State(Phase.DISCONNECTED, Rankings.EMPTY, null, null, null, "Open settings to load tiers");
+    private Rankings lastGood = Rankings.EMPTY;
     private boolean connected;
     private boolean enabled = true;
     private boolean closed;
@@ -96,12 +97,12 @@ public final class RankingRepository implements TierRepository {
         Instant now = clock.instant();
         if (now.isBefore(retryNotBefore) || now.isBefore(manualAllowedAt)) {
             Instant next = manualAllowedAt.isAfter(retryNotBefore) ? manualAllowedAt : retryNotBefore;
-            state = new State(Phase.ERROR, Rankings.EMPTY, state.lastAttempt(), state.lastSuccess(), next, "Waiting for request cooldown");
+            state = new State(Phase.ERROR, lastGood, state.lastAttempt(), state.lastSuccess(), next, "Waiting for request cooldown");
             return;
         }
         long token = generation;
         manualAllowedAt = now.plusSeconds(30);
-        state = new State(Phase.LOADING, state.rankings(), now, state.lastSuccess(), null, "Fetching rankings");
+        state = new State(Phase.LOADING, lastGood, now, state.lastSuccess(), null, "Fetching rankings");
         request = worker.submit(() -> {
             Rankings rankings;
             try { rankings = source.fetch(); }
@@ -116,7 +117,7 @@ public final class RankingRepository implements TierRepository {
                     retryNotBefore = next;
                     String message = exception instanceof RankingSource.ApiException ? exception.getMessage()
                             : exception instanceof IllegalArgumentException ? "API data could not be read" : "API connection failed";
-                    state = new State(Phase.ERROR, Rankings.EMPTY, state.lastAttempt(), state.lastSuccess(), next, message);
+                    state = new State(Phase.ERROR, lastGood, state.lastAttempt(), state.lastSuccess(), next, message);
                 }
                 return;
             }
@@ -125,6 +126,7 @@ public final class RankingRepository implements TierRepository {
                 failures = 0;
                 retryNotBefore = Instant.MIN;
                 Instant fetched = clock.instant();
+                lastGood = rankings;
                 state = new State(rankings.stale() ? Phase.STALE : Phase.READY, rankings,
                         state.lastAttempt(), fetched, fetched.plusSeconds(300 + jitter.getAsInt()),
                         rankings.stale() ? "API reports stale data" : "Rankings up to date");
@@ -148,6 +150,7 @@ public final class RankingRepository implements TierRepository {
         closed = true;
         connected = false;
         resetSession();
+        lastGood = Rankings.EMPTY;
         worker.shutdownNow();
         source.close();
         inactive();
