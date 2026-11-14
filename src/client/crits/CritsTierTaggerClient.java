@@ -73,7 +73,7 @@ public final class CritsTierTaggerClient implements ClientModInitializer {
     public PaidNameResolver paidNames() { return paidNames; }
     public QueueRepository waitlists() { return waitlists; }
     public void browseWaitlists(boolean browsing) { browsingWaitlists = browsing; }
-    public String configWarning() { return store.warning(); }
+    public String configWarning() { return guiSaveWarning.isEmpty() ? store.warning() : guiSaveWarning; }
     public void requestWorldRefresh() { worldRefreshRequested = true; }
 
     @Override public void onInitializeClient() {
@@ -112,11 +112,13 @@ public final class CritsTierTaggerClient implements ClientModInitializer {
             repository.disconnect(); paidNames.setActive(false);
         });
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
+            flushGuiConfig();
             var services = new java.util.HashSet<TierRepository>(gameRepositories.values());
             services.addAll(profileRepositories.values()); services.add(repository); services.add(browser);
             services.forEach(TierRepository::close); paidNames.close(); identities.close(); waitlists.close();
         });
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (guiSaveDue != 0 && System.nanoTime() >= guiSaveDue) flushGuiConfig();
             identities.setActive(config.enabled && selectedProvider != TierlistProvider.AFRITIERS
                     || browsingPlayers && profileProvider != TierlistProvider.AFRITIERS);
             updateWorldSession(client);
@@ -144,10 +146,28 @@ public final class CritsTierTaggerClient implements ClientModInitializer {
         if (!store.warning().isEmpty()) LOGGER.warn("{}", store.warning());
     }
 
+    private long guiSaveDue;
+    private String guiSaveWarning = "";
+    public void saveGuiConfig(TaggerConfig edited) throws IOException {
+        TaggerConfig validated = edited.copy(); validated.validate();
+        applyConfig(validated);
+        guiSaveDue = System.nanoTime() + 350_000_000L;
+    }
+    private void flushGuiConfig() {
+        if (guiSaveDue == 0) return;
+        try { store.save(config); guiSaveDue = 0; guiSaveWarning = ""; }
+        catch (IOException failure) { guiSaveDue = System.nanoTime() + 5_000_000_000L; guiSaveWarning = "Could not save settings; retrying"; LOGGER.warn("Could not save GUI settings", failure); }
+    }
     public void saveConfig(TaggerConfig edited) throws IOException {
         TaggerConfig validated = edited.copy();
         validated.validate();
         store.save(validated);
+        guiSaveDue = 0;
+        applyConfig(validated);
+    }
+
+    private void applyConfig(TaggerConfig validated) {
+        boolean rankingsChanged = config.enabled != validated.enabled || !config.tierlist.equals(validated.tierlist);
         config = validated;
         crits.gui.GuiTheme.apply(config.appearance);
         TierlistProvider next = TierlistProvider.from(validated.tierlist);
@@ -160,7 +180,7 @@ public final class CritsTierTaggerClient implements ClientModInitializer {
             if (validated.enabled) repository.connect();
         }
         repository.setEnabled(validated.enabled);
-        loadSelectedTierlist();
+        if (rankingsChanged) loadSelectedTierlist();
         if (!validated.enabled) paidNames.setActive(false);
     }
 

@@ -41,6 +41,7 @@ public final class AppearanceScreen extends TaggerScreen {
         for (int i = 0; i < pages.length; i++) {
             String label = pages[i];
             var tab = new TaggerWidgets.Action(label, cell, 22, page.equals(label), pressed -> {
+                if (page.equals(label)) return;
                 rememberScroll(); page = label; feedback = ""; rebuildWidgets();
             });
             tab.setPosition(x + 12 + i % columns * (cell + 4), y + 42 + i / columns * 26); addRenderableWidget(tab);
@@ -79,10 +80,11 @@ public final class AppearanceScreen extends TaggerScreen {
             if (!(preset.label + " " + preset.description).toLowerCase(Locale.ROOT).contains(filter.toLowerCase(Locale.ROOT))) continue;
             if (index++ % columns == 0) { row = LinearLayout.horizontal().spacing(8); rows.addChild(row); }
             row.addChild(new ThemeCard(preset, cell, preset.id.equals(prefs.theme) && !prefs.customPalette, pressed -> {
+                if (preset.id.equals(config().appearance.theme) && !config().appearance.customPalette) return;
                 if (save(c -> {
                     c.appearance.theme = preset.id; c.appearance.accent = ""; c.appearance.customPalette = false;
                     c.appearance.opacity = 60;
-                    c.appearance.smoothFont = preset != ThemePreset.BLOCK;
+                    // Font style is an independent preference.
                     if (preset == ThemePreset.GLASS) c.appearance.transparentGui = true;
                 })) rebuildKeepingScroll();
             }));
@@ -99,9 +101,9 @@ public final class AppearanceScreen extends TaggerScreen {
         var opacity = new PreferenceSlider("Panel opacity", width, prefs.opacity, 60, 100, "%", value -> save(c -> c.appearance.opacity = value));
         opacity.active = prefs.transparentGui;
         rows.addChild(opacity);
-        rows.addChild(new TaggerWidgets.Toggle("Smooth font", "Smooth text and rounded edges; pixel style when off", width, false,
-                () -> config().appearance.smoothFont, value -> {
-                    if (save(c -> c.appearance.smoothFont = value)) rebuildKeepingScroll();
+        rows.addChild(new TaggerWidgets.Toggle("Pixel Style", "Use Minecraft pixel text and stepped corners", width, false,
+                () -> !config().appearance.smoothFont, value -> {
+                    if (save(c -> c.appearance.smoothFont = !value)) rebuildKeepingScroll();
                 }));
         label(rows, width, "Accent colour");
         colourRow(rows, width, "Accent", prefs.accent, hex(ThemePreset.from(prefs.theme).accent), (c, value) -> c.appearance.accent = value);
@@ -212,7 +214,7 @@ public final class AppearanceScreen extends TaggerScreen {
     private void rebuildKeepingScroll() { rememberScroll(); rebuildWidgets(); }
     private boolean save(Consumer<TaggerConfig> edit) {
         try {
-            var next = config(); edit.accept(next); CritsTierTaggerClient.instance().saveConfig(next);
+            var next = config(); edit.accept(next); CritsTierTaggerClient.instance().saveGuiConfig(next);
             feedback = "Saved automatically"; return true;
         } catch (java.io.IOException | IllegalArgumentException exception) {
             feedback = "Could not save · check values and config permissions"; return false;
