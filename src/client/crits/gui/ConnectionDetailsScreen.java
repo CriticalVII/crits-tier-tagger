@@ -68,7 +68,7 @@ final class ConnectionDetailsScreen extends Screen {
                 CritsTierTaggerClient.instance().configWarning());
         for (int i = 0; i < values.size(); i++) {
             String line = lines.get(i);
-            values.get(i).setMessage(Component.literal(font.plainSubstrByWidth(line, w - 44)).withColor(TaggerWidgets.MUTED));
+            values.get(i).setMessage(Component.literal(font.plainSubstrByWidth(line, w - 44)).withColor(GuiTheme.muted));
             values.get(i).setTooltip(TaggerFonts.tooltip(Component.literal(line)));
         }
     }
@@ -76,8 +76,8 @@ final class ConnectionDetailsScreen extends Screen {
     @Override public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
         TaggerWidgets.backdrop(g, width, height);
         TaggerWidgets.panel(g, x, y, w, h);
-        g.text(font, TaggerFrame.heading(title.getString()), x + 14, y + 12, TaggerWidgets.TEXT, false);
-        g.fill(x + 14, y + 31, x + w - 14, y + 32, TaggerWidgets.LINE);
+        g.text(font, TaggerFrame.heading(title.getString()), x + 14, y + 12, GuiTheme.text, false);
+        g.fill(x + 14, y + 31, x + w - 14, y + 32, GuiTheme.border);
         super.extractRenderState(g, mouseX, mouseY, delta);
     }
 

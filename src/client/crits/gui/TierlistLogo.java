@@ -20,13 +20,13 @@ final class TierlistLogo {
             @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
                 float hover = hoverAmount();
                 TaggerWidgets.surface(g, getX(), getY(), getWidth(), getHeight(), 3,
-                        selected ? 0xFF10172B : hover > 0 ? 0xFF272727 : 0xFF171717,
-                        selected || isFocused() ? TaggerWidgets.BLUE : TaggerWidgets.LINE);
+                        selected ? GuiTheme.selection : hover > 0 ? GuiTheme.hover : GuiTheme.surface,
+                        selected || isFocused() ? GuiTheme.accent : GuiTheme.border);
                 var font = TaggerFonts.body();
                 String text = font.plainSubstrByWidth(getMessage().getString(), getWidth() - 27);
                 int left = getX() + (getWidth() - font.width(text) - 17) / 2;
                 draw(g, provider, left, getY() + (getHeight() - 12) / 2, 12);
-                g.text(font, text, left + 17, getY() + (getHeight() - 8) / 2, active ? TaggerWidgets.TEXT : TaggerWidgets.FAINT, false);
+                g.text(font, text, left + 17, getY() + (getHeight() - 8) / 2, active ? GuiTheme.text : GuiTheme.muted, false);
             }
         };
     }
