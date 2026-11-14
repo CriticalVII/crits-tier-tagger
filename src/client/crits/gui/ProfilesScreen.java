@@ -52,7 +52,7 @@ public final class ProfilesScreen extends TaggerScreen {
     void selectProvider(TierlistProvider selected) {
         try {
             var config = CritsTierTaggerClient.instance().config(); config.profileTierlist = selected.id();
-            CritsTierTaggerClient.instance().saveConfig(config);
+            CritsTierTaggerClient.instance().saveGuiConfig(config);
             provider = selected; feedback = "";
         } catch (java.io.IOException exception) { feedback = "Could not save profile tierlist. Check config permissions."; }
     }

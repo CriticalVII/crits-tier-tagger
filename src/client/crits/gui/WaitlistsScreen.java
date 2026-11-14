@@ -85,7 +85,7 @@ public final class WaitlistsScreen extends TaggerScreen {
         var edited = CritsTierTaggerClient.instance().config();
         change.accept(edited);
         try {
-            CritsTierTaggerClient.instance().saveConfig(edited);
+            CritsTierTaggerClient.instance().saveGuiConfig(edited);
             config = CritsTierTaggerClient.instance().config();
             feedback("Saved automatically");
         } catch (java.io.IOException | IllegalArgumentException exception) {

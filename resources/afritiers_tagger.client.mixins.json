@@ -2,6 +2,6 @@
   "required": true,
   "package": "crits.mixin",
   "compatibilityLevel": "JAVA_25",
-  "client": ["PlayerRendererMixin", "PlayerTabOverlayMixin", "ModeIconFontMixin", "ClientPacketListenerMixin", "FontProviderAccessor", "SmoothGuiTextMixin", "MenuInputAlignmentMixin"],
+  "client": ["PlayerRendererMixin", "PlayerTabOverlayMixin", "ModeIconFontMixin", "ClientPacketListenerMixin", "FontProviderAccessor", "SmoothGuiTextMixin", "MenuInputAlignmentMixin", "CursorTooltipMixin"],
   "injectors": { "defaultRequire": 1 }
 }
