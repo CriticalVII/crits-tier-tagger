@@ -23,9 +23,11 @@ final class SmoothSurfaces {
         for (int layer = 0; layer < 2; layer++) {
             NativeImage image = new NativeImage(size, size, true);
             for (int y = 0; y < size; y++) for (int x = 0; x < size; x++) {
-                double dx = Math.max(Math.abs(x + 0.5 - size / 2.0) - 2, 0);
-                double dy = Math.max(Math.abs(y + 0.5 - size / 2.0) - 2, 0);
-                double distance = Math.sqrt(dx * dx + dy * dy) - r * 4;
+                double qx = Math.abs(x + 0.5 - size / 2.0) - 2;
+                double dx = Math.max(qx, 0);
+                double qy = Math.abs(y + 0.5 - size / 2.0) - 2;
+                double dy = Math.max(qy, 0);
+                double distance = Math.sqrt(dx * dx + dy * dy) + Math.min(Math.max(qx, qy), 0) - r * 4;
                 double coverage = Math.clamp(0.5 - distance, 0, 1);
                 if (layer == 1) coverage -= Math.clamp(0.5 - distance - 4, 0, 1);
                 image.setPixel(x, y, ((int)Math.round(coverage * 255) << 24) | 0xFFFFFF);
