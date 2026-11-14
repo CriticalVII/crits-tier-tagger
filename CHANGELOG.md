@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.6 — 2026-11-14
+
+- Matched AfriTiers profile tier ordering to the website: current-tier points descending, with ties following the website’s mode order. Other providers retain their existing ordering.
+- Verified that AfriTiers overall position follows current active-tier points in the live API. Confirmed an upstream discrepancy: the live website shows tiers missing from its public API. Overall ranks remain based on API data, without invented tiers or fixed rank overrides.
+
 ## 2.3.5 — 2026-11-14
 
 - Reduced the gallery to six themes, mapping retired preset IDs to a nearby retained theme. Grouped HT/LT colour choices under Tier 1–Tier 5.

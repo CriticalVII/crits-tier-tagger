@@ -126,7 +126,8 @@ public final class ProfilesScreen extends TaggerScreen {
             rows.addChild(new PositionBar(contentWidth, profile));
             rows.addChild(new TaggerWidgets.Label(contentWidth, 12, Component.literal("TIERS").withColor(GuiTheme.muted), font));
             var tiers = snapshot.players().getOrDefault(apiName, java.util.List.of()).stream()
-                    .sorted(Comparator.comparing(Tier::retired).thenComparingInt(Tier::strength).thenComparing(Tier::mode)).toList();
+                    .sorted(provider == TierlistProvider.AFRITIERS ? Tier.afriProfileOrder()
+                            : Comparator.comparing(Tier::retired).thenComparingInt(Tier::strength).thenComparing(Tier::mode)).toList();
             if (!tiers.isEmpty()) rows.addChild(new TierStrip(contentWidth, tiers));
             if (tiers.isEmpty()) rows.addChild(new ProfileLine(contentWidth, Component.literal("No recorded tiers").withColor(GuiTheme.muted)));
         }
