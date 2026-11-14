@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.3.2 — 2026-11-14
+
+- Improved tier-label contrast on light and translucent themes with dark backing and text shadows.
+- Positioned profile tier hover details at the cursor. Squared the sidebar’s inside corners while retaining the outer frame shape.
+- Set default and preset opacity to 60%, and made content panels translucent over the blurred backdrop.
+- Extended Smooth font to render rounded edges with framebuffer-resolution subpixel coverage; pixel mode remains available.
+
 ## 2.3.1 — 2026-11-14
 
 - Removed theme-card subtitles and shortened hover text. Each card now uses its own preset background, border, text colours and corner style.
