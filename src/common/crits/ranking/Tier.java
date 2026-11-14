@@ -6,6 +6,15 @@ import java.util.Locale;
 public record Tier(String mode, String level, boolean retired) {
     public static final List<String> ORDER = List.of("HT1", "LT1", "HT2", "LT2", "HT3", "LT3", "HT4", "LT4", "HT5", "LT5");
 
+    private static final List<String> AFRI_PROFILE_MODES = List.of("sword", "axe", "vanilla", "uhc", "diapot", "nethop", "smp", "mace", "spear", "diasmp", "diavanilla", "cart", "speed", "creeper", "bed", "ogv", "rocketmace", "holefight");
+
+    /** Website profileSlots: current points descending, stable ties in the site's mode order. */
+    public static java.util.Comparator<Tier> afriProfileOrder() {
+        return java.util.Comparator.comparingInt(Tier::points).reversed()
+                .thenComparingInt(tier -> { int index = AFRI_PROFILE_MODES.indexOf(tier.mode()); return index < 0 ? Integer.MAX_VALUE : index; })
+                .thenComparing(Tier::mode);
+    }
+
     public int strength() { return ORDER.indexOf(level); }
 
     /** AfriTiers awards points for active current tiers, never retired tiers or peaks. */
