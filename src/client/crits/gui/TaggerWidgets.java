@@ -25,8 +25,11 @@ final class TaggerWidgets {
     }
 
     static void rounded(GuiGraphicsExtractor g, int x, int y, int w, int h, int radius, int colour) {
+        roundedExact(g, x, y, w, h, GuiTheme.radius(radius), colour);
+    }
+    private static void roundedExact(GuiGraphicsExtractor g, int x, int y, int w, int h, int radius, int colour) {
         if (w <= 0 || h <= 0) return;
-        int r = Math.max(0, Math.min(GuiTheme.radius(radius), Math.min(w, h) / 2));
+        int r = Math.max(0, Math.min(radius, Math.min(w, h) / 2));
         g.fill(x, y + r, x + w, y + h - r, colour);
         for (int row = 0; row < r; row++) {
             int inset = (int) Math.ceil(r - Math.sqrt(r * r - Math.pow(r - row - 0.5, 2)));
@@ -36,9 +39,13 @@ final class TaggerWidgets {
     }
 
     static void surface(GuiGraphicsExtractor g, int x, int y, int w, int h, int r, int fill, int border) {
+        surfaceExact(g, x, y, w, h, GuiTheme.radius(r), fill, border);
+    }
+    /** Gallery cards preview their own corners, independent of the active workspace. */
+    static void surfaceExact(GuiGraphicsExtractor g, int x, int y, int w, int h, int r, int fill, int border) {
         if (w <= 0 || h <= 0) return;
-        r = Math.max(0, Math.min(GuiTheme.radius(r), Math.min(w, h) / 2));
-        rounded(g, x, y, w, h, r, fill);
+        r = Math.max(0, Math.min(r, Math.min(w, h) / 2));
+        roundedExact(g, x, y, w, h, r, fill);
         if (r == 0) { g.outline(x, y, w, h, border); return; }
         // Draw only the border ring: an opaque undercoat would hide glass transparency.
         g.fill(x, y + r, x + 1, y + h - r, border);

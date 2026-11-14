@@ -226,13 +226,15 @@ public final class AppearanceScreen extends TaggerScreen {
         private final ThemePreset preset;
         private final boolean selected;
         ThemeCard(ThemePreset preset, int width, boolean selected, OnPress action) {
-            super(preset.label, width, 90, false, action); this.preset = preset; this.selected = selected;
+            super(preset.label, width, width >= 175 ? 62 : 76, false, action); this.preset = preset; this.selected = selected;
             setMessage(Component.literal(preset.label + (selected ? " · Selected" : "")));
-            setTooltip(TaggerFonts.tooltip(Component.literal(preset.description + "\nApply theme and its default accent and opacity. Custom colours are kept for later.")));
+            setTooltip(TaggerFonts.tooltip(Component.literal("Apply " + preset.label)));
         }
         @Override protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
-            TaggerWidgets.surface(g, getX(), getY(), width, height, 9, selected ? GuiTheme.selection : GuiTheme.blend(GuiTheme.surface, GuiTheme.hover, hoverAmount()),
-                    selected || isFocused() ? GuiTheme.accent : GuiTheme.border);
+            int fill = GuiTheme.blend(GuiTheme.rgb(preset.surface), GuiTheme.rgb(preset.text), hoverAmount() * 0.06F);
+            if (selected) fill = GuiTheme.blend(fill, GuiTheme.rgb(preset.accent), 0.10F);
+            TaggerWidgets.surfaceExact(g, getX(), getY(), width, height, preset == ThemePreset.BLOCK ? 0 : 8, fill,
+                    GuiTheme.rgb(selected || isFocused() ? preset.accent : preset.border));
             int px = getX() + 8, py = getY() + 8;
             // Draw the actual preset colours rather than a static screenshot of another theme.
             TaggerWidgets.rounded(g, px, py, 70, 45, 3, GuiTheme.rgb(preset.background));
@@ -247,13 +249,11 @@ public final class AppearanceScreen extends TaggerScreen {
             var font = TaggerFonts.body();
             int textX = width >= 175 ? px + 78 : px;
             int textY = width >= 175 ? py + 3 : py + 49;
-            g.text(font, font.plainSubstrByWidth(preset.label, getRight() - textX - 7), textX, textY, GuiTheme.text, false);
+            g.text(font, font.plainSubstrByWidth(preset.label, getRight() - textX - 7), textX, textY, GuiTheme.rgb(preset.text), false);
             if (width >= 175) {
                 TaggerWidgets.rounded(g, textX, py + 21, 12, 12, 6, GuiTheme.rgb(preset.accent));
-                g.text(font, selected ? "Selected" : preset == ThemePreset.LATTE || preset == ThemePreset.SNOW || preset == ThemePreset.SAND ? "Light" : "Dark", textX + 17, py + 23, GuiTheme.muted, false);
+                g.text(font, selected ? "Selected" : preset == ThemePreset.GLASS ? "Transparent" : preset == ThemePreset.LATTE || preset == ThemePreset.SNOW || preset == ThemePreset.SAND ? "Light" : "Dark", textX + 17, py + 23, GuiTheme.rgb(preset.muted), false);
             }
-            String detail = font.plainSubstrByWidth(preset.description, width - 16);
-            g.text(font, detail, px, getBottom() - 17, GuiTheme.muted, false);
         }
     }
     private static final class Swatch extends TaggerWidgets.Action {
