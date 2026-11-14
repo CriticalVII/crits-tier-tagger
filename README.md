@@ -14,7 +14,7 @@ A client-side Fabric mod for **Minecraft Java 26.2**. Display PvP tiers from **A
 
 ## Install
 
-Download [crits-tier-tagger-2.3.0.jar](releases/crits-tier-tagger-2.3.0.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
+Download [crits-tier-tagger-2.3.1.jar](releases/crits-tier-tagger-2.3.1.jar). Check its SHA-256 against [SHA256SUMS.txt](releases/SHA256SUMS.txt), and see the [changelog](CHANGELOG.md) for release details.
 
 | Requirement | Version |
 | --- | --- |
@@ -34,9 +34,9 @@ Press **K**, run `/crittiers config`, or open **Mods → Crit's Tier Tagger → 
 
 The GUI uses an inset workspace with rounded, translucent panels and four side tabs: **Tier Tags**, **Profiles**, **Waitlists** and **Settings**. Smaller GUI sizes keep the sidebar and scroll the content. Profiles retains its centred identity, overall position and continuous panel of mode icons with coloured tier pills.
 
-In **Settings → Themes**, choose from 14 palettes: Frosted, Glass, Obsidian, Minecraft, Mauve, Rose, Latte, Nordic, Snow, Ember, Forest, Abyss, Linen and Cherry. Search the gallery, pick an accent swatch or enter a hex value, adjust panel opacity and corner radius, and toggle blur, motion or smooth Outfit text. The Minecraft preset keeps square corners and pixel text. Blur follows Minecraft's Menu Background Blur setting; animations also respect its Screen Effects preference. GUI font and palette preferences never replace Minecraft's HUD font.
+In **Settings → Themes**, choose from 14 palettes: Frosted, Glass, Obsidian, Minecraft, Mauve, Rose, Latte, Nordic, Snow, Ember, Forest, Abyss, Linen and Cherry. Each card previews its own palette without descriptive subtitles. In **Settings → Interface**, choose transparent or opaque panels, adjust opacity and corner radius, pick an accent swatch or enter a hex value, and toggle blur, motion or smooth Outfit text. The Minecraft preset starts with square corners and pixel text; its font can also be switched to Outfit. Blur follows Minecraft's Menu Background Blur setting; animations also respect its Screen Effects preference. GUI font and palette preferences never replace Minecraft's HUD font.
 
-**Settings → Tier colours** edits the five tier colours, with live previews and four colour sets. High, low and retired tiers share their tier number's colour. An optional all-tags override applies to Tab and nametags; Profiles keeps the individual tier colours. Blank fields restore defaults; unfinished hex values keep the last saved colour.
+**Settings → Tier colours** edits the five tier colours, with live previews and four colour sets. High, low and retired tiers share their tier number's colour. An optional all-tags override applies to Tab and nametags; Profiles keeps the individual tier colours. Colour editing is available here only; Tier Tags contains visibility, provider and mode controls. Blank fields restore defaults; unfinished hex values keep the last saved colour.
 
 **Settings → Custom** lets you override background, sidebar, surface, text, muted text and borders on top of a preset. Enable Custom palette to use these overrides. Copy theme and Paste theme share only appearance preferences, without usernames, aliases or account data. Appearance and tier palettes have separate resets. Selecting a preset restores its accent and opacity, and turns off custom palette overrides while keeping them available for later.
 
@@ -88,7 +88,7 @@ Queues are checked about every 30 seconds while watching in game or browsing thi
 
 ## Build
 
-Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.3.0.jar`.
+Use JDK 25 and run `./gradlew build`, or `.\gradlew.bat build` on Windows. The production JAR is written to `build/libs/crits-tier-tagger-2.3.1.jar`.
 
 The repository includes production source, canonical runtime assets, build files, provenance documentation and the latest packaged JAR. See [Codebase layout](docs/CODEBASE.md) for the source map. Local verification tools, fixtures and debug files are excluded.
 
