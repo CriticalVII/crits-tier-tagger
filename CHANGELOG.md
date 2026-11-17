@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.3.7 — 2026-11-14
+## 2.3.7 â€” 2026-11-14
 
 - Keep the last successful AfriTiers snapshot visible while reconnects, API failures and cooldowns delay refreshes.
 - Retain cached MCTiers, PvPTiers and SubTiers profiles during failed refreshes, retry automatically after cooldown, and replace cached tiers only after a successful response. Successful empty/not-found responses still remove outdated tiers.
